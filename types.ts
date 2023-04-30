@@ -19,7 +19,9 @@ export type Tperson = {
 
 export type Tappointment = {
   id: string;
-  startTime: string;
-  endTime: string;
-  customerId: TpersonId;
+  time: string;
+  customerId: string;
+  notes?: string;
+  recurring: boolean;
+  frequency: number | "weekly" | "fortnightly" | "monthly";
 };
