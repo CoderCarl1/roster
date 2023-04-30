@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Tperson, Tappointment } from "@/types";
-
+import AppointmentRow from "./AppointmentRow";
 
 const useTimeUtils = () => {
   const [appointments, setAppointments] = useState<Tappointment[]>([]);
@@ -60,12 +60,14 @@ const Timetable: React.FC<Props> = ({ customers, date }) => {
       <tbody>
       {times.map((time) => {
           const appointment = getAppointmentAtTime(date, time);
-          const customer = appointment ? customers.find((c) => c.id === appointment.customerId) : null;
+          const customer = appointment ? customers.find((c) => c.id === appointment.customerId) : undefined;
           return (
-            <tr key={time}>
-              <td>{time}</td>
-              <td>{appointment ? `${customer?.fName} ${customer?.lName}` : "-"}</td>
-            </tr>
+            <AppointmentRow
+            key={time}
+            time={time}
+            appointment={appointment}
+            customer={customer}
+          />
           );
         })}
       </tbody>
