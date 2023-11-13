@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id           String        @id @default(cuid())
+  firstName    String
+  lastName     String
+  contact      String
+  appointments Appointment[]
+  addresses    Address[]
+  suspended    Boolean       @default(false)
+  suspendedAt  DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([firstName(sort: Desc), contact])
+}
+
+model Appointment {
+  id              String   @id @default(cuid())
+  recurring       Boolean  @default(false)
+  frequency       Int?
+  customerId      String  
+  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerIsOwner Boolean?
+  addressId       String
+  address         Address  @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  start           String
+  end             String
+  completed       Boolean @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([customerId])
+}
+
+model Address {
+  id           String        @id @default(cuid())
+  Customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId   String
+  Appointments Appointment[]
+  number       String?
+  line1        String
+  line2        String
+  suburb       String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([customerId])
+}
