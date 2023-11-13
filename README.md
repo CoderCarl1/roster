@@ -1,38 +1,10 @@
-# Welcome to Remix!
+# Schedule App
 
-- [Remix Docs](https://remix.run/docs)
+This application has been designed for a small business that mows and maintains gardens for their clients.
 
-## Development
+There is limited need for data outside of scheduling and basic customer data - SQLite was considered the best option for this purpose and ease within development
 
-From your terminal:
+### preparing app for review
 
-```sh
-npm run dev
-```
+If you want to see how this app works, either locally or online, please ensure that you seed the database by running the npm script `db:script`
 
-This starts your app in development mode, rebuilding assets on file changes.
-
-## Deployment
-
-First, build your app for production:
-
-```sh
-npm run build
-```
-
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `remix build`
-
-- `build/`
-- `public/build/`
