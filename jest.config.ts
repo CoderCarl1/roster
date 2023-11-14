@@ -18,20 +18,25 @@ const config: Config = {
   // fakeTimers: {
   //   "enableGlobally": false
   // },
+
   moduleNameMapper: {
-    '~/(.*)': '../<rootDir>/app/$1',
+    '~/(.*)': '<rootDir>/app/$1',
   },
   resetMocks: true,
   restoreMocks: false,
   setupFilesAfterEnv: ['<rootDir>/tests/mocks/prismaclient.ts'],
   slowTestThreshold: 5,
-  testEnvironment: "jest-environment-node",
+  preset: 'ts-jest',
+  testEnvironment: 'node',
   testMatch: ['<rootDir>/tests/**/*.{js,jsx,ts,tsx}'],
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
     '<rootDir>/.cache/',
     '<rootDir>/build/',
   ],
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': 'ts-jest',
+  },
   transformIgnorePatterns: ['/node_modules/'],
 };
 
