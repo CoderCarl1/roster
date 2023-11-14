@@ -24,7 +24,10 @@ const config: Config = {
   },
   resetMocks: true,
   restoreMocks: false,
-  setupFilesAfterEnv: ["<rootDir>/tests/mocks/prismaclient.ts"],
+  setupFilesAfterEnv: [
+    "<rootDir>/tests/setup.ts",
+    "<rootDir>/tests/mocks/prismaclient.ts",
+  ],
   slowTestThreshold: 5,
   preset: "ts-jest",
   testEnvironment: "node",
@@ -33,6 +36,7 @@ const config: Config = {
     "<rootDir>/node_modules/",
     "<rootDir>/.cache/",
     "<rootDir>/build/",
+    "<rootDir>/tests/setup.ts",
   ],
   transform: {
     "^.+\\.(js|jsx|ts|tsx)$": "ts-jest",

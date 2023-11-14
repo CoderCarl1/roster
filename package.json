@@ -13,7 +13,7 @@
     "format": "prettier --write .",
     "format:repo": "npm run format && npm run lint -- --fix",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
-    "test": "jest --watch"
+    "test": "jest --watch "
   },
   "dependencies": {
     "@prisma/client": "^5.5.2",
