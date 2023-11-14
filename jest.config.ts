@@ -1,4 +1,4 @@
-import type {Config} from 'jest';
+import type { Config } from "jest";
 
 const config: Config = {
   // All imported modules in your tests should be mocked automatically
@@ -18,9 +18,9 @@ const config: Config = {
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   collectCoverageFrom: [
-    '**/*.{js,jsx,ts,tsx}',
-    '!**/*.d.ts',
-    '!**/node_modules/**',
+    "**/*.{js,jsx,ts,tsx}",
+    "!**/*.d.ts",
+    "!**/node_modules/**",
   ],
 
   // The directory where Jest should output its coverage files
@@ -51,10 +51,9 @@ const config: Config = {
   // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
   // maxWorkers: "50%",
 
-
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
-    '~/(.*)': '../<rootDir>/app/$1',
+    "~/(.*)": "../<rootDir>/app/$1",
   },
 
   // A preset that is used as a base for Jest's configuration
@@ -91,21 +90,20 @@ const config: Config = {
   // testLocationInResults: false,
 
   // The glob patterns Jest uses to detect test files
-  testMatch: ['<rootDir>/tests/**/*.{js,jsx,ts,tsx}'],
+  testMatch: ["<rootDir>/tests/**/*.{js,jsx,ts,tsx}"],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   testPathIgnorePatterns: [
-    '<rootDir>/node_modules/',
-    '<rootDir>/.cache/',
-    '<rootDir>/build/',
+    "<rootDir>/node_modules/",
+    "<rootDir>/.cache/",
+    "<rootDir>/build/",
   ],
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  transformIgnorePatterns: ['/node_modules/'],
+  transformIgnorePatterns: ["/node_modules/"],
 
   // Indicates whether each individual test should be reported during the run
   // verbose: undefined,
-
 };
 
 export default config;

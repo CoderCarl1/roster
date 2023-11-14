@@ -26,14 +26,14 @@ model Appointment {
   id              String   @id @default(cuid())
   recurring       Boolean  @default(false)
   frequency       Int?
-  customerId      String  
+  customerId      String
   customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerIsOwner Boolean?
   addressId       String
   address         Address  @relation(fields: [addressId], references: [id], onDelete: Cascade)
   start           String
   end             String
-  completed       Boolean @default(false)
+  completed       Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -49,6 +49,7 @@ model Address {
   line1        String
   line2        String
   suburb       String
+  archived     Boolean       @default(false)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 

@@ -104,14 +104,14 @@ function logStackTrace(stackTrace: string): void {
   console.error(`${colors.red}${stackTrace}${colors.reset}`);
 }
 
-export function log(color: colorKey = 'reset', ...args: unknown[]): void {
+export function log(color: colorKey = "reset", ...args: unknown[]): void {
   const colorCode = colors[color];
   let formattedText = "";
   const nonText: unknown[] = [];
   let errStack;
 
-  args.forEach(arg => {
-    if (typeof arg === 'string') {
+  args.forEach((arg) => {
+    if (typeof arg === "string") {
       formattedText += colorCode ? `${colorCode}${arg}${colors.reset}` : arg;
     } else if (arg instanceof Error) {
       formattedText += `${colors.red}${arg.message}${colors.reset}`;
@@ -120,7 +120,7 @@ export function log(color: colorKey = 'reset', ...args: unknown[]): void {
       nonText.push(arg);
     }
   });
-  
+
   console.log(formattedText);
 
   if (errStack !== undefined) {
@@ -131,4 +131,3 @@ export function log(color: colorKey = 'reset', ...args: unknown[]): void {
     console.log(...nonText);
   }
 }
-
