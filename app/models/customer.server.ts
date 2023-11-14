@@ -2,6 +2,7 @@ import { Customer } from "@prisma/client";
 
 import { TCustomer_data_for_creation } from "@types";
 import { prisma } from "~/db.server";
+import { log } from "~/functions/helpers/functions";
 /**
  * CREATE
  */
@@ -27,6 +28,18 @@ export async function findAllCustomers() {
   });
   return customers;
 }
+
+export async function findAllCustomers_pagination(skip: number = 0, take: number = 20): Promise<Customer[]> {
+  const customers = await prisma.customer.findMany({
+    skip,
+    take,
+    where: { 
+      suspended: false ,
+     },
+  });
+  return customers;
+}
+
 
 export async function findCustomer(customerId: string) {
   const customer = await prisma.customer.findUnique({
@@ -87,7 +100,8 @@ export async function updateCustomer(
   addressInput?: UpdateAddressInput[],
   appointmentInput?: UpdateAppointmentInput[],
 ): Promise<Customer> {
-  const transaction = await prisma.$transaction([
+  
+  await prisma.$transaction([
     prisma.customer.update({
       where: { id: customerId },
       data: input,
@@ -110,14 +124,7 @@ export async function updateCustomer(
       : []),
   ]);
 
-  // Retrieve and return the updated customer
-  const updatedCustomer = await prisma.customer.findUnique({
-    where: { id: customerId },
-    include: {
-      addresses: true,
-      appointments: true,
-    },
-  });
+  const updatedCustomer = await findCustomer_includeAssociations(customerId);
 
   if (!updatedCustomer) {
     throw new Error(`Customer with ID ${customerId} not found.`);
@@ -155,4 +162,13 @@ export async function suspendCustomer(customerId: string) {
   });
 
   return suspendedCustomer;
+}
+
+export async function customers_deleteAllExamples(){
+  await prisma.customer
+  .deleteMany({ where: { contact: { endsWith: "example.com" } } })
+  .then(() => log("magenta", "DELETED all previous example records"))
+  .catch((err) => {
+    log("red", "error deleting customers", err);
+  });
 }

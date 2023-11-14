@@ -21,6 +21,7 @@ export async function createAppointment(
 /**
  * READ
  */
+
 export async function findAllAppointments(): Promise<Appointment[] | null> {
   const appointments = await prisma.appointment.findMany();
   return appointments;
