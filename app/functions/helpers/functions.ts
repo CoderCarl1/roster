@@ -100,12 +100,30 @@ const colors: Record<colorKey, string> = {
   white: "\x1b[37m",
 };
 
-export function log(color: colorKey, ...args: any[]): void {
-  // Check if a color is specified
+export function log(color: colorKey = 'reset', ...args: unknown[]): void {
   const colorCode = colors[color];
-  const formattedText = colorCode
-    ? `${colorCode}${args.join(" ")}${colors.reset}`
-    : args.join(" ");
+  let formattedText = "";
+  const nonText: unknown[] = [];
+  let errStack;
 
+  args.forEach(arg => {
+    if (typeof arg === 'string') {
+      formattedText += colorCode ? `${colorCode}${arg}${colors.reset}` : arg;
+    } else if (arg instanceof Error) {
+      formattedText += `${colors.red}${arg.message}${colors.reset}`;
+      errStack = arg.stack;
+    } else {
+      nonText.push(arg);
+    }
+  });
+  
   console.log(formattedText);
+
+  if (errStack !== undefined) {
+    console.error(errStack);
+  }
+
+  if (nonText.length > 0) {
+    console.log(...nonText);
+  }
 }
