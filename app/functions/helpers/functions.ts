@@ -100,6 +100,10 @@ const colors: Record<colorKey, string> = {
   white: "\x1b[37m",
 };
 
+function logStackTrace(stackTrace: string): void {
+  console.error(`${colors.red}${stackTrace}${colors.reset}`);
+}
+
 export function log(color: colorKey = 'reset', ...args: unknown[]): void {
   const colorCode = colors[color];
   let formattedText = "";
@@ -120,10 +124,11 @@ export function log(color: colorKey = 'reset', ...args: unknown[]): void {
   console.log(formattedText);
 
   if (errStack !== undefined) {
-    console.error(errStack);
+    logStackTrace(errStack);
   }
 
   if (nonText.length > 0) {
     console.log(...nonText);
   }
 }
+
