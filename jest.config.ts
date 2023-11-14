@@ -1,4 +1,4 @@
-import type {Config} from 'jest';
+import type { Config } from "jest";
 
 const config: Config = {
   // All imported modules in your tests should be mocked automatically
@@ -9,9 +9,9 @@ const config: Config = {
   clearMocks: true,
   collectCoverage: true,
   collectCoverageFrom: [
-    '**/*.{js,jsx,ts,tsx}',
-    '!**/*.d.ts',
-    '!**/node_modules/**',
+    "**/*.{js,jsx,ts,tsx}",
+    "!**/*.d.ts",
+    "!**/node_modules/**",
   ],
   coverageDirectory: "coverage",
   // The default configuration for fake timers
@@ -20,24 +20,24 @@ const config: Config = {
   // },
 
   moduleNameMapper: {
-    '~/(.*)': '<rootDir>/app/$1',
+    "~/(.*)": "<rootDir>/app/$1",
   },
   resetMocks: true,
   restoreMocks: false,
-  setupFilesAfterEnv: ['<rootDir>/tests/mocks/prismaclient.ts'],
+  setupFilesAfterEnv: ["<rootDir>/tests/mocks/prismaclient.ts"],
   slowTestThreshold: 5,
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  testMatch: ['<rootDir>/tests/**/*.{js,jsx,ts,tsx}'],
+  preset: "ts-jest",
+  testEnvironment: "node",
+  testMatch: ["<rootDir>/tests/**/*.{js,jsx,ts,tsx}"],
   testPathIgnorePatterns: [
-    '<rootDir>/node_modules/',
-    '<rootDir>/.cache/',
-    '<rootDir>/build/',
+    "<rootDir>/node_modules/",
+    "<rootDir>/.cache/",
+    "<rootDir>/build/",
   ],
   transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': 'ts-jest',
+    "^.+\\.(js|jsx|ts|tsx)$": "ts-jest",
   },
-  transformIgnorePatterns: ['/node_modules/'],
+  transformIgnorePatterns: ["/node_modules/"],
 };
 
 export default config;

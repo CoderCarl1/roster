@@ -29,17 +29,19 @@ export async function findAllCustomers() {
   return customers;
 }
 
-export async function findAllCustomers_pagination(skip: number = 0, take: number = 20): Promise<Customer[]> {
+export async function findAllCustomers_pagination(
+  skip = 0,
+  take = 20,
+): Promise<Customer[]> {
   const customers = await prisma.customer.findMany({
     skip,
     take,
-    where: { 
-      suspended: false ,
-     },
+    where: {
+      suspended: false,
+    },
   });
   return customers;
 }
-
 
 export async function findCustomer(customerId: string) {
   const customer = await prisma.customer.findUnique({
@@ -100,7 +102,6 @@ export async function updateCustomer(
   addressInput?: UpdateAddressInput[],
   appointmentInput?: UpdateAppointmentInput[],
 ): Promise<Customer> {
-  
   await prisma.$transaction([
     prisma.customer.update({
       where: { id: customerId },
@@ -164,11 +165,11 @@ export async function suspendCustomer(customerId: string) {
   return suspendedCustomer;
 }
 
-export async function customers_deleteAllExamples(){
+export async function customers_deleteAllExamples() {
   await prisma.customer
-  .deleteMany({ where: { contact: { endsWith: "example.com" } } })
-  .then(() => log("magenta", "DELETED all previous example records"))
-  .catch((err) => {
-    log("red", "error deleting customers", err);
-  });
+    .deleteMany({ where: { contact: { endsWith: "example.com" } } })
+    .then(() => log("magenta", "DELETED all previous example records"))
+    .catch((err) => {
+      log("red", "error deleting customers", err);
+    });
 }

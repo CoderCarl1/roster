@@ -3,10 +3,11 @@ import { singleton } from "./singleton.server";
 
 const prisma = singleton(
   "prisma",
-  () =>
+  (testing?: string) =>
     new PrismaClient({
-      log: ["query", "info", "warn", "error"],
+      log: testing === "true" ? [] : ["query", "info", "warn", "error"],
     }),
+  "false",
 );
 prisma.$connect();
 

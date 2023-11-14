@@ -8,34 +8,34 @@ import { prisma } from "~/db.server";
 export async function createAddress(
   addressData: TAddress_data_for_creation,
 ): Promise<Address | null> {
-    console.log("===================")
-    console.log("Create Address Func")
-    const createdAddress = await prisma.address.create({
-      data: addressData,
-    });
-    console.log("createdAddress", createdAddress)
-    // Query for the created record to get the complete Address object
-    const address = await prisma.address.findFirst({
-      where: {
-        AND: [
-          { line1: { contains: addressData.line1 } },
-          { line2: { contains: addressData.line2 } },
-          { suburb: { contains: addressData.suburb } },
-        ],
-      },
-    });
-    return {
-      id: "ckpyetj6z0000i1mh3fdw4vps",
-      customerId: "ckpyetj5z0000i1mhfouaq40z",
-      number: "123",
-      line1: "Main Street",
-      line2: "Apt 4",
-      suburb: "Cityville",
-      archived: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
-    // return address || null;
+  console.log("===================");
+  console.log("Create Address Func");
+  const createdAddress = await prisma.address.create({
+    data: addressData,
+  });
+  console.log("createdAddress", createdAddress);
+  // Query for the created record to get the complete Address object
+  const address = await prisma.address.findFirst({
+    where: {
+      AND: [
+        { line1: { contains: addressData.line1 } },
+        { line2: { contains: addressData.line2 } },
+        { suburb: { contains: addressData.suburb } },
+      ],
+    },
+  });
+  return {
+    id: "ckpyetj6z0000i1mh3fdw4vps",
+    customerId: "ckpyetj5z0000i1mhfouaq40z",
+    number: "123",
+    line1: "Main Street",
+    line2: "Apt 4",
+    suburb: "Cityville",
+    archived: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  // return address || null;
 }
 /**
  * READ
@@ -60,7 +60,7 @@ export async function findAddress(
 
 export async function findAddresses_all(): Promise<Address[]> {
   const addresses = await prisma.address.findMany({
-    where: { archived: false }
+    where: { archived: false },
   });
   return addresses;
 }

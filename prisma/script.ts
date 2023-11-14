@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { TAddress_No_ID, TAppointment_No_ID, TCustomer_No_ID } from "@types";
 import { log } from "~/functions/helpers/functions";
+import { customers_deleteAllExamples } from "~/models/customer.server";
 import { singleton } from "~/singleton.server";
 import {
   customers,
@@ -43,13 +44,7 @@ main()
 async function seed() {
   log("magenta", "==================");
   log("magenta", "Cleaning DB before Seeding");
-  await prisma.customer
-    .deleteMany({ where: { contact: { endsWith: "example.com" } } })
-    .then(() => log("magenta", "DELETED all previous example records"))
-    .catch((err) => {
-      log("red", "error deleting customers", err);
-    });
-
+  customers_deleteAllExamples();
   log("magenta", "CREATING Customers");
 
   for (const customer of customers) {
