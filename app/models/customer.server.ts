@@ -3,7 +3,6 @@ import { Customer } from '@prisma/client';
 import { TCustomer_data_for_creation } from '@types';
 import { prisma } from '~/db.server';
 import { log } from '~/functions/helpers/functions';
-import { customers } from '~/lib/placeholder-data';
 
 /**
  * CREATE
@@ -12,17 +11,16 @@ export async function createCustomer(
     customerData: TCustomer_data_for_creation
 ): Promise<Customer> {
     const customer = await prisma.customer.create({ data: customerData });
-    log('magenta', 'customer => ', customer);
-    return customers[0];
+    return customer;
 }
 
 /**
  * READ
  */
 
-export async function findAllCustomers() {
+export async function findAllCustomers(includeSuspended: boolean = false) {
     const customers = await prisma.customer.findMany({
-        where: { suspended: false },
+        where: { suspended: includeSuspended },
     });
     return customers;
 }
@@ -129,7 +127,7 @@ export async function updateCustomer(
         throw new Error(`Customer with ID ${customerId} not found.`);
     }
 
-    console.log(
+    log("blue",
         `Customer with ID ${customerId} and associated data updated successfully.`
     );
 
@@ -163,10 +161,10 @@ export async function suspendCustomer(customerId: string) {
     return suspendedCustomer;
 }
 
-export async function customers_deleteAllExamples() {
+export async function customers_deleteAll(string: string) {
     await prisma.customer
-        .deleteMany({ where: { contact: { endsWith: 'example.com' } } })
-        .then(() => log('magenta', 'DELETED all previous example records'))
+        .deleteMany({ where: { contact: { endsWith: string} } })
+        .then(() => log('magenta', `DELETED all records containing the words ${string}`))
         .catch((err) => {
             log('red', 'error deleting customers', err);
         });

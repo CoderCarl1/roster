@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { TAddress_No_ID, TAppointment_No_ID, TCustomer_No_ID } from '@types'
 import { log } from '~/functions/helpers/functions'
-import { customers_deleteAllExamples } from '~/models/customer.server'
+import { customers_deleteAll } from '~/models/customer.server'
 import { singleton } from '~/singleton.server'
 import { customers, addresses, appointments } from '../app/lib/placeholder-data'
 
@@ -40,7 +40,7 @@ main()
 async function seed() {
     log('magenta', '==================')
     log('magenta', 'Cleaning DB before Seeding')
-    customers_deleteAllExamples()
+    customers_deleteAll('example.com')
     log('magenta', 'CREATING Customers')
 
     for (const customer of customers) {

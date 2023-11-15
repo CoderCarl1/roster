@@ -1,4 +1,3 @@
-import { Address, Appointment, Customer } from '@prisma/client';
 import {
     TAddress_data_for_creation,
     TAppointment_data_for_creation,
