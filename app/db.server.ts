@@ -7,7 +7,7 @@ const prisma = singleton(
     new PrismaClient({
       log: testing === "true" ? [] : ["query", "info", "warn", "error"],
     }),
-    process.env.TESTING
+  process.env.TESTING,
 );
 prisma.$connect();
 
