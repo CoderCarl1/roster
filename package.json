@@ -10,7 +10,7 @@
     "db:seed": "npx tsx prisma/script.ts --seeding true",
     "dev": "remix dev --manual",
     "start": "remix-serve ./build/index.js",
-    "format": "prettier --write .",
+    "format": "prettier --write \"app/**/*.{js,ts,jsx,tsx}\" \"tests/**/*.{js,ts,jsx,tsx}\" \"types.d.ts\"",
     "format:repo": "npm run format && npm run lint -- --fix",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "test": "jest --watch "
@@ -26,7 +26,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "prettier": {},
   "eslintIgnore": [
     "/node_modules",
     "/build",

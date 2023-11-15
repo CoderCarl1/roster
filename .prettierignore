@@ -1,5 +1,7 @@
 node_modules
-
-/build
-/public/build
+coverage
+build
+public
 .env
+**.json
+**db**

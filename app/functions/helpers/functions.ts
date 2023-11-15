@@ -9,23 +9,23 @@
  */
 
 type debounceProps<T> = {
-  func: (args: T) => void;
-  delay: number;
-  args: T;
+    func: (args: T) => void;
+    delay: number;
+    args: T;
 };
 function debounce<T>({ func, delay, args }: debounceProps<T>): void {
-  let debounceTimer: NodeJS.Timeout | null = null;
+    let debounceTimer: NodeJS.Timeout | null = null;
 
-  function setTimer() {
-    if (debounceTimer) {
-      clearTimeout(debounceTimer);
+    function setTimer() {
+        if (debounceTimer) {
+            clearTimeout(debounceTimer);
+        }
+        debounceTimer = setTimeout(() => {
+            func(args);
+        }, delay);
     }
-    debounceTimer = setTimeout(() => {
-      func(args);
-    }, delay);
-  }
 
-  setTimer();
+    setTimer();
 }
 
 /**
@@ -38,41 +38,41 @@ function debounce<T>({ func, delay, args }: debounceProps<T>): void {
  *
  */
 export function getDateRange(
-  date: Date | string = new Date(),
-  days = 0,
-  future = true,
+    date: Date | string = new Date(),
+    days = 0,
+    future = true
 ): { from: Date; to: Date } {
-  let dateObj;
+    let dateObj;
 
-  if (typeof date === "string") {
-    const parsedDate = new Date(date);
+    if (typeof date === 'string') {
+        const parsedDate = new Date(date);
 
-    if (!isNaN(parsedDate.getTime())) {
-      dateObj = parsedDate;
+        if (!isNaN(parsedDate.getTime())) {
+            dateObj = parsedDate;
+        } else {
+            throw new Error('Invalid date string provided.');
+        }
+    } else if (date instanceof Date) {
+        dateObj = date;
     } else {
-      throw new Error("Invalid date string provided.");
+        throw new Error('Invalid date type provided.');
     }
-  } else if (date instanceof Date) {
-    dateObj = date;
-  } else {
-    throw new Error("Invalid date type provided.");
-  }
 
-  const today = new Date();
+    const today = new Date();
 
-  if (future) {
-    dateObj.setDate(dateObj.getDate() + days);
-  } else {
-    dateObj.setDate(dateObj.getDate() - days);
-  }
+    if (future) {
+        dateObj.setDate(dateObj.getDate() + days);
+    } else {
+        dateObj.setDate(dateObj.getDate() - days);
+    }
 
-  dateObj.setHours(0, 0, 0, 0);
+    dateObj.setHours(0, 0, 0, 0);
 
-  today.setHours(23, 59, 59, 999);
-  const from = dateObj < today ? dateObj : today;
-  const to = dateObj < today ? today : dateObj;
+    today.setHours(23, 59, 59, 999);
+    const from = dateObj < today ? dateObj : today;
+    const to = dateObj < today ? today : dateObj;
 
-  return { from, to };
+    return { from, to };
 }
 
 /**
@@ -80,54 +80,56 @@ export function getDateRange(
  */
 
 type colorKey =
-  | "reset"
-  | "red"
-  | "green"
-  | "yellow"
-  | "blue"
-  | "magenta"
-  | "cyan"
-  | "white";
+    | 'reset'
+    | 'red'
+    | 'green'
+    | 'yellow'
+    | 'blue'
+    | 'magenta'
+    | 'cyan'
+    | 'white';
 
 const colors: Record<colorKey, string> = {
-  reset: "\x1b[0m",
-  red: "\x1b[31m",
-  green: "\x1b[32m",
-  yellow: "\x1b[33m",
-  blue: "\x1b[34m",
-  magenta: "\x1b[35m",
-  cyan: "\x1b[36m",
-  white: "\x1b[37m",
+    reset: '\x1b[0m',
+    red: '\x1b[31m',
+    green: '\x1b[32m',
+    yellow: '\x1b[33m',
+    blue: '\x1b[34m',
+    magenta: '\x1b[35m',
+    cyan: '\x1b[36m',
+    white: '\x1b[37m',
 };
 
 function logStackTrace(stackTrace: string): void {
-  console.error(`${colors.red}${stackTrace}${colors.reset}`);
+    console.error(`${colors.red}${stackTrace}${colors.reset}`);
 }
 
-export function log(color: colorKey = "reset", ...args: unknown[]): void {
-  const colorCode = colors[color];
-  let formattedText = "";
-  const nonText: unknown[] = [];
-  let errStack;
+export function log(color: colorKey = 'reset', ...args: unknown[]): void {
+    const colorCode = colors[color];
+    let formattedText = '';
+    const nonText: unknown[] = [];
+    let errStack;
 
-  args.forEach((arg) => {
-    if (typeof arg === "string") {
-      formattedText += colorCode ? `${colorCode}${arg}${colors.reset}` : arg;
-    } else if (arg instanceof Error) {
-      formattedText += `${colors.red}${arg.message}${colors.reset}`;
-      errStack = arg.stack;
-    } else {
-      nonText.push(arg);
+    args.forEach((arg) => {
+        if (typeof arg === 'string') {
+            formattedText += colorCode
+                ? `${colorCode}${arg}${colors.reset}`
+                : arg;
+        } else if (arg instanceof Error) {
+            formattedText += `${colors.red}${arg.message}${colors.reset}`;
+            errStack = arg.stack;
+        } else {
+            nonText.push(arg);
+        }
+    });
+
+    console.log(formattedText);
+
+    if (errStack !== undefined) {
+        logStackTrace(errStack);
     }
-  });
 
-  console.log(formattedText);
-
-  if (errStack !== undefined) {
-    logStackTrace(errStack);
-  }
-
-  if (nonText.length > 0) {
-    console.log(...nonText);
-  }
+    if (nonText.length > 0) {
+        console.log(...nonText);
+    }
 }

@@ -1,1 +1,1 @@
-process.env.TESTING = "true";
+process.env.TESTING = 'true';
