@@ -9,7 +9,8 @@ const config: Config = {
   clearMocks: true,
   collectCoverage: true,
   collectCoverageFrom: [
-    "**/*.{js,jsx,ts,tsx}",
+    "<rootDir>/app/**/*.{js,jsx,ts,tsx}",
+    "!<rootDir>/app/lib/**",
     "!**/*.d.ts",
     "!**/node_modules/**",
   ],
@@ -36,8 +37,8 @@ const config: Config = {
     "<rootDir>/node_modules/",
     "<rootDir>/.cache/",
     "<rootDir>/build/",
-    "<rootDir>/tests/setup.ts",
-  ],
+    "<rootDir>/tests/mocks"
+    ],
   transform: {
     "^.+\\.(js|jsx|ts|tsx)$": "ts-jest",
   },

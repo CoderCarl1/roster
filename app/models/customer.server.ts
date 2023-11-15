@@ -3,19 +3,16 @@ import { Customer } from "@prisma/client";
 import { TCustomer_data_for_creation } from "@types";
 import { prisma } from "~/db.server";
 import { log } from "~/functions/helpers/functions";
+import { customers } from "~/lib/placeholder-data";
+
 /**
  * CREATE
  */
 export async function createCustomer(
   customerData: TCustomer_data_for_creation,
-): Promise<Customer | null> {
-  try {
-    const customer = await prisma.customer.create({ data: customerData });
-    return customer;
-  } catch (error) {
-    console.error("Error creating customer:", error);
-    return null;
-  }
+): Promise<Customer> {
+  return customers[0];
+  return await prisma.customer.create({ data: customerData });
 }
 
 /**

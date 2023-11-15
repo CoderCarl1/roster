@@ -8,12 +8,9 @@ import { prisma } from "~/db.server";
 export async function createAddress(
   addressData: TAddress_data_for_creation,
 ): Promise<Address | null> {
-  console.log("===================");
-  console.log("Create Address Func");
   const createdAddress = await prisma.address.create({
     data: addressData,
   });
-  console.log("createdAddress", createdAddress);
   // Query for the created record to get the complete Address object
   const address = await prisma.address.findFirst({
     where: {

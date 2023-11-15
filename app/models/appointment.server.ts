@@ -1,22 +1,18 @@
 import { Appointment } from "@prisma/client";
-
 import { TAppointment_data_for_creation } from "@types";
 import { prisma } from "~/db.server";
+import { appointments } from "~/lib/placeholder-data";
 /**
  * CREATE
  */
 export async function createAppointment(
   appointmentData: TAppointment_data_for_creation,
-): Promise<Appointment | null> {
-  try {
-    const appointment = await prisma.appointment.create({
-      data: appointmentData,
-    });
-    return appointment;
-  } catch (error) {
-    console.error("Error creating appointment:", error);
-    return null;
-  }
+): Promise<Appointment> {
+  const appointment = await prisma.appointment.create({
+    data: appointmentData,
+  });
+  return appointments[0];
+  return appointment;
 }
 /**
  * READ
