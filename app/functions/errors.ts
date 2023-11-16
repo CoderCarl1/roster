@@ -1,4 +1,4 @@
-class CreationError extends Error {
+class OperationError extends Error {
     constructor(
         message: string,
         public errorData?: any,
@@ -6,10 +6,10 @@ class CreationError extends Error {
         public componentName?: string
     ) {
         super(message);
-        this.name = 'CreationError';
+        this.name = 'OperationError';
 
         if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, CreationError);
+            Error.captureStackTrace(this, OperationError);
         }
         this.errorData = errorData;
         this.stackTrace = stackTrace;
@@ -34,10 +34,8 @@ class CreationError extends Error {
     }
 }
 
-class CustomerCreationError extends CreationError {}
+class CustomerOperationError extends OperationError {}
 
-class AddressCreationError extends CreationError {}
+class AddressOperationError extends OperationError {}
 
-class AppointmentCreationError extends CreationError {}
-
-class NoteCreationError extends CreationError {}
+class AppointmentOperationError extends OperationError {}
