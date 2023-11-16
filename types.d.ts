@@ -38,6 +38,12 @@ export type TAddress_data_for_creation = Omit<
     'id' | 'customerId' | 'archived' | 'createdAt' | 'updatedAt'
 >;
 
+export type inclusionTypes = {
+    customers?: boolean;
+    appointments?: boolean;
+    addresses?: boolean;
+};
+
 // Types used for Seeding
 export type TCustomer_No_ID = Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>;
 export type TAddress_No_ID = Omit<

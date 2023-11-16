@@ -18,31 +18,32 @@ model Customer {
   suspendedAt  DateTime?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  note         String
 
-  @@unique([firstName(sort: Desc), contact])
+  @@unique([firstName, contact])
 }
 
 model Appointment {
-  id              String   @id @default(cuid())
-  recurring       Boolean  @default(false)
-  frequency       Int?
-  customerId      String
-  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  customerIsOwner Boolean?
-  addressId       String
-  address         Address  @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  start           String
-  end             String
-  completed       Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id         String   @id @default(cuid())
+  recurring  Boolean  @default(false)
+  frequency  Int?
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  addressId  String
+  address    Address  @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  start      String
+  end        String
+  completed  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  note       String
 
   @@index([customerId])
 }
 
 model Address {
   id           String        @id @default(cuid())
-  Customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  Customer     Customer      @relation(fields: [customerId], references: [id])
   customerId   String
   Appointments Appointment[]
   number       String?
@@ -52,6 +53,7 @@ model Address {
   archived     Boolean       @default(false)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  note         String
 
   @@index([customerId])
 }

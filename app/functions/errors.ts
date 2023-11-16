@@ -1,7 +1,7 @@
 class OperationError extends Error {
     constructor(
         message: string,
-        public errorData?: any,
+        public errorData?: unknown,
         public stackTrace?: string,
         public componentName?: string
     ) {
@@ -34,8 +34,9 @@ class OperationError extends Error {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class CustomerOperationError extends OperationError {}
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class AddressOperationError extends OperationError {}
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class AppointmentOperationError extends OperationError {}
