@@ -6,7 +6,7 @@ import {
     TCustomer_data_for_creation,
     inclusionTypes,
 } from '@types';
-import { CustomerOperationError } from '~/functions/errors';
+import { AddressOperationError, CustomerOperationError } from '~/functions/errors';
 import { prisma } from '~/db.server';
 import { log } from '~/functions/helpers/functions';
 
@@ -26,6 +26,7 @@ export async function customer_create(
     addressData?: Omit<TAddress_data_for_creation, 'customerId'>[],
 ): Promise<Customer | CustomerOperationError> {
     try {
+        console.log("received ", customerData)
         const customerId = createId();
         const createdCustomer = await prisma.$transaction(async (tx) => {
             let customer = await tx.customer.create({ data: { ...customerData, id: customerId } });
@@ -56,19 +57,30 @@ export async function customer_create(
             } else {
                 console.log("no address data was given to include")
             };
-            throw new Error();
+            throw new CustomerOperationError("Failed creating customer", "transaction failed");
         }
         return createdCustomer;
     } catch (err) {
+        if (err instanceof CustomerOperationError) {
+            return err;
+        }
         return new CustomerOperationError('Failed creating customer', err);
     }
 }
 
-export const customer_create_many = async (
+export async function customer_create_many  (
     customerDataArray: TCustomerDataWithAddresses_for_creation[]
-): Promise<(Customer | CustomerOperationError)[]> => {
-    return await Promise.all(customerDataArray.map(async (data) => await customer_create(data)));
-}
+): Promise<(Customer | CustomerOperationError)[]>{
+
+   return await Promise.all(customerDataArray.map(async (data) => {
+       if (data.addresses && data.addresses.length){
+            const { addresses, ...customerData } = data;
+            return await customer_create(customerData, addresses);
+        }
+        return await customer_create(data);
+    }))
+} ;
+
 
 /**
  * Retrieves a customer by their ID.
@@ -87,12 +99,15 @@ export async function customer_find(
             include,
         });
 
-        if (!customer) throw new Error();
+        if (!customer) throw new CustomerOperationError("failed to find customer", 'No customer found with this id');
 
         return customer;
     } catch (err) {
+        if (err instanceof CustomerOperationError) {
+            return err;
+        }
         return new CustomerOperationError(
-            'No customer found with this id',
+            "failed to find customer",
             err
         );
     }
@@ -106,8 +121,7 @@ export async function customer_find(
  * @param skip - Optional. The number of customers to skip for pagination.
  * @param take - Optional. The number of customers to take for pagination.
  * @param includeSuspended - Optional. If true, includes suspended customers.
- * @returns {Promise<Customer[] | CustomerOperationError>} A promise that resolves to an array of customers or an error if an issue occurs.
- * @throws {CustomerOperationError} Throws a CustomerOperationError if an error occurs during the operation.
+ * @returns A promise that resolves to an array of customers or an error if an issue occurs.
  */
 export async function customer_find_many(
     include?: inclusionTypes,
@@ -159,7 +173,6 @@ export async function customer_update(
                 data: customerData,
             });
 
-
             if (addressData && addressData.length) {
                 const updatedAddresses = await Promise.all(addressData.map(
                     async (address) => {
@@ -167,7 +180,7 @@ export async function customer_update(
                     }));
 
                 if (!updatedAddresses) {
-                    throw new Error();
+                    throw new AddressOperationError("couldn't update customer", "Updating address failed");
                 }
                 customer = await tx.customer.findFirstOrThrow({
                     where: { id: customerId },
@@ -184,6 +197,9 @@ export async function customer_update(
         }
         return updatedCustomer;
     } catch (err) {
+        if (err instanceof CustomerOperationError || err instanceof AddressOperationError) {
+            return err;
+        }
         return new CustomerOperationError('Failed updating customer', err);
     }
 }
@@ -228,9 +244,12 @@ export async function customer_delete(customerId: string): Promise<void | Custom
         const deletedCustomer = await prisma.customer
             .delete({ where: { id: customerId } });
 
-        if (!deletedCustomer) throw new Error();
+        if (!deletedCustomer) throw new CustomerOperationError(`unable to delete ${customerId}`);
 
     } catch (err) {
+        if (err instanceof CustomerOperationError) {
+            return err;
+        }
         return new CustomerOperationError(`unable to delete ${customerId}`, err)
     }
 }
@@ -250,11 +269,8 @@ export async function customer_delete_many(string = 'impossibru'): Promise<void 
             .deleteMany({ where: { contact: { endsWith: string } } })
         if (deletedCustomers) {
             log('magenta', `DELETED all records containing the words ${string}`)
-        } else {
-            throw new Error();
         }
-
     } catch (err) {
-        return new CustomerOperationError(`unable to delete customers with contact including:  ${string}`, err)
+        return new CustomerOperationError('unable to delete customers', err)
     }
 }
