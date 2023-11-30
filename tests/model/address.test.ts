@@ -1,7 +1,6 @@
 import { Address, Customer } from '@prisma/client';
 import { prisma } from '~/db.server';
 import { AddressOperationError } from '~/functions/errors';
-import * as addressModule from '~/models/address.server';
 import {
     address_archive,
     address_archive_remove,
@@ -34,6 +33,7 @@ describe('ADDRESS FUNCTIONS', () => {
         it('address_create returns an AddressOperationError if no address is created', async () => {
             const createSpy = jest
                 .spyOn(prisma.address, 'create')
+                // @ts-ignore
                 .mockResolvedValueOnce(null!);
             const newAddress = await address_create(addresses[addressRef]);
             expect(newAddress).toBeInstanceOf(AddressOperationError);
@@ -271,19 +271,16 @@ describe('ADDRESS FUNCTIONS', () => {
             });
         });
 
-        // it('address_find_all returns an array of all unarchived addresses', async () => {
-        //     console.log("HERERERERERERE ++++++++++")
-        //     await address_create_many(addresses) as Address[];
+        it('address_find_all returns an array of all unarchived addresses', async () => {
+            await address_create_many(addresses) as Address[];
 
-        //     const result = await address_find_all() as Address[];
-        //     console.log("received ", {result})
-        //     expect(Array.isArray(result)).toBe(true);
-        //     expect(result.length).toBeGreaterThan(0);
-        //     result.forEach(address => {
-        //         expect(address.archived).toBe(false);
-        //     })
-        //     console.log("HERERERERERERE ++++++++++")
-        // }, 10000)
+            const result = await address_find_all() as Address[];
+            expect(Array.isArray(result)).toBe(true);
+            expect(result.length).toBeGreaterThan(0);
+            result.forEach(address => {
+                expect(address.archived).toBeFalsy();
+            })
+        }, 10000)
         it('address_find_all returns an empty array when there are no addresses in the database', async () => {
             jest.spyOn(prisma.address, 'findMany').mockResolvedValueOnce([]);
             const result = (await address_find_all()) as Address[];
