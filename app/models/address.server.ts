@@ -1,115 +1,208 @@
-import { Address, Appointment } from '@prisma/client';
+import { Address } from '@prisma/client';
 
 import { TAddress_data_for_creation } from '@types';
 import { prisma } from '~/db.server';
+import { AddressOperationError } from '~/functions/errors';
+import { log } from '~/functions/helpers/functions';
 /**
  * CREATE
  */
-export async function createAddress(
+
+
+/**
+ * Creates a new address.
+ * @param addressData - A single address.
+ * @returns A promise that resolves to the created address or rejects with a `AddressOperationError`.
+ */
+export async function address_create(
     addressData: TAddress_data_for_creation
-): Promise<Address | null> {
-    const createdAddress = await prisma.address.create({
-        data: addressData,
-    });
-    // Query for the created record to get the complete Address object
-    const address = await prisma.address.findFirst({
-        where: {
-            AND: [
-                { line1: { contains: addressData.line1 } },
-                { line2: { contains: addressData.line2 } },
-                { suburb: { contains: addressData.suburb } },
-            ],
-        },
-    });
-    return {
-        id: 'ckpyetj6z0000i1mh3fdw4vps',
-        customerId: 'ckpyetj5z0000i1mhfouaq40z',
-        number: '123',
-        line1: 'Main Street',
-        line2: 'Apt 4',
-        suburb: 'Cityville',
-        archived: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    };
-    // return address || null;
-}
-/**
- * READ
- */
+): Promise<Address | AddressOperationError> {
 
-export async function findAddress(
-    searchString: string
-): Promise<Address | null> {
-    const address = await prisma.address.findFirst({
-        where: {
-            OR: [
-                { number: { contains: searchString } },
-                { line1: { contains: searchString } },
-                { line2: { contains: searchString } },
-                { suburb: { contains: searchString } },
-            ],
-        },
-    });
+    try {
+        const createdAddress = await prisma.address.create({
+            data: addressData,
+        });
 
-    return address;
-}
+        if (!createdAddress) {
+            log('red', 'Failed Creating Address, dumping data');
+            console.log(addressData);
+            throw new Error(JSON.stringify(addressData));
+        }
 
-export async function findAddresses_all(): Promise<Address[]> {
-    const addresses = await prisma.address.findMany({
-        where: { archived: false },
-    });
-    return addresses;
-}
-
-export async function findAddresses_byCustomer(
-    customerId: string
-): Promise<Address[]> {
-    const addresses = await prisma.address.findMany({
-        include: { Customer: true },
-        where: {
-            customerId: customerId,
-        },
-    });
-    return addresses;
-}
-
-/**
- * UPDATE
- */
-
-type UpdateAddressInput = {
-    id: string;
-    customerId?: string;
-    number?: string;
-    line1?: string;
-    line2?: string;
-    suburb?: string;
-    Appointments?: Appointment[];
-};
-export async function updateAddress({
-    id,
-    ...args
-}: UpdateAddressInput): Promise<Address> {
-    await prisma.address.update({
-        where: { id },
-        data: args as any,
-    });
-
-    const updatedAddress = await prisma.address.findUnique({
-        where: { id },
-    });
-
-    if (!updatedAddress) {
-        throw new Error(`Address with ID ${id} not found.`);
+        return createdAddress;
+    } catch (err) {
+        return new AddressOperationError('Failed creating address', err);
     }
+}
 
-    console.log(
-        `Customer with ID ${id} and associated data updated successfully.`
-    );
+export async function address_create_many(
+    addressDataArray: TAddress_data_for_creation[]
+): Promise<Address[] | AddressOperationError> {
+    try {
+        const results = await Promise.all(
+            addressDataArray.map(async data => {
+                return await address_create(data);
+            })
+        );
+        const errors = results.filter(result => result instanceof AddressOperationError);
 
-    return updatedAddress;
+        if (errors.length) {
+            throw new AddressOperationError('create many addresses failed', errors)
+        }
+        return results as Address[];
+    } catch (err) {
+        return new AddressOperationError('create many addresses failed', err);
+    }
+}
+
+/**
+ * Retrieves an address by its ID.
+ *
+ * @param addressId - The ID of the address to retrieve.
+ * @returns A promise that resolves to the retrieved address or an AddressOperationError.
+ */
+export async function address_get(addressId: string
+): Promise<Address | AddressOperationError> {
+    try {
+        return await prisma.address.findFirstOrThrow({
+            where: { id: addressId }
+        });
+    } catch (err) {
+        return new AddressOperationError('no address by that ID', err);
+    }
+};
+
+/**
+ * Finds addresses that match the given search string.
+ *
+ * @param searchString - The search string to match against address fields.
+ * @returns A promise that resolves to an array of matching addresses or an AddressOperationError.
+ */
+export async function address_find(
+    searchString: string
+): Promise<Address[] | AddressOperationError> {
+    try {
+        if (typeof searchString !== 'string' || searchString.length < 1) {
+            throw new Error('did not recieve a string to search');
+        }
+        const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+        const searchStringRegex = new RegExp(`(${searchString}|${capitalizeFirstLetter(searchString)})`, 'i');
+
+        const possibleAddress = await prisma.address.findMany({
+            where: {
+                OR: [
+                    { number: { contains: searchStringRegex.source } },
+                    { line1: { contains: searchStringRegex.source } },
+                    { line2: { contains: searchStringRegex.source } },
+                    { suburb: { contains: searchStringRegex.source } },
+                ],
+            },
+        });
+
+        return possibleAddress;
+    } catch (err) {
+        return new AddressOperationError('searchString must be a non-null string', err);
+    }
+}
+
+/**
+ * Retrieves all non-archived addresses from the database.
+ *
+ * @returns A promise that resolves to an array of addresses or an AddressOperationError.
+ */
+export async function address_find_all(): Promise<Address[] | AddressOperationError> {
+    try {
+        const addresses = await prisma.address.findMany({ where: { archived: false } });
+        return addresses;
+    } catch (err) {
+        return new AddressOperationError('unable to return all addresses', err);
+    }
+}
+
+/**
+ * Retrieves all addresses associated with a specific customer from the database.
+ *
+ * @param customerId - The ID of the customer for whom to retrieve addresses.
+ * @returns A promise that resolves to an array of addresses associated with the specified customer or an AddressOperationError.
+ */
+export async function address_findby_customer(
+    customerId: string
+): Promise<Address[] | AddressOperationError> {
+    try {
+        const addresses = await prisma.address.findMany({
+            include: { Customer: true },
+            where: {
+                customerId: customerId,
+            },
+        });
+        return addresses;
+
+    } catch (err) {
+        return new AddressOperationError(`unable to return addresses for customer ${customerId}`, err);
+    }
+}
+
+/**
+ * Updates an address with the specified ID.
+ *
+ * @param id - The ID of the address to update.
+ * @param addressData - The partial data with which to update the address.
+ * @returns  A promise that resolves to the updated address or an AddressOperationError if the update fails.
+ */
+export async function address_update(
+    id: string,
+    addressData: Partial<Address>): Promise<Address | AddressOperationError> {
+
+    try {
+        const updatedAddress = await prisma.address.update({
+            where: { id },
+            data: addressData,
+        });
+
+        console.log(
+            `Customer with ID ${id} and associated data updated successfully.`
+        );
+
+        return updatedAddress;
+
+    } catch (err) {
+        return new AddressOperationError('Updating of address not possible', err);
+    }
+}
+
+/**
+ * Archives an address by updating its 'archived' status.
+ *
+ * @param addressId - The ID of the address to be archived.
+ * @returns A promise that resolves to the updated address if successful,
+ *   or an instance of AddressOperationError if an error occurs.
+ */
+export async function address_archive(addressId: string) {
+    return await address_update(addressId, { archived: true });
 }
 /**
- * DELETE
+ * Un-Archives an address by updating its 'archived' status.
+ *
+ * @param addressId - The ID of the address to be un-archived.
+ * @returns A promise that resolves to the updated address if successful,
+ *   or an instance of AddressOperationError if an error occurs.
  */
+export async function address_archive_remove(addressId: string) {
+    return await address_update(addressId, { archived: false });
+}
+
+/**
+ * Deletes an address by its ID.
+ *
+ * @param addressId - The ID of the address to be deleted.
+ * @returns A promise that resolves to undefined if deletion is successful,
+ *   or an instance of AddressOperationError if an error occurs.
+ */
+export async function address_delete(addressId: string): Promise<void | AddressOperationError> {
+    try {
+        await prisma.address
+            .delete({ where: { id: addressId } })
+    } catch (err) {
+        return new AddressOperationError(`unable to delete ${addressId}`, err)
+    }
+}
