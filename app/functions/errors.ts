@@ -1,5 +1,5 @@
-import { Prisma } from "@prisma/client";
-import { TprismaErrorDataType } from "@types";
+import { Prisma } from '@prisma/client';
+import { TprismaErrorDataType } from '@types';
 
 export class OperationError extends Error {
     constructor(
@@ -14,14 +14,15 @@ export class OperationError extends Error {
         if (Error.captureStackTrace) {
             Error.captureStackTrace(this, OperationError);
         }
-        this.errorData = typeof errorData === 'string' ? {reason: errorData} : errorData;
+        this.errorData =
+            typeof errorData === 'string' ? { reason: errorData } : errorData;
         this.stackTrace = stackTrace;
         this.componentName = componentName;
 
         if (this._isPrismaError()) {
             this._handlePrismaError();
         }
-        
+
         this.log();
     }
 
@@ -34,17 +35,16 @@ export class OperationError extends Error {
         };
     }
 
-
     public log() {
         console.log(`[${this.name}] ${this.message}`);
         if (this.errorData && Object.keys(this.errorData).length) {
-            console.log(this.errorData)
+            console.log(this.errorData);
         }
     }
 
-
     private _isPrismaError() {
-        return this.errorData instanceof Prisma.PrismaClientKnownRequestError ||
+        return (
+            this.errorData instanceof Prisma.PrismaClientKnownRequestError ||
             this.errorData instanceof Prisma.PrismaClientUnknownRequestError ||
             this.errorData instanceof Prisma.PrismaClientRustPanicError ||
             this.errorData instanceof Prisma.PrismaClientInitializationError ||
@@ -52,13 +52,17 @@ export class OperationError extends Error {
             this.errorData instanceof Prisma.NotFoundError ||
             this.errorData instanceof CustomerOperationError ||
             this.errorData instanceof AddressOperationError ||
-            this.errorData instanceof AppointmentOperationError;
+            this.errorData instanceof AppointmentOperationError
+        );
     }
 
     private _handlePrismaError() {
-        let prismaErrorData = typeof this.errorData === 'string' ? {reason: this.errorData} : this.errorData as TprismaErrorDataType;
-        let prismaErrorMessage = this.message;
-        let prismaErrorStack = this.stack;
+        const prismaErrorData =
+            typeof this.errorData === 'string'
+                ? { reason: this.errorData }
+                : (this.errorData as TprismaErrorDataType);
+        const prismaErrorMessage = this.message;
+        const prismaErrorStack = this.stack;
         if (this instanceof Prisma.PrismaClientKnownRequestError) {
             // The meta lists the duplicate field
             prismaErrorData.duplicateField = this.meta || {};
@@ -78,10 +82,10 @@ export class OperationError extends Error {
         }
         this.errorData = { data: this.errorData, ...prismaErrorData };
         this.stackTrace = prismaErrorStack;
-        this.message = prismaErrorMessage;;
+        this.message = prismaErrorMessage;
     }
 }
 
-export class CustomerOperationError extends OperationError { }
-export class AddressOperationError extends OperationError { }
-export class AppointmentOperationError extends OperationError { }
+export class CustomerOperationError extends OperationError {}
+export class AddressOperationError extends OperationError {}
+export class AppointmentOperationError extends OperationError {}

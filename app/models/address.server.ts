@@ -8,7 +8,6 @@ import { log } from '~/functions/helpers/functions';
  * CREATE
  */
 
-
 /**
  * Creates a new address.
  * @param addressData - A single address.
@@ -17,7 +16,6 @@ import { log } from '~/functions/helpers/functions';
 export async function address_create(
     addressData: TAddress_data_for_creation
 ): Promise<Address | AddressOperationError> {
-
     try {
         const createdAddress = await prisma.address.create({
             data: addressData,
@@ -40,14 +38,19 @@ export async function address_create_many(
 ): Promise<Address[] | AddressOperationError> {
     try {
         const results = await Promise.all(
-            addressDataArray.map(async data => {
+            addressDataArray.map(async (data) => {
                 return await address_create(data);
             })
         );
-        const errors = results.filter(result => result instanceof AddressOperationError);
+        const errors = results.filter(
+            (result) => result instanceof AddressOperationError
+        );
 
         if (errors.length) {
-            throw new AddressOperationError('create many addresses failed', errors)
+            throw new AddressOperationError(
+                'create many addresses failed',
+                errors
+            );
         }
         return results as Address[];
     } catch (err) {
@@ -61,16 +64,17 @@ export async function address_create_many(
  * @param addressId - The ID of the address to retrieve.
  * @returns A promise that resolves to the retrieved address or an AddressOperationError.
  */
-export async function address_get(addressId: string
+export async function address_get(
+    addressId: string
 ): Promise<Address | AddressOperationError> {
     try {
         return await prisma.address.findFirstOrThrow({
-            where: { id: addressId }
+            where: { id: addressId },
         });
     } catch (err) {
         return new AddressOperationError('no address by that ID', err);
     }
-};
+}
 
 /**
  * Finds addresses that match the given search string.
@@ -85,8 +89,12 @@ export async function address_find(
         if (typeof searchString !== 'string' || searchString.length < 1) {
             throw new Error('did not recieve a string to search');
         }
-        const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-        const searchStringRegex = new RegExp(`(${searchString}|${capitalizeFirstLetter(searchString)})`, 'i');
+        const capitalizeFirstLetter = (str: string) =>
+            str.charAt(0).toUpperCase() + str.slice(1);
+        const searchStringRegex = new RegExp(
+            `(${searchString}|${capitalizeFirstLetter(searchString)})`,
+            'i'
+        );
 
         const possibleAddress = await prisma.address.findMany({
             where: {
@@ -101,7 +109,10 @@ export async function address_find(
 
         return possibleAddress;
     } catch (err) {
-        return new AddressOperationError('searchString must be a non-null string', err);
+        return new AddressOperationError(
+            'searchString must be a non-null string',
+            err
+        );
     }
 }
 
@@ -110,9 +121,13 @@ export async function address_find(
  *
  * @returns A promise that resolves to an array of addresses or an AddressOperationError.
  */
-export async function address_find_all(): Promise<Address[] | AddressOperationError> {
+export async function address_find_all(): Promise<
+    Address[] | AddressOperationError
+> {
     try {
-        const addresses = await prisma.address.findMany({ where: { archived: false } });
+        const addresses = await prisma.address.findMany({
+            where: { archived: false },
+        });
         return addresses;
     } catch (err) {
         return new AddressOperationError('unable to return all addresses', err);
@@ -136,9 +151,11 @@ export async function address_findby_customer(
             },
         });
         return addresses;
-
     } catch (err) {
-        return new AddressOperationError(`unable to return addresses for customer ${customerId}`, err);
+        return new AddressOperationError(
+            `unable to return addresses for customer ${customerId}`,
+            err
+        );
     }
 }
 
@@ -151,8 +168,8 @@ export async function address_findby_customer(
  */
 export async function address_update(
     id: string,
-    addressData: Partial<Address>): Promise<Address | AddressOperationError> {
-
+    addressData: Partial<Address>
+): Promise<Address | AddressOperationError> {
     try {
         const updatedAddress = await prisma.address.update({
             where: { id },
@@ -164,9 +181,11 @@ export async function address_update(
         );
 
         return updatedAddress;
-
     } catch (err) {
-        return new AddressOperationError('Updating of address not possible', err);
+        return new AddressOperationError(
+            'Updating of address not possible',
+            err
+        );
     }
 }
 
@@ -198,11 +217,12 @@ export async function address_archive_remove(addressId: string) {
  * @returns A promise that resolves to undefined if deletion is successful,
  *   or an instance of AddressOperationError if an error occurs.
  */
-export async function address_delete(addressId: string): Promise<void | AddressOperationError> {
+export async function address_delete(
+    addressId: string
+): Promise<void | AddressOperationError> {
     try {
-        await prisma.address
-            .delete({ where: { id: addressId } })
+        await prisma.address.delete({ where: { id: addressId } });
     } catch (err) {
-        return new AddressOperationError(`unable to delete ${addressId}`, err)
+        return new AddressOperationError(`unable to delete ${addressId}`, err);
     }
 }

@@ -28,7 +28,7 @@ const config: Config = {
   setupFilesAfterEnv: [
     "<rootDir>/tests/setup.ts",
   ],
-  slowTestThreshold: 5,
+  slowTestThreshold: 10,
   preset: "ts-jest",
   testEnvironment: "node",
   testMatch: ["<rootDir>/tests/**/*.{js,jsx,ts,tsx}"],

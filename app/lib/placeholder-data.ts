@@ -10,6 +10,7 @@ const customers: Customer[] = [
         suspendedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
+        note: 'Note for John Doe',
     },
     {
         id: 'ckpyetj5z0001i1mhm3tvbhel',
@@ -20,6 +21,7 @@ const customers: Customer[] = [
         suspendedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
+        note: 'Note for Jane Smith',
     },
     {
         id: 'ckpyetj5z0002i1mhmhbyon5r',
@@ -30,6 +32,7 @@ const customers: Customer[] = [
         suspendedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
+        note: 'Note for Bob Johnson',
     },
     {
         id: 'ckpyetj5z0003i1mhmraqqbj2',
@@ -40,6 +43,7 @@ const customers: Customer[] = [
         suspendedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
+        note: 'Note for Alice Williams',
     },
     {
         id: 'ckpyetj5z0004i1mhmz5craju',
@@ -49,6 +53,7 @@ const customers: Customer[] = [
         suspended: true,
         suspendedAt: new Date(), // Marked as suspended
         createdAt: new Date(),
+        note: 'Note for Charlie Brown',
         updatedAt: new Date(),
     },
     {
@@ -59,6 +64,7 @@ const customers: Customer[] = [
         suspended: true,
         suspendedAt: new Date(), // Marked as suspended
         createdAt: new Date(),
+        note: 'Note for Eva Davis',
         updatedAt: new Date(),
     },
     {
@@ -69,6 +75,7 @@ const customers: Customer[] = [
         suspended: false,
         suspendedAt: null,
         createdAt: new Date(),
+        note: 'Note for Frank Miller',
         updatedAt: new Date(),
     },
     {
@@ -79,6 +86,7 @@ const customers: Customer[] = [
         suspended: false,
         suspendedAt: null,
         createdAt: new Date(),
+        note: 'Note for Grace Wilson',
         updatedAt: new Date(),
     },
     {
@@ -89,6 +97,7 @@ const customers: Customer[] = [
         suspended: false,
         suspendedAt: null,
         createdAt: new Date(),
+        note: 'Note for Henry Thomas',
         updatedAt: new Date(),
     },
     {
@@ -99,6 +108,7 @@ const customers: Customer[] = [
         suspended: false,
         suspendedAt: null,
         createdAt: new Date(),
+        note: 'Note for Ivy Moore',
         updatedAt: new Date(),
     },
 ];
@@ -112,6 +122,7 @@ const addresses: Address[] = [
         suburb: 'Cityville',
         archived: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Address 123 Main Street',
         updatedAt: new Date(),
     },
     {
@@ -123,6 +134,7 @@ const addresses: Address[] = [
         suburb: 'Suburbia',
         archived: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Address 456 Oak Avenue',
         updatedAt: new Date(),
     },
     {
@@ -134,6 +146,7 @@ const addresses: Address[] = [
         suburb: 'Townsville',
         archived: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Address 789 Pine Street',
         updatedAt: new Date(),
     },
     {
@@ -145,6 +158,7 @@ const addresses: Address[] = [
         suburb: 'Villageland',
         archived: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Address 1011 Cedar Road',
         updatedAt: new Date(),
     },
     {
@@ -156,6 +170,7 @@ const addresses: Address[] = [
         suburb: 'Hamlet City',
         archived: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Address 1213 Maple Lane',
         updatedAt: new Date(),
     },
     {
@@ -167,6 +182,7 @@ const addresses: Address[] = [
         suburb: 'Countryside',
         archived: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Address 1415 Birch Avenue',
         updatedAt: new Date(),
     },
     {
@@ -178,6 +194,7 @@ const addresses: Address[] = [
         suburb: 'Meadowland',
         archived: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Address 1617 Spruce Street',
         updatedAt: new Date(),
     },
     {
@@ -189,6 +206,7 @@ const addresses: Address[] = [
         suburb: 'Hometown',
         archived: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Address 1819 Redwood Road',
         updatedAt: new Date(),
     },
     {
@@ -200,6 +218,7 @@ const addresses: Address[] = [
         suburb: 'Greenfield',
         archived: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Address 2021 Fir Lane',
         updatedAt: new Date(),
     },
     {
@@ -211,6 +230,7 @@ const addresses: Address[] = [
         suburb: 'Cottageville',
         archived: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Address 2223 Holly Street',
         updatedAt: new Date(),
     },
 ];
@@ -220,12 +240,12 @@ const appointments: Appointment[] = [
         customerId: 'ckpyetj5z0000i1mhfouaq40z',
         recurring: false,
         frequency: null,
-        customerIsOwner: false,
         addressId: 'ckpyetj6z0000i1mh3fdw4vps',
         start: '2023-10-31T10:00:00Z',
         end: '2023-10-31T11:00:00Z',
         completed: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Appointment on 2023-10-31',
         updatedAt: new Date(),
     },
     {
@@ -233,12 +253,12 @@ const appointments: Appointment[] = [
         customerId: 'ckpyetj5z0001i1mhm3tvbhel',
         recurring: true,
         frequency: 7,
-        customerIsOwner: false,
         addressId: 'ckpyetj6z0001i1mh06m90gvm',
         start: '2023-11-01T14:00:00Z',
         end: '2023-11-01T15:00:00Z',
         completed: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Recurring Appointment on 2023-11-01',
         updatedAt: new Date(),
     },
     {
@@ -246,12 +266,12 @@ const appointments: Appointment[] = [
         customerId: 'ckpyetj5z0002i1mhmhbyon5r',
         recurring: false,
         frequency: null,
-        customerIsOwner: false,
         addressId: 'ckpyetj6z0002i1mhwj8cskst',
         start: '2023-11-02T09:00:00Z',
         end: '2023-11-02T10:00:00Z',
         completed: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Appointment on 2023-11-02',
         updatedAt: new Date(),
     },
     {
@@ -259,12 +279,12 @@ const appointments: Appointment[] = [
         customerId: 'ckpyetj5z0003i1mhmraqqbj2',
         recurring: false,
         frequency: null,
-        customerIsOwner: false,
         addressId: 'ckpyetj6z0003i1mh3cn2g3m0',
         start: '2023-11-03T15:30:00Z',
         end: '2023-11-03T16:30:00Z',
         completed: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Appointment on 2023-11-03',
         updatedAt: new Date(),
     },
     {
@@ -272,12 +292,12 @@ const appointments: Appointment[] = [
         customerId: 'ckpyetj5z0004i1mhmz5craju',
         recurring: false,
         frequency: null,
-        customerIsOwner: false,
         addressId: 'ckpyetj6z0004i1mh5nwmb2r4',
         start: '2023-11-04T12:00:00Z',
         end: '2023-11-04T13:00:00Z',
         completed: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Appointment on 2023-11-04',
         updatedAt: new Date(),
     },
     {
@@ -285,12 +305,12 @@ const appointments: Appointment[] = [
         customerId: 'ckpyetj5z0005i1mhn6s4gyvh',
         recurring: false,
         frequency: null,
-        customerIsOwner: false,
         addressId: 'ckpyetj6z0005i1mhrft0wt3q',
         start: '2023-11-05T11:00:00Z',
         end: '2023-11-05T12:00:00Z',
         completed: false,
         createdAt: generateRandomDate(),
+        note: 'Note for Appointment on 2023-11-05',
         updatedAt: new Date(),
     },
 ];
@@ -309,3 +329,4 @@ function generateRandomDate(): Date {
 }
 
 export { customers, addresses, appointments };
+export default { customers, addresses, appointments };

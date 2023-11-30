@@ -33,8 +33,7 @@ describe('CUSTOMER FUNCTIONS ', () => {
                 .mockImplementation(() => Promise.resolve(null));
 
             const mockData = customers[ customerRef++ ];
-            const createdRecord = await customer_create(mockData) as Customer;
-            console.log("createdRecord", createdRecord)
+            const createdRecord = await customer_create(mockData);
             expect(createdRecord).toBeInstanceOf(CustomerOperationError);
 
             createSpy.mockRestore();
@@ -159,7 +158,7 @@ describe('CUSTOMER FUNCTIONS ', () => {
                 }));
             }
         });
-        it('customer_update returns an error if no customerId received', async() => {
+        it('customer_update returns an error if no customerId received', async () => {
             const createdAddress = await address_create(addresses[ addressRef++ ]) as Address;
 
             const updatedAddressData = [ { ...addresses[ addressRef ], id: createdAddress.id } ];

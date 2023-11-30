@@ -1,13 +1,31 @@
 import { Address, Appointment, Customer } from '@prisma/client';
+import {
+    NotFoundError,
+    PrismaClientInitializationError,
+    PrismaClientKnownRequestError,
+    PrismaClientRustPanicError,
+    PrismaClientUnknownRequestError,
+    PrismaClientValidationError,
+} from '@prisma/client/runtime/library';
 
-export type TCustomer_data_for_creation = Omit<
+export type TCustomer_data_for_creation = Pick<
     Customer,
-    'id' | 'suspended' | 'suspendedAt' | 'createdAt' | 'updatedAt'
+    'firstName' | 'lastName' | 'contact' | 'note'
+>;
+
+export type TAppointment_data_for_creation = Pick<
+    Appointment,
+    'recurring' | 'frequency' | 'start' | 'end' | 'note'
+>;
+
+export type TAddress_data_for_creation = Pick<
+    Address,
+    'customerId' | 'number' | 'line1' | 'line2' | 'suburb' | 'note'
 >;
 
 export type TCustomerDataWithAddresses_for_creation =
     TCustomer_data_for_creation & {
-        addresses: TAddress_data_for_creation[] | Address[];
+        addresses?: TAddress_data_for_creation[] | Address[];
     };
 export type TCustomerDataWithAppointmentsAndAddresses_for_creation =
     TCustomer_data_for_creation & {
@@ -22,21 +40,12 @@ export type TCustomer_Appointments_Addresses_for_creation =
 export type TCustomer_Appointments_Addresses =
     | Customer
     | (Customer & {
-          addresses: Address[];
-      })
+        addresses: Address[];
+    })
     | (Customer & {
-          addresses: Address[];
-          appointments: Appointment[];
-      });
-
-export type TAppointment_data_for_creation = Omit<
-    Appointment,
-    'id' | 'customerId' | 'addressId' | 'completed' | 'createdAt' | 'updatedAt'
->;
-export type TAddress_data_for_creation = Omit<
-    Address,
-    'id' | 'customerId' | 'archived' | 'createdAt' | 'updatedAt'
->;
+        addresses: Address[];
+        appointments: Appointment[];
+    });
 
 export type inclusionTypes = {
     customers?: boolean;
@@ -54,3 +63,44 @@ export type TAppointment_No_ID = Omit<
     Appointment,
     'id' | 'createdAt' | 'updatedAt'
 >;
+
+type TmockCustomerData = {
+    firstName: string;
+    lastName: string;
+    contact: string;
+    note: string;
+};
+type TmockAddressData = {
+    number: string;
+    line1: string;
+    line2: string;
+    suburb: string;
+    note: string;
+    customerId: null;
+};
+type TmockAppointment = {
+    recurring: boolean;
+    frequency: null | number;
+    start: string;
+    end: string;
+    note: string;
+};
+
+// Errors
+
+/**
+ * Prisma Errors
+ */
+export type TprismaError =
+    | PrismaClientKnownRequestError
+    | PrismaClientUnknownRequestError
+    | PrismaClientRustPanicError
+    | PrismaClientInitializationError
+    | PrismaClientValidationError
+    | NotFoundError;
+
+export type TprismaErrorDataType = {
+    code?: string;
+    duplicateField?: Record<string, unknown> | undefined;
+    reason?: string;
+};
