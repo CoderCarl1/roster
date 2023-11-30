@@ -14,8 +14,7 @@ export class OperationError extends Error {
         if (Error.captureStackTrace) {
             Error.captureStackTrace(this, OperationError);
         }
-        this.errorData =
-            typeof errorData === 'string' ? { reason: errorData } : errorData;
+        this.errorData = { reason: errorData };
         this.stackTrace = stackTrace;
         this.componentName = componentName;
 
