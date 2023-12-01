@@ -125,9 +125,10 @@ export async function address_find_all(): Promise<
     Address[] | AddressOperationError
 > {
     try {
-        const addresses = await prisma.address.findMany({
-            where: { archived: false },
-        });
+        const addresses = await prisma.address.findMany();
+        if (!addresses){
+            throw new Error("no addresses found")
+        }
         return addresses;
     } catch (err) {
         return new AddressOperationError('unable to return all addresses', err);
@@ -144,6 +145,9 @@ export async function address_findby_customer(
     customerId: string
 ): Promise<Address[] | AddressOperationError> {
     try {
+        if (!customerId || typeof customerId !== 'string'){
+            throw new Error(`invalid customerId: ${customerId}`);
+        }
         const addresses = await prisma.address.findMany({
             include: { Customer: true },
             where: {
