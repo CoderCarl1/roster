@@ -44,7 +44,7 @@ export async function customer_create(
                 );
                 if (!addresses) {
                     throw new Error(
-                        'Customer_create: Error creating Address/s'
+                        'Customer_create: Error creating Address/s' + JSON.stringify(addresses)
                     );
                 }
                 customer = await tx.customer.findFirstOrThrow({
