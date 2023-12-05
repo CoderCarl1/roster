@@ -241,12 +241,9 @@ describe('ADDRESS FUNCTIONS', () => {
             const addressArray = await address_create_many(
                 mockDataArray
             ) as Address[];
-            console.log("addressArray", { addressArray })
 
             expect(Array.isArray(addressArray)).toBe(true);
             expect(addressArray.length === mockDataArray.length).toBe(true);
-            const result = await prisma.address.findMany() as Address[];
-            console.log("address_create_many   address_find_all result", { result })
 
             addressArray.forEach((createdAddress, index) => {
                 const mockData = mockDataArray[ index ];

@@ -34,6 +34,7 @@ describe('CUSTOMER FUNCTIONS ', () => {
 
             const mockData = customers[ customerRef++ ];
             const createdRecord = await customer_create(mockData);
+            console.log("createdRecord", createdRecord)
             expect(createdRecord).toBeInstanceOf(CustomerOperationError);
 
             createSpy.mockRestore();

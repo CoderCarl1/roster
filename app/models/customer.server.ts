@@ -27,13 +27,17 @@ import { log } from '~/functions/helpers/functions';
 export async function customer_create(
     customerData: TCustomer_data_for_creation,
     addressData?: Omit<TAddress_data_for_creation, 'customerId'>[]
-): Promise<Customer | CustomerOperationError> {
+): Promise<Customer | CustomerOperationError | AddressOperationError> {
     try {
         const customerId = createId();
         const createdCustomer = await prisma.$transaction(async (tx) => {
             let customer = await tx.customer.create({
                 data: { ...customerData, id: customerId },
             });
+
+            if (!customer){
+                throw new CustomerOperationError('unable to create customer', customerData);
+            }
             if (addressData && addressData.length) {
                 const addresses = await Promise.all(
                     addressData.map(async (address) => {
@@ -43,9 +47,7 @@ export async function customer_create(
                     })
                 );
                 if (!addresses) {
-                    throw new Error(
-                        'Customer_create: Error creating Address/s' + JSON.stringify(addresses)
-                    );
+                    throw new AddressOperationError('Customer_create: Error creating Address/s', addresses);
                 }
                 customer = await tx.customer.findFirstOrThrow({
                     where: { id: customer.id },
@@ -59,21 +61,18 @@ export async function customer_create(
         });
 
         if (!createdCustomer) {
-            log('red', 'Failed Creating Customer, dumping data');
-            console.log(customerData);
+            let reason = {};
             if (addressData) {
-                console.log('Address data:', addressData);
-            } else {
-                console.log('no address data was given to include');
-            }
+                reason = {addressInfo: 'Error creating associated Addresses', addressData};
+            } 
             throw new CustomerOperationError(
                 'Failed creating customer',
-                'transaction failed'
+                {transactionInfo: 'transaction failed', customerData, ...reason}
             );
         }
         return createdCustomer;
     } catch (err) {
-        if (err instanceof CustomerOperationError) {
+        if (err instanceof CustomerOperationError || err instanceof AddressOperationError) {
             return err;
         }
         return new CustomerOperationError('Failed creating customer', err);
@@ -106,11 +105,12 @@ export async function customer_find(
     include?: inclusionTypes
 ): Promise<Customer | CustomerOperationError> {
     try {
+        console.log("customer_find args", include)
         const customer = await prisma.customer.findUnique({
             where: { id: customerId },
             include,
         });
-
+        console.log("customer_find customer", customer)
         if (!customer)
             throw new CustomerOperationError(
                 'failed to find customer',
@@ -182,7 +182,9 @@ export async function customer_update(
                 where: { id: customerId },
                 data: customerData,
             });
-
+            if(!customer) {
+                throw new CustomerOperationError(`unable to update customer ${customerId}`, customerData)
+            }
             if (addressData && addressData.length) {
                 const updatedAddresses = await Promise.all(
                     addressData.map(async (address) => {
