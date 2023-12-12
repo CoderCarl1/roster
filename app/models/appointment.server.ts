@@ -18,8 +18,23 @@ export async function appointment_create(
     appointmentData: TAppointment_data_for_creation
 ): Promise<Appointment | AppointmentOperationError> {
     try {
+        console.log(
+            'appointment_createappointment_createappointment_createappointment_createappointment_createappointment_create'
+        );
         if (!customerId) throw new Error('no customer ID');
         if (!addressId) throw new Error('no address ID');
+        const timeAlreadyTaken = await existingAppointment(
+            appointmentData.start,
+            appointmentData.end
+        );
+
+        if (timeAlreadyTaken && timeAlreadyTaken.length) {
+            throw new AppointmentOperationError(
+                'time already taken',
+                timeAlreadyTaken
+            );
+        }
+
         const createdAppointment = await prisma.appointment.create({
             data: { ...appointmentData, customerId, addressId },
         });
@@ -31,8 +46,44 @@ export async function appointment_create(
         }
         return createdAppointment;
     } catch (err) {
-        return new AppointmentOperationError('Failed creating appointment', err);
+        if (err instanceof AppointmentOperationError) {
+            return err;
+        }
+        return new AppointmentOperationError(
+            'Failed creating appointment',
+            err
+        );
     }
+}
+
+export async function existingAppointment(start: string, end: string) {
+    console.log('===========   existingAppointment start');
+    const startDate = new Date(start);
+    console.log('existingAppointment startDate', startDate);
+    const endDate = new Date(end);
+    console.log('existingAppointment endDate', endDate);
+
+    const oneMinute = 60 * 1000; // 1 minute in milliseconds
+
+    const existingAppointmentsData = await prisma.appointment.findMany({
+        where: {
+            start: {
+                gte: new Date(startDate.getTime() - oneMinute).toISOString(),
+                lt: new Date(endDate.getTime() + oneMinute).toISOString(),
+            },
+            end: {
+                gte: new Date(startDate.getTime() - oneMinute).toISOString(),
+                lt: new Date(endDate.getTime() + oneMinute).toISOString(),
+            },
+        },
+    });
+    console.log('===========   existingAppointment  AFTER findmany ran');
+    if (existingAppointmentsData && existingAppointmentsData.length) {
+        console.log('existingAppointment', existingAppointmentsData);
+        return existingAppointmentsData;
+    }
+    console.log('No existing appointments within the specified time range.');
+    return false;
 }
 
 /**
@@ -57,41 +108,59 @@ export async function appointment_create_many(
                     const appointment = await tx.appointment.create({
                         data: { ...appointmentData, customerId, addressId },
                     });
-                    if (!appointment){
-                        throw new Error(`unable to create appointment, ${JSON.stringify(appointmentData)}`)
+                    if (!appointment) {
+                        throw new Error(
+                            `unable to create appointment, ${JSON.stringify(
+                                appointmentData
+                            )}`
+                        );
                     }
                     return appointment;
                 })
             );
-            return appointments
-        })
+            return appointments;
+        });
 
-        if (!createdAppointments || createdAppointments.length !== appointmentDataArray.length) {
-            throw new AppointmentOperationError('Failed Creating appointment, dumping data', appointmentDataArray);
+        if (
+            !createdAppointments ||
+            createdAppointments.length !== appointmentDataArray.length
+        ) {
+            throw new AppointmentOperationError(
+                'Failed Creating appointment, dumping data',
+                appointmentDataArray
+            );
         }
         return createdAppointments;
     } catch (err) {
         if (err instanceof AppointmentOperationError) {
             return err;
         }
-        return new AppointmentOperationError('Failed creating appointment', err);
+        return new AppointmentOperationError(
+            'Failed creating appointment',
+            err
+        );
     }
 }
-
-
 
 /**
  * Retrieves all appointments from the database.
  * @returns A promise that resolves to an array of appointments or an AppointmentOperationError.
  */
-export async function appointment_find_many(whereBlock?: Prisma.AppointmentWhereInput | undefined): Promise<Appointment[] | AppointmentOperationError> {
+export async function appointment_find_many(
+    whereBlock?: Prisma.AppointmentWhereInput | undefined
+): Promise<Appointment[] | AppointmentOperationError> {
     try {
         const appointments = await prisma.appointment.findMany({
-            where: { completed: false, ...whereBlock }
+            where: { completed: false, ...whereBlock },
         });
         return appointments;
     } catch (err) {
-        return new AppointmentOperationError(`Error while retrieving appointments \n ${JSON.stringify(whereBlock)}`, err);
+        return new AppointmentOperationError(
+            `Error while retrieving appointments \n ${JSON.stringify(
+                whereBlock
+            )}`,
+            err
+        );
     }
 }
 
@@ -99,7 +168,9 @@ export async function appointment_find_many(whereBlock?: Prisma.AppointmentWhere
  * Retrieves all Completed appointments from the database.
  * @returns A promise that resolves to an array of appointments or an AppointmentOperationError.
  */
-export async function appointment_find_many_completed(): Promise<Appointment[] | AppointmentOperationError> {
+export async function appointment_find_many_completed(): Promise<
+    Appointment[] | AppointmentOperationError
+> {
     return await appointment_find_many({ completed: true });
 }
 
@@ -112,10 +183,15 @@ export async function appointment_findbyCustomer(
     customerId: string
 ): Promise<Appointment[] | AppointmentOperationError> {
     try {
-        const appointments = await prisma.appointment.findMany({ where: { customerId } });
+        const appointments = await prisma.appointment.findMany({
+            where: { customerId },
+        });
         return appointments;
     } catch (err) {
-        return new AppointmentOperationError(`Error while retrieving appointments for customer ${customerId}`, err);
+        return new AppointmentOperationError(
+            `Error while retrieving appointments for customer ${customerId}`,
+            err
+        );
     }
 }
 
@@ -128,10 +204,15 @@ export async function appointment_findbyAddress(
     addressId: string
 ): Promise<Appointment[] | AppointmentOperationError> {
     try {
-        const appointments = await prisma.appointment.findMany({ where: { addressId } });
+        const appointments = await prisma.appointment.findMany({
+            where: { addressId },
+        });
         return appointments;
     } catch (err) {
-        return new AppointmentOperationError(`Error while retrieving appointments for address ${addressId}`, err);
+        return new AppointmentOperationError(
+            `Error while retrieving appointments for address ${addressId}`,
+            err
+        );
     }
 }
 
@@ -144,8 +225,8 @@ export async function appointment_findbyAddress(
  */
 export async function appointment_update(
     id: string,
-    { ...args
-    }: Omit<Partial<Appointment>, 'id' | 'updatedAt' | 'createdAt'>): Promise<Appointment | AppointmentOperationError> {
+    { ...args }: Omit<Partial<Appointment>, 'id' | 'updatedAt' | 'createdAt'>
+): Promise<Appointment | AppointmentOperationError> {
     try {
         const updatedAppointment = await prisma.appointment.update({
             where: { id },
@@ -162,7 +243,10 @@ export async function appointment_update(
         if (err instanceof AppointmentOperationError) {
             return err;
         }
-        return new AppointmentOperationError('failed to update appointment', err);
+        return new AppointmentOperationError(
+            'failed to update appointment',
+            err
+        );
     }
 }
 
@@ -179,6 +263,9 @@ export async function appointment_delete(appointmentId: string) {
 
         return appointment;
     } catch (err) {
-        return new AppointmentOperationError(`failed to delete id: ${appointmentId}`, err)
+        return new AppointmentOperationError(
+            `failed to delete id: ${appointmentId}`,
+            err
+        );
     }
 }
