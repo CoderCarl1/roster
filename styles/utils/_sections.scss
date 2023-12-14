@@ -1,0 +1,13 @@
+
+.section-wrapper {
+  max-height: 75dvh;
+  overflow-y: scroll;
+}
+
+// should this go somewhere else?
+.section-wrapper tr {
+  &:hover,
+  &:focus-within {
+    background-color: #c1c1ff7d;
+  }
+}
