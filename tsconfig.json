@@ -14,7 +14,10 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"],
-      "@types": ["types.d.ts"]
+      "@components": ["./app/components"],
+      "@functions": ["./app/functions"],
+      "@types": ["types.d.ts"],
+      "@errors": ["./app/functions/errors.ts"]
     },
     "noEmit": true
   }
