@@ -1,5 +1,6 @@
 import { createId } from '@paralleldrive/cuid2';
 import { Address, Customer } from '@prisma/client';
+import { AddressOperationError, CustomerOperationError } from '@errors';
 import {
     TAddress_data_for_creation,
     TCustomerDataWithAddresses_for_creation,
@@ -7,10 +8,6 @@ import {
     inclusionTypes,
 } from '@types';
 import { prisma } from '~/db.server';
-import {
-    AddressOperationError,
-    CustomerOperationError,
-} from '~/functions/errors';
 import { log } from '~/functions/helpers/functions';
 
 /**

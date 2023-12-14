@@ -1,6 +1,6 @@
 import { Address, Customer } from '@prisma/client';
+import { CustomerOperationError } from '@errors';
 import { prisma } from '~/db.server';
-import { CustomerOperationError } from '~/functions/errors';
 import { address_create } from '~/models/address.server';
 import {
     customer_create,
@@ -180,7 +180,6 @@ describe('CUSTOMER FUNCTIONS', () => {
                         line1: updatedAddressData[0].line1,
                         line2: updatedAddressData[0].line2,
                         suburb: updatedAddressData[0].suburb,
-                        note: updatedAddressData[0].note,
                     })
                 );
             }

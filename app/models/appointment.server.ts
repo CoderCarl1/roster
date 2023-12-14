@@ -1,7 +1,7 @@
 import { Appointment, Prisma } from '@prisma/client';
+import { AppointmentOperationError } from '@errors';
 import { TAppointment_data_for_creation } from '@types';
 import { prisma } from '~/db.server';
-import { AppointmentOperationError } from '~/functions/errors';
 import { log } from '~/functions/helpers/functions';
 
 /**

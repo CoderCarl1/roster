@@ -1,14 +1,14 @@
 import { Address, Customer } from '@prisma/client';
+import { AddressOperationError } from '@errors';
 import { prisma } from '~/db.server';
-import { AddressOperationError } from '~/functions/errors';
 import {
     address_archive,
     address_archive_remove,
     address_create,
-    address_create_many,
+    // address_create_many,
     address_delete,
     address_find,
-    address_find_all,
+    // address_find_all,
     address_findby_customer,
     address_get,
     address_update,
@@ -25,7 +25,7 @@ describe('ADDRESS FUNCTIONS', () => {
     let validCustomerId = '';
     const validAddressData = addresses[0] as Pick<
         Address,
-        'customerId' | 'number' | 'line1' | 'line2' | 'suburb' | 'note'
+        'customerId' | 'number' | 'line1' | 'line2' | 'suburb'
     >;
     const createdAddressRefData = addresses[1];
     let createdAddressId = '';
@@ -199,7 +199,6 @@ describe('ADDRESS FUNCTIONS', () => {
                 line1: mockData_old.line1,
                 line2: mockData_old.line2,
                 suburb: mockData_old.suburb,
-                note: mockData_old.note,
             });
 
             expect(updatedAddress).toMatchObject({
@@ -207,7 +206,6 @@ describe('ADDRESS FUNCTIONS', () => {
                 line1: mockData_updated.line1,
                 line2: mockData_updated.line2,
                 suburb: mockData_updated.suburb,
-                note: mockData_updated.note,
             });
         });
         it('address_update returns an AddressOperationError if throws', async () => {
@@ -270,7 +268,6 @@ describe('ADDRESS FUNCTIONS', () => {
     //             expect(createdAddress.line1).toBe(mockData.line1);
     //             expect(createdAddress.line2).toBe(mockData.line2);
     //             expect(createdAddress.suburb).toBe(mockData.suburb);
-    //             expect(createdAddress.note).toBe(mockData.note);
     //             expect(createdAddress.id).toBeDefined();
     //             expect(createdAddress.customerId).toBeNull(); // customerId is null in the test data
     //             expect(createdAddress.archived).toBe(false); // archived is false by default

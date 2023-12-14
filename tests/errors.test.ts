@@ -3,7 +3,7 @@ import {
     CustomerOperationError,
     AddressOperationError,
     AppointmentOperationError,
-} from '~/functions/errors';
+} from '@errors';
 
 describe('OperationError', () => {
     it('creates a generic OperationError', () => {

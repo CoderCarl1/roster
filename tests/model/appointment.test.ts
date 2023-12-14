@@ -1,6 +1,6 @@
 import { Address, Appointment, Customer } from '@prisma/client';
+import { AppointmentOperationError } from '@errors';
 import { prisma } from '~/db.server';
-import { AppointmentOperationError } from '~/functions/errors';
 import { address_create } from '~/models/address.server';
 import {
     appointment_create,
@@ -63,7 +63,7 @@ describe('APPOINTMENT FUNCTIONS', () => {
     });
 
     describe('SINGLE -', () => {
-        it.only('appointment_create returns an appointment', async () => {
+        it('appointment_create returns an appointment', async () => {
             const mockData = appointments[appointmentRef++];
             const createdRecord = await appointment_create(
                 validCustomerId,
@@ -101,7 +101,7 @@ describe('APPOINTMENT FUNCTIONS', () => {
             expect(result).toBeInstanceOf(AppointmentOperationError);
             expect(result?.message).toBe('Failed creating appointment');
         });
-        it.only('appointment_create returns an AppointmentOperationError if the appointment time is already taken', async () => {
+        it('appointment_create returns an AppointmentOperationError if the appointment time is already taken', async () => {
             console.log(
                 'appointment_create appointment_create appointment_create'
             );
@@ -193,7 +193,6 @@ describe('APPOINTMENT FUNCTIONS', () => {
                 addressId: validAddressId,
                 start: validAppointmentData.start,
                 end: validAppointmentData.end,
-                note: validAppointmentData.note,
                 completed: false,
             });
 
@@ -209,7 +208,6 @@ describe('APPOINTMENT FUNCTIONS', () => {
                 addressId: validAddressId,
                 start: mockAppointmentData.start,
                 end: mockAppointmentData.end,
-                note: mockAppointmentData.note,
                 completed: true,
             });
         });
@@ -222,22 +220,6 @@ describe('APPOINTMENT FUNCTIONS', () => {
                 validAppointmentData
             );
             expect(errorResult).toBeInstanceOf(AppointmentOperationError);
-        });
-        it('appointment_update returns the updated appointment', async () => {
-            const result = (await appointment_delete(
-                validAppointmentId
-            )) as Appointment;
-            expect(result).toMatchObject({
-                id: validAppointmentId,
-                customerId: validCustomerId,
-                recurring: validAppointmentData.recurring,
-                frequency: validAppointmentData.frequency,
-                addressId: validAddressId,
-                start: validAppointmentData.start,
-                end: validAppointmentData.end,
-                note: validAppointmentData.note,
-                completed: validAppointmentData.completed,
-            });
         });
     });
 
@@ -269,7 +251,6 @@ describe('APPOINTMENT FUNCTIONS', () => {
                         start: appointmentDataArray[index].start,
                         end: appointmentDataArray[index].end,
                         completed: false,
-                        note: appointmentDataArray[index].note,
                     })
                 );
             });

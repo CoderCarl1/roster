@@ -1,11 +1,11 @@
 import { PrismaClient } from '@prisma/client'
+import { AddressOperationError, AppointmentOperationError, CustomerOperationError } from '@errors';
 import { TAddress_No_ID, TAppointment_No_ID, TCustomer, TCustomer_No_ID } from '@types'
-import { AddressOperationError, AppointmentOperationError, CustomerOperationError } from '~/functions/errors'
-import { log } from '~/functions/helpers/functions'
-import { appointment_create } from '~/models/appointment.server'
-import { customer_create, customer_delete_many } from '~/models/customer.server'
-import { singleton } from '~/singleton.server'
-import { firstNames, lastNames, addressLine2Types, streetNames, streetTypes, suburbs } from '../app/lib/placeholder-data'
+import { log } from '~/functions/helpers/functions';
+import { appointment_create } from '~/models/appointment.server';
+import { customer_create, customer_delete_many } from '~/models/customer.server';
+import { singleton } from '~/singleton.server';
+import { firstNames, lastNames, addressLine2Types, streetNames, streetTypes, suburbs } from '../app/lib/placeholder-data';
 
 const seedingFlagIndex = process.argv.indexOf('--seeding') + 1
 if (seedingFlagIndex !== -1) {
@@ -129,24 +129,24 @@ function generateRandomFullName() {
     return [ firstName, lastName ];
 }
 
-async function createMockCustomer(){
+async function createMockCustomer() {
     try {
         const customerData = randomCustomerData();
-    
+
         const numberOfAddresses = randomNumber(100) > 17 ? 1 : 2;
         const addressesData = [] as TAddress_No_ID[];
-    
+
         for (let i = 0; i < numberOfAddresses; i++) {
             addressesData.push(randomAddress());
         }
         const result = await customer_create(customerData, addressesData);
         if (result instanceof CustomerOperationError || result instanceof AddressOperationError) {
-           return await createMockCustomer();
+            return await createMockCustomer();
         }
         return result;
     } catch (err) {
         if (err instanceof CustomerOperationError || err instanceof AddressOperationError) {
-           return await createMockCustomer();
+            return await createMockCustomer();
         } else {
             console.log("unknown error happened while generating a mock customer", err);
             throw err;
@@ -156,7 +156,7 @@ async function createMockCustomer(){
 function randomCustomerData() {
     const customer = {} as TCustomer_No_ID;
     const [ first, last ] = generateRandomFullName();
-    console.log("GENERATING DATA FOR  ", first , last)
+    console.log("GENERATING DATA FOR  ", first, last)
     customer.firstName = first;
     customer.lastName = last;
     customer.contact = `${customer.firstName}.${customer.lastName}@example.com`;

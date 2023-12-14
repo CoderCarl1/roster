@@ -1,8 +1,8 @@
 import { Address } from '@prisma/client';
 
+import { AddressOperationError } from '@errors';
 import { TAddress_data_for_creation } from '@types';
 import { prisma } from '~/db.server';
-import { AddressOperationError } from '~/functions/errors';
 import { log } from '~/functions/helpers/functions';
 /**
  * CREATE
