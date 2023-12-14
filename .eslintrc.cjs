@@ -98,6 +98,11 @@ module.exports = {
       env: {
         "jest/globals": true,
       },
+      rules: {
+        "jest/no-commented-out-tests": "off",
+        "jest/no-conditional-expect": "warn",
+        "@typescript-eslint/ban-ts-comment": "off"
+      }
     },
 
     // Cypress
