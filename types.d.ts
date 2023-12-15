@@ -14,21 +14,23 @@ export type TCustomer = {
     createdAt: Date | string | null;
     appointments?: Appointment[] | TAppointmentWithCustomerName[];
     addresses?: Address[] | TAddressWithCustomerNameAndFullAddress[];
-    note?: Note;
 } & Customer;
 
+type optionalFullName = {
+    fullName?: string;
+}
+type optionalFullAddress = {
+    fullAddress?: string;
+}
 export type TAddress = Address;
-export type TAddressWithCustomerNameAndFullAddress = {
-    fullAddress: string;
-    fullName: string;
-    note?: Note;
-} & TAddress;
+export type TAddressWithCustomerNameAndFullAddress = optionalFullName & optionalFullAddress & TAddress;
 
 export type TAppointment = Appointment;
-export type TAppointmentWithCustomerName = {
-    fullName: string;
-    note?: Note;
-} & TAppointment;
+export type TAppointmentWithCustomerName = optionalFullName & TAppointment;
+
+export type TAppointmentWithCustomerNameAndAddress = TAppointmentWithCustomerName & {
+    fullAddress: string;
+}
 
 export type TCustomer_data_for_creation = Pick<
     Customer,

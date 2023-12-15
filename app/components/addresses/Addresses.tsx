@@ -1,28 +1,29 @@
-import { Await, useLoaderData } from '@remix-run/react';
-import React, { Suspense } from 'react';
-import { LoadingComponent, useAddresses, Address_Card } from '@components';
+import { useAddresses, Address_Card } from '@components';
 import { TAddressWithCustomerNameAndFullAddress } from '@types';
-import { loaderType } from '~/routes/_index';
-import Note from '../note/note';
 import Table, { Caption, Row, TD, TH } from '../table/table';
+import { useEffect } from 'react';
+import { useLoaderData } from '@remix-run/react';
+import { loaderType } from '~/routes/_index';
 
 function Main() {
-    const { addresses } = useLoaderData<loaderType>();
-    const { setAddress, currentAddress } = useAddresses(addresses as any);
+    const { addressesLoaderData } = useLoaderData<loaderType>();
 
+    const { setAddress, currentAddress, setAddresses, addresses } = useAddresses();
+
+    useEffect(() => {
+        console.log(" useEffect setAddresses")
+        setAddresses(addressesLoaderData as any);
+    }, [ setAddresses, addressesLoaderData ]);
+    
     return (
-        <Suspense fallback={<LoadingComponent />}>
-            <Await resolve={addresses}>
-                <Addresses setAddress={setAddress} addresses={addresses as any}>
-                    {currentAddress ? (
-                        <Address_Card
-                            clearAddress={setAddress}
-                            address={currentAddress}
-                        />
-                    ) : null}
-                </Addresses>
-            </Await>
-        </Suspense>
+        <Addresses setAddress={setAddress} addresses={addresses as any}>
+            {currentAddress ? (
+                <Address_Card
+                    address={currentAddress}
+                    clearAddress={setAddress}
+                />
+            ) : null}
+        </Addresses>
     );
 }
 
@@ -43,18 +44,18 @@ function Addresses({ addresses = [], setAddress, children }: addressesProps) {
                 {/* <TH>Note</TH> */}
                 {addresses
                     ? addresses.map((address) => {
-                          const { id, fullName, fullAddress, note } = address;
-                          return (
-                              <Row
-                                  key={id + fullName}
-                                  cb={() => setAddress(id)}
-                              >
-                                  <TD>{fullName}</TD>
-                                  <TD>{fullAddress}</TD>
-                                  {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
-                              </Row>
-                          );
-                      })
+                        const { id, fullName, fullAddress } = address;
+                        return (
+                            <Row
+                                key={id + fullName}
+                                cb={() => setAddress(id)}
+                            >
+                                <TD>{fullName}</TD>
+                                <TD>{fullAddress}</TD>
+                                {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
+                            </Row>
+                        );
+                    })
                     : null}
             </Table>
         </section>

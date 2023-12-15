@@ -1,31 +1,32 @@
-import { Await, useLoaderData } from '@remix-run/react';
-import { Suspense } from 'react';
-import { LoadingComponent, Customer_Card, useCustomers } from '@components';
+import { Customer_Card, useCustomers } from '@components';
 import { TCustomer } from '@types';
-import { loaderType } from '~/routes/_index';
-import Note from '../note/note';
 import Table, { Caption, Row, TD, TH } from '../table/table';
+import { useLoaderData } from '@remix-run/react';
+import { loaderType } from '~/routes/_index';
+import { useEffect } from 'react';
 
 function Main() {
-    const { customers } = useLoaderData<loaderType>();
-    const { setCustomer, currentCustomer } = useCustomers(customers as any);
+    const { customersLoaderData } = useLoaderData<loaderType>();
 
+    const { setCustomer, currentCustomer, customersData, setCustomers } = useCustomers();
+
+    useEffect(() => {
+        console.log(" useEffect setCustomers")
+        setCustomers(customersLoaderData as any);
+    }, [ setCustomers, customersLoaderData ]);
+    
     return (
-        <Suspense fallback={<LoadingComponent />}>
-            <Await resolve={customers}>
-                <Customers
-                    setCustomer={setCustomer}
-                    customers={customers as any}
-                >
-                    {currentCustomer ? (
-                        <Customer_Card
-                            clearCustomer={setCustomer}
-                            customer={currentCustomer}
-                        />
-                    ) : null}
-                </Customers>
-            </Await>
-        </Suspense>
+        <Customers
+            setCustomer={setCustomer}
+            customers={customersData as any}
+        >
+            {currentCustomer ? (
+                <Customer_Card
+                    clearCustomer={setCustomer}
+                    customer={currentCustomer}
+                />
+            ) : null}
+        </Customers>
     );
 }
 
@@ -47,20 +48,20 @@ function Customers({ customers, setCustomer, children }: customersProps) {
                 {/* <TH>Note</TH> */}
                 {customers
                     ? customers.map((customer) => {
-                          const { id, firstName, lastName, contact, note } =
-                              customer;
-                          return (
-                              <Row
-                                  key={id + firstName + lastName}
-                                  cb={() => setCustomer(id)}
-                              >
-                                  <TD>{firstName}</TD>
-                                  <TD>{lastName}</TD>
-                                  <TD>{contact}</TD>
-                                  {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
-                              </Row>
-                          );
-                      })
+                        const { id, firstName, lastName, contact } =
+                            customer;
+                        return (
+                            <Row
+                                key={id + firstName + lastName}
+                                cb={() => setCustomer(id)}
+                            >
+                                <TD>{firstName}</TD>
+                                <TD>{lastName}</TD>
+                                <TD>{contact}</TD>
+                                {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
+                            </Row>
+                        );
+                    })
                     : null}
             </Table>
         </section>

@@ -1,36 +1,35 @@
-import { Await, useLoaderData } from '@remix-run/react';
-import { Suspense } from 'react';
 import {
-    LoadingComponent,
     Appointment_Card,
     useAppointments,
 } from '@components';
 import { TAppointmentWithCustomerName } from '@types';
-import { loaderType } from '~/routes/_index';
 import Table, { Caption, Row, TD, TH } from '../table/table';
+import { useLoaderData } from '@remix-run/react';
+import { loaderType } from '~/routes/_index';
+import { useEffect } from 'react';
 
 function Main() {
-    const { appointments } = useLoaderData<loaderType>();
-    const { setAppointment, currentAppointment } = useAppointments(
-        appointments as any
-    );
+    const { appointmentsLoaderData } = useLoaderData<loaderType>();
 
+    const { setAppointment, currentAppointment, setAppointments, appointments } = useAppointments();
+    
+    useEffect(() => {
+        console.log(" useEffect setAppointments")
+        setAppointments(appointmentsLoaderData as any);
+    }, [ setAppointments, appointmentsLoaderData ]);
+    
     return (
-        <Suspense fallback={<LoadingComponent />}>
-            <Await resolve={appointments}>
-                <Appointments
-                    setAppointment={setAppointment}
-                    appointments={appointments as any}
-                >
-                    {currentAppointment ? (
-                        <Appointment_Card
-                            clearAppointment={setAppointment}
-                            appointment={currentAppointment}
-                        />
-                    ) : null}
-                </Appointments>
-            </Await>
-        </Suspense>
+        <Appointments
+            setAppointment={setAppointment}
+            appointments={appointments as any}
+        >
+            {currentAppointment ? (
+                <Appointment_Card
+                    clearAppointment={setAppointment}
+                    appointment={currentAppointment}
+                />
+            ) : null}
+        </Appointments>
     );
 }
 
@@ -60,31 +59,30 @@ function Appointments({
 
                 {appointments
                     ? appointments.map((appointment) => {
-                          const {
-                              id,
-                              fullName,
-                              start,
-                              end,
-                              recurring,
-                              frequency,
-                              completed,
-                              note,
-                          } = appointment;
-                          return (
-                              <Row
-                                  key={id + fullName}
-                                  cb={() => setAppointment(id)}
-                              >
-                                  <TD>{fullName}</TD>
-                                  <TD>{start}</TD>
-                                  <TD>{end}</TD>
-                                  <TD>{recurring ? 'Yes' : 'No'}</TD>
-                                  <TD>{frequency}</TD>
-                                  <TD>{completed ? '✅' : '❌'}</TD>
-                                  {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
-                              </Row>
-                          );
-                      })
+                        const {
+                            id,
+                            fullName,
+                            start,
+                            end,
+                            recurring,
+                            frequency,
+                            completed,
+                        } = appointment;
+                        return (
+                            <Row
+                                key={id + fullName}
+                                cb={() => setAppointment(id)}
+                            >
+                                <TD>{fullName}</TD>
+                                <TD>{start}</TD>
+                                <TD>{end}</TD>
+                                <TD>{recurring ? 'Yes' : 'No'}</TD>
+                                <TD>{frequency}</TD>
+                                <TD>{completed ? '✅' : '❌'}</TD>
+                                {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
+                            </Row>
+                        );
+                    })
                     : null}
             </Table>
         </section>

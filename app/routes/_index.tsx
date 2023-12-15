@@ -3,19 +3,32 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
 } from '@remix-run/node';
+import { Await, useLoaderData } from '@remix-run/react';
 import {
     Addresses,
     Appointments,
     Customers,
+    LoadingComponent,
     useAddresses,
     useAppointments,
+    useCustomers,
 } from '@components';
+import {
+    CustomerProvider,
+    AppointmentProvider,
+    AddressProvider,
+} from '@contexts';
+import {
+    getAppointmentsFromCustomerArray,
+    getAddressesFromCustomerArray
+} from '@functions';
 import {
     AddressOperationError,
     AppointmentOperationError,
     CustomerOperationError,
 } from '@errors';
 import { customer_find_many } from '~/models/customer.server';
+import { Suspense } from 'react';
 
 export const meta: MetaFunction = () => {
     return [
@@ -28,36 +41,78 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
-    const customers = await customer_find_many({
+    const customersLoaderData = await customer_find_many({
         addresses: true,
         appointments: true,
     });
 
     if (
-        !customers ||
-        customers instanceof CustomerOperationError ||
-        customers instanceof AddressOperationError ||
-        customers instanceof AppointmentOperationError
+        !customersLoaderData ||
+        customersLoaderData instanceof CustomerOperationError ||
+        customersLoaderData instanceof AddressOperationError ||
+        customersLoaderData instanceof AppointmentOperationError
     ) {
-        throw new Response('Not Found', { status: 404 });
+        throw new Response('Customers Not Found', { status: 404 });
     }
 
-    const appointments =
-        useAppointments.getAppointmentsFromCustomerArray(customers);
-    const addresses = useAddresses.getAddressesFromCustomerArray(customers);
+    const appointmentsLoaderData = getAppointmentsFromCustomerArray(customersLoaderData);
+    if (
+        !appointmentsLoaderData ||
+        appointmentsLoaderData instanceof CustomerOperationError ||
+        appointmentsLoaderData instanceof AddressOperationError ||
+        appointmentsLoaderData instanceof AppointmentOperationError
+    ) {
+        throw new Response('Appointments Not Found', { status: 404 });
+    }
 
-    return json({ customers, addresses, appointments });
+    const addressesLoaderData = getAddressesFromCustomerArray(customersLoaderData);
+    if (
+        !addressesLoaderData ||
+        addressesLoaderData instanceof CustomerOperationError ||
+        addressesLoaderData instanceof AddressOperationError ||
+        addressesLoaderData instanceof AppointmentOperationError
+    ) {
+        throw new Response('addresses Not Found', { status: 404 });
+    }
+
+    console.log("about to return data")
+
+    return json({ customersLoaderData, addressesLoaderData, appointmentsLoaderData });
 };
 
 export type loaderType = typeof loader;
 
 export default function Index() {
+    const { customersLoaderData, addressesLoaderData, appointmentsLoaderData } = useLoaderData<loaderType>();
+
     return (
         <main>
             <div className="dashboard">
-                <Customers />
-                <Appointments />
-                <Addresses />
+                <CustomerProvider>
+                    <AppointmentProvider>
+                        <AddressProvider>
+        
+                            <Suspense fallback={<LoadingComponent />}>
+                                <Await resolve={customersLoaderData}>
+                                    <Customers />
+                                </Await>
+                            </Suspense>
+
+                            <Suspense fallback={<LoadingComponent />}>
+                                <Await resolve={appointmentsLoaderData}>
+                                    <Appointments />
+                                </Await>
+                            </Suspense>
+
+                            <Suspense fallback={<LoadingComponent />}>
+                                <Await resolve={addressesLoaderData}>
+                                    <Addresses />
+                                </Await>
+                            </Suspense>
+
+                        </AddressProvider>
+                    </AppointmentProvider>
+                </CustomerProvider>
             </div>
         </main>
     );

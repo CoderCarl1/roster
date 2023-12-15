@@ -1,39 +1,17 @@
-import { useState } from 'react';
-import { TCustomer, TAddressWithCustomerNameAndFullAddress } from '@types';
-import { useCustomers } from '~/components';
+import { useAddressContext } from '@contexts';
 
-function useAddresses(addressArray: TAddressWithCustomerNameAndFullAddress[]) {
-    const [currentAddress, setCurrentAddress] =
-        useState<null | TAddressWithCustomerNameAndFullAddress>(null);
+function useAddresses() {
+    const {addresses, setAddresses, currentAddress, setCurrentAddress} = useAddressContext();
 
     function setAddress(addressId?: string) {
         let data = null;
-        if (addressId && addressArray) {
-            data =
-                addressArray.find((address) => address.id === addressId) ??
+        if (addressId && addresses) {
+            data = addresses.find((address) => address.id === addressId) ??
                 null;
         }
         setCurrentAddress(data);
     }
-    return { setAddress, currentAddress };
+    return { addresses, setAddresses, currentAddress, setAddress};
 }
 
-function getAddressesFromCustomerArray(customers: TCustomer[] = []) {
-    const { extractFullName } = useCustomers();
-
-    return customers.reduce((addressesArr, customer) => {
-        if (customer.addresses && customer.addresses.length) {
-            addressesArr.push(
-                ...customer.addresses.map((address) => ({
-                    fullAddress: `${address.number} ${address.line1} ${address.line2}, ${address.suburb}`,
-                    fullName: extractFullName(customer),
-                    ...address,
-                }))
-            );
-        }
-        return addressesArr;
-    }, [] as TAddressWithCustomerNameAndFullAddress[]);
-}
-
-useAddresses.getAddressesFromCustomerArray = getAddressesFromCustomerArray;
-export { useAddresses as default, getAddressesFromCustomerArray };
+export { useAddresses as default };
