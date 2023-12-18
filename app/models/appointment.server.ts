@@ -18,21 +18,23 @@ export async function appointment_create(
     appointmentData: TAppointment_data_for_creation
 ): Promise<Appointment | AppointmentOperationError> {
     try {
-        console.log(
-            'appointment_createappointment_createappointment_createappointment_createappointment_createappointment_create'
-        );
         if (!customerId) throw new Error('no customer ID');
         if (!addressId) throw new Error('no address ID');
-        const timeAlreadyTaken = await existingAppointment(
+
+        const startTime = Date.parse(appointmentData.start);
+        const endTime = Date.parse(appointmentData.end);
+
+        if (isNaN(startTime) || isNaN(endTime) || startTime >= endTime) {
+            throw new Error('Invalid start or end time');
+        }
+        
+        const timeConflictExists = await existingAppointmentCheck(
             appointmentData.start,
             appointmentData.end
         );
 
-        if (timeAlreadyTaken && timeAlreadyTaken.length) {
-            throw new AppointmentOperationError(
-                'time already taken',
-                timeAlreadyTaken
-            );
+        if (timeConflictExists instanceof AppointmentOperationError) {
+            throw timeConflictExists;
         }
 
         const createdAppointment = await prisma.appointment.create({
@@ -56,33 +58,27 @@ export async function appointment_create(
     }
 }
 
-export async function existingAppointment(start: string, end: string) {
-    console.log('===========   existingAppointment start');
-    const startDate = new Date(start);
-    console.log('existingAppointment startDate', startDate);
-    const endDate = new Date(end);
-    console.log('existingAppointment endDate', endDate);
+export async function existingAppointmentCheck(start: string | Date, end: string | Date) {
+    const startDate = new Date(start).getTime();
+    const endDate = new Date(end).getTime();
 
     const oneMinute = 60 * 1000; // 1 minute in milliseconds
 
     const existingAppointmentsData = await prisma.appointment.findMany({
         where: {
             start: {
-                gte: new Date(startDate.getTime() - oneMinute).toISOString(),
-                lt: new Date(endDate.getTime() + oneMinute).toISOString(),
+                gte: new Date(startDate - oneMinute).toISOString(),
+                lt: new Date(endDate + oneMinute).toISOString(),
             },
             end: {
-                gte: new Date(startDate.getTime() - oneMinute).toISOString(),
-                lt: new Date(endDate.getTime() + oneMinute).toISOString(),
+                gte: new Date(startDate - oneMinute).toISOString(),
+                lt: new Date(endDate + oneMinute).toISOString(),
             },
         },
     });
-    console.log('===========   existingAppointment  AFTER findmany ran');
     if (existingAppointmentsData && existingAppointmentsData.length) {
-        console.log('existingAppointment', existingAppointmentsData);
-        return existingAppointmentsData;
+        return new AppointmentOperationError('conflicting appointments found', existingAppointmentsData);
     }
-    console.log('No existing appointments within the specified time range.');
     return false;
 }
 
@@ -100,14 +96,29 @@ export async function appointment_create_many(
     appointmentDataArray: TAppointment_data_for_creation[]
 ): Promise<Appointment[] | AppointmentOperationError> {
     try {
-        if (!customerId) throw new Error('no customer ID');
-        if (!addressId) throw new Error('no address ID');
+
         const createdAppointments = await prisma.$transaction(async (tx) => {
             const appointments = await Promise.all(
                 appointmentDataArray.map(async (appointmentData) => {
+
+                    const startTime = Date.parse(appointmentData.start);
+                    const endTime = Date.parse(appointmentData.end);
+            
+                    if (isNaN(startTime) || isNaN(endTime) || startTime >= endTime) {
+                        throw new Error('Invalid start or end time');
+                    }
+                    const timeConflictExists = await existingAppointmentCheck(
+                        appointmentData.start,
+                        appointmentData.end
+                    );
+            
+                    if (timeConflictExists instanceof AppointmentOperationError) {
+                        throw timeConflictExists;
+                    }
                     const appointment = await tx.appointment.create({
                         data: { ...appointmentData, customerId, addressId },
                     });
+
                     if (!appointment) {
                         throw new Error(
                             `unable to create appointment, ${JSON.stringify(
@@ -121,15 +132,16 @@ export async function appointment_create_many(
             return appointments;
         });
 
-        if (
-            !createdAppointments ||
-            createdAppointments.length !== appointmentDataArray.length
-        ) {
-            throw new AppointmentOperationError(
-                'Failed Creating appointment, dumping data',
-                appointmentDataArray
-            );
-        }
+        /** removing for now as I am unsure if it is needed */
+        // if (
+        //     !createdAppointments ||
+        //     createdAppointments.length !== appointmentDataArray.length
+        // ) {
+        //     throw new AppointmentOperationError(
+        //         'Failed Creating appointment, dumping data',
+        //         appointmentDataArray
+        //     );
+        // }
         return createdAppointments;
     } catch (err) {
         if (err instanceof AppointmentOperationError) {
@@ -152,7 +164,13 @@ export async function appointment_find_many(
     try {
         const appointments = await prisma.appointment.findMany({
             where: { completed: false, ...whereBlock },
+            orderBy: { start: 'asc' },
         });
+
+        if (!appointments) {
+            return [];
+        }
+
         return appointments;
     } catch (err) {
         return new AppointmentOperationError(
@@ -185,6 +203,7 @@ export async function appointment_findbyCustomer(
     try {
         const appointments = await prisma.appointment.findMany({
             where: { customerId },
+            orderBy: { start: 'asc' },
         });
         return appointments;
     } catch (err) {
@@ -194,6 +213,7 @@ export async function appointment_findbyCustomer(
         );
     }
 }
+
 
 /**
  * Retrieves all appointments from the database for a customer.
@@ -206,11 +226,33 @@ export async function appointment_findbyAddress(
     try {
         const appointments = await prisma.appointment.findMany({
             where: { addressId },
+            orderBy: { start: 'asc' },
         });
         return appointments;
     } catch (err) {
         return new AppointmentOperationError(
             `Error while retrieving appointments for address ${addressId}`,
+            err
+        );
+    }
+}
+
+/**
+ * Retrieves the appointment from the database.
+ * @param appointmentId - The ID of the appointment.
+ * @returns A promise that resolves to an appointment or an AppointmentOperationError.
+ */
+export async function appointment_findbyId(
+    appointmentId: string
+): Promise<Appointment | AppointmentOperationError> {
+    try {
+        return await prisma.appointment.findUniqueOrThrow({
+            where: { id: appointmentId },
+        });
+
+    } catch (err) {
+        return new AppointmentOperationError(
+            `Error while retrieving appointment ${appointmentId}`,
             err
         );
     }
@@ -228,16 +270,40 @@ export async function appointment_update(
     { ...args }: Omit<Partial<Appointment>, 'id' | 'updatedAt' | 'createdAt'>
 ): Promise<Appointment | AppointmentOperationError> {
     try {
+        const existingAppointment = await appointment_findbyId(id);
+
+        if (existingAppointment instanceof AppointmentOperationError) {
+            throw existingAppointment;
+        }
+
+        const startTime = Date.parse(args.start || existingAppointment.start);
+        const endTime = Date.parse(args.end || existingAppointment.end);
+
+        if (isNaN(startTime) || isNaN(endTime) || startTime >= endTime) {
+            throw new AppointmentOperationError('Invalid start or end time');
+        }
+        const timeConflictExists = await existingAppointmentCheck(
+            args.start || existingAppointment.start,
+            args.end || existingAppointment.end
+        );
+        
+        if (timeConflictExists instanceof AppointmentOperationError) {
+            throw timeConflictExists;
+        }
+
         const updatedAppointment = await prisma.appointment.update({
             where: { id },
-            data: args,
+            data: { ...args },
         });
+
         if (!updatedAppointment) {
             throw new Error(`appointment with ID ${id} not updated.`);
         }
+
         console.log(
             `Customer with ID ${id} and associated data updated successfully.`
         );
+
         return updatedAppointment;
     } catch (err) {
         if (err instanceof AppointmentOperationError) {
