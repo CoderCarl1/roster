@@ -1,0 +1,61 @@
+@use '../abstracts/' as *;
+
+.button {
+  --_bg-color: var(--bg-color, transparent);
+  --_color: var(--color, clr(primary, 400));
+  --_border-color: var(--border-color, clr(primary, 100));
+  --_outline-color: var(--_color, clr(primary, 100));
+  --_border: 1px solid var(--_border-color);
+  --_border-radius: var(--border-radius, 0.125em);
+  --_padding: var(--padding, 0.5em 1.125em);
+
+  background-color: var(--_bg-color);
+  color: var(--_color);
+  cursor: pointer;
+  display: inline-block;
+  padding: var(--_padding);
+  text-align: center;
+  text-decoration: none;
+  transition: all 250ms;
+  border: var(--_border, 0);
+  border-radius: var(--_border-radius);
+  text-transform: capitalize;
+}
+
+.button:hover {
+  --_bg-color: #fff;
+
+  box-shadow:
+    -0.125em -0.125em 0.5em 0 var(--_bg-color),
+    0.125em 0.125em 0.5em 0 var(--_border-color);
+}
+
+.button:active {
+  outline: 1px solid var(--_outline-color);
+  outline-offset: -1px;
+  transform: scale(0.975);
+  transition:
+    background-color 0.1s ease-in-out,
+    color 0.1s ease-in-out;
+}
+
+.button.primary {
+  --_bg-color: clr(primary, 100);
+  --_color: clr(primary, 400);
+  --_border-color: clr(primary, 200);
+  box-shadow: none;
+
+  &:hover {
+    --_bg-color: clr(primary, 100);
+  }
+}
+.button.secondary {
+  --_bg-color: clr(secondary, 200);
+  --_color: clr(secondary, 400);
+  --_border-color: clr(secondary, 300);
+  box-shadow: none;
+
+  &:hover {
+    --_bg-color: clr(secondary, 100);
+  }
+}
