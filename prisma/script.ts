@@ -169,7 +169,7 @@ function randomCustomerData() {
     }
     customer.createdAt = randomDateInPast(90);
     customer.updatedAt = customer.suspended
-        ? (customer.suspendedAt as Date)
+        ? customer.suspendedAt
         : randomDateBetween(new Date(customer.createdAt), new Date());
 
     return customer;
@@ -197,8 +197,9 @@ function randomAppointment() {
 
     appointment.completed = randomNumber(10) <= 7;
     const appointmentLength = randomNumber(2);
+    // start time of appointments betwen 8:00 and 15:00
     const startHour = 8 + randomNumber(7);
-    const startMinutes = randomNumber(1) === 1 ? 30 : 0;
+    const startMinutes = (randomNumber(4) * 15 ) - 15;
     if (appointment.completed) {
         const startDate = randomDateInPast(90);
         const intermediaryDate = new Date(
