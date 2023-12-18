@@ -1,4 +1,11 @@
-import { Address, Appointment, Customer, Note, User } from '@prisma/client';
+import {
+    Address,
+    Appointment,
+    Customer,
+    Note,
+    Prisma,
+    User,
+} from '@prisma/client';
 import {
     NotFoundError,
     PrismaClientInitializationError,
@@ -8,29 +15,35 @@ import {
     PrismaClientValidationError,
 } from '@prisma/client/runtime/library';
 
+type optionalFullName = {
+    fullName?: string | undefined | null;
+};
+type optionalFullAddress = {
+    fullAddress?: string | undefined | null;
+};
+
+type optionalCustomer = { customer?: TCustomer };
+
 export type TCustomer = {
     suspendedAt: Date | string | null;
     updatedAt: Date | string | null;
     createdAt: Date | string | null;
     appointments?: Appointment[] | TAppointmentWithCustomerName[];
     addresses?: Address[] | TAddressWithCustomerNameAndFullAddress[];
-} & Customer;
+} & Customer &
+    optionalFullName &
+    optionalFullAddress;
 
-type optionalFullName = {
-    fullName?: string;
-}
-type optionalFullAddress = {
-    fullAddress?: string;
-}
-export type TAddress = Address;
-export type TAddressWithCustomerNameAndFullAddress = optionalFullName & optionalFullAddress & TAddress;
+export type TAddress = optionalCustomer & Address;
+export type TAddressWithCustomerNameAndFullAddress = optionalFullName &
+    optionalFullAddress &
+    TAddress;
 
-export type TAppointment = Appointment;
+export type TAppointment = { address: Address } & optionalCustomer &
+    Appointment;
 export type TAppointmentWithCustomerName = optionalFullName & TAppointment;
-
-export type TAppointmentWithCustomerNameAndAddress = TAppointmentWithCustomerName & {
-    fullAddress: string;
-}
+export type TAppointmentWithCustomerNameAndFullAddress =
+    TAppointmentWithCustomerName & optionalFullAddress;
 
 export type TCustomer_data_for_creation = Pick<
     Customer,
@@ -75,12 +88,6 @@ export type TCustomer_Appointments_Addresses =
           addresses: Address[];
           appointments: Appointment[];
       });
-
-export type inclusionTypes = {
-    customers?: boolean;
-    appointments?: boolean;
-    addresses?: boolean;
-};
 
 // Types used for Seeding
 export type TCustomer_No_ID = Omit<Customer, 'id'>;

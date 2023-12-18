@@ -3,7 +3,7 @@ type formProps = {
     handleSubmit?: React.FormEventHandler<Element>;
 } & React.HTMLProps<HTMLFormElement>;
 
-function Form({ handleSubmit, children }: formProps) {
+function Form({ handleSubmit, children, ...props }: formProps) {
     function innerHandleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (!handleSubmit) return;
@@ -12,7 +12,7 @@ function Form({ handleSubmit, children }: formProps) {
     }
 
     return (
-        <form onSubmit={innerHandleSubmit}>
+        <form onSubmit={innerHandleSubmit} {...props}>
             <fieldset>{children}</fieldset>
         </form>
     );

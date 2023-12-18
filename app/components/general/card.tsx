@@ -18,14 +18,25 @@ export default function Card({
     // TODO: update to use icons
     return (
         <Form className="card" autoComplete="on" {...props}>
-            <div className="card_controls">
-                <Button className="capitalize" onClick={toggleEditable}>
-                    Edit
-                </Button>
-                {editable ? <Button type="submit">Save</Button> : null}
-                <Button type="button" onClick={closeFunc}>
-                    {' '}
-                    X{' '}
+            <div className="card__controls">
+                {!editable ? (
+                    <Button
+                        className="uppercase primary"
+                        onClick={toggleEditable}
+                    >
+                        Edit
+                    </Button>
+                ) : (
+                    <Button type="submit" className="uppercase primary">
+                        Save
+                    </Button>
+                )}
+                <Button
+                    type="button"
+                    className="button secondary"
+                    onClick={closeFunc}
+                >
+                    X
                 </Button>
             </div>
 

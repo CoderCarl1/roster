@@ -1,20 +1,21 @@
+import { useLoaderData } from '@remix-run/react';
+import { useEffect } from 'react';
 import { useAddresses, Address_Card } from '@components';
 import { TAddressWithCustomerNameAndFullAddress } from '@types';
-import Table, { Caption, Row, TD, TH } from '../table/table';
-import { useEffect } from 'react';
-import { useLoaderData } from '@remix-run/react';
 import { loaderType } from '~/routes/_index';
+import Table, { Caption, Row, TD, TH } from '../table/table';
 
 function Main() {
     const { addressesLoaderData } = useLoaderData<loaderType>();
 
-    const { setAddress, currentAddress, setAddresses, addresses } = useAddresses();
+    const { setAddress, currentAddress, setAddresses, addresses } =
+        useAddresses();
 
     useEffect(() => {
-        console.log(" useEffect setAddresses")
+        console.log(' useEffect setAddresses');
         setAddresses(addressesLoaderData as any);
-    }, [ setAddresses, addressesLoaderData ]);
-    
+    }, [setAddresses, addressesLoaderData]);
+
     return (
         <Addresses setAddress={setAddress} addresses={addresses as any}>
             {currentAddress ? (
@@ -44,18 +45,18 @@ function Addresses({ addresses = [], setAddress, children }: addressesProps) {
                 {/* <TH>Note</TH> */}
                 {addresses
                     ? addresses.map((address) => {
-                        const { id, fullName, fullAddress } = address;
-                        return (
-                            <Row
-                                key={id + fullName}
-                                cb={() => setAddress(id)}
-                            >
-                                <TD>{fullName}</TD>
-                                <TD>{fullAddress}</TD>
-                                {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
-                            </Row>
-                        );
-                    })
+                          const { id, fullName, fullAddress } = address;
+                          return (
+                              <Row
+                                  key={id + fullName}
+                                  cb={() => setAddress(id)}
+                              >
+                                  <TD>{fullName}</TD>
+                                  <TD>{fullAddress}</TD>
+                                  {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
+                              </Row>
+                          );
+                      })
                     : null}
             </Table>
         </section>

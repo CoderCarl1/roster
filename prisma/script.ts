@@ -179,7 +179,7 @@ function randomAddress() {
     const address = {} as TAddress_No_ID;
 
     address.number = randomNumber(100) + "";
-    address.line1 = streetNames[ randomNumber(streetNames.length) - 1 ] + streetTypes[ randomNumber(streetTypes.length) - 1 ];
+    address.line1 = streetNames[ randomNumber(streetNames.length) - 1 ] + " " + streetTypes[ randomNumber(streetTypes.length) - 1 ];
     if (randomNumber(100) <= 17) {
         address.line2 = addressLine2Types[ randomNumber(addressLine2Types.length) - 1 ];
     } else {

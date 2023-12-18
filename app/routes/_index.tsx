@@ -4,6 +4,7 @@ import {
     type MetaFunction,
 } from '@remix-run/node';
 import { Await, useLoaderData } from '@remix-run/react';
+import { Suspense } from 'react';
 import {
     Addresses,
     Appointments,
@@ -17,18 +18,16 @@ import {
     CustomerProvider,
     AppointmentProvider,
     AddressProvider,
+    CalendarProvider,
 } from '@contexts';
-import {
-    getAppointmentsFromCustomerArray,
-    getAddressesFromCustomerArray
-} from '@functions';
 import {
     AddressOperationError,
     AppointmentOperationError,
     CustomerOperationError,
 } from '@errors';
+import { address_find_all } from '~/models/address.server';
+import { appointment_find_many } from '~/models/appointment.server';
 import { customer_find_many } from '~/models/customer.server';
-import { Suspense } from 'react';
 
 export const meta: MetaFunction = () => {
     return [
@@ -55,7 +54,10 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
         throw new Response('Customers Not Found', { status: 404 });
     }
 
-    const appointmentsLoaderData = getAppointmentsFromCustomerArray(customersLoaderData);
+    const appointmentsLoaderData = await appointment_find_many({
+        address: true,
+        customer: true,
+    });
     if (
         !appointmentsLoaderData ||
         appointmentsLoaderData instanceof CustomerOperationError ||
@@ -65,25 +67,34 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
         throw new Response('Appointments Not Found', { status: 404 });
     }
 
-    const addressesLoaderData = getAddressesFromCustomerArray(customersLoaderData);
-    if (
-        !addressesLoaderData ||
-        addressesLoaderData instanceof CustomerOperationError ||
-        addressesLoaderData instanceof AddressOperationError ||
-        addressesLoaderData instanceof AppointmentOperationError
-    ) {
-        throw new Response('addresses Not Found', { status: 404 });
-    }
+    const addressesLoaderData = [];
+    // await address_find_all({
+    //     customer: true,
+    //     appointments: true
+    // });
+    // if (
+    //     !addressesLoaderData ||
+    //     addressesLoaderData instanceof CustomerOperationError ||
+    //     addressesLoaderData instanceof AddressOperationError ||
+    //     addressesLoaderData instanceof AppointmentOperationError
+    // ) {
+    //     throw new Response('addresses Not Found', { status: 404 });
+    // }
 
-    console.log("about to return data")
+    console.log('about to return data');
 
-    return json({ customersLoaderData, addressesLoaderData, appointmentsLoaderData });
+    return json({
+        customersLoaderData,
+        addressesLoaderData,
+        appointmentsLoaderData,
+    });
 };
 
 export type loaderType = typeof loader;
 
 export default function Index() {
-    const { customersLoaderData, addressesLoaderData, appointmentsLoaderData } = useLoaderData<loaderType>();
+    const { customersLoaderData, addressesLoaderData, appointmentsLoaderData } =
+        useLoaderData<loaderType>();
 
     return (
         <main>
@@ -91,25 +102,25 @@ export default function Index() {
                 <CustomerProvider>
                     <AppointmentProvider>
                         <AddressProvider>
-        
-                            <Suspense fallback={<LoadingComponent />}>
-                                <Await resolve={customersLoaderData}>
-                                    <Customers />
-                                </Await>
-                            </Suspense>
+                            <CalendarProvider>
+                                <Suspense fallback={<LoadingComponent />}>
+                                    <Await resolve={customersLoaderData}>
+                                        <Customers />
+                                    </Await>
+                                </Suspense>
 
-                            <Suspense fallback={<LoadingComponent />}>
-                                <Await resolve={appointmentsLoaderData}>
-                                    <Appointments />
-                                </Await>
-                            </Suspense>
+                                <Suspense fallback={<LoadingComponent />}>
+                                    <Await resolve={appointmentsLoaderData}>
+                                        <Appointments />
+                                    </Await>
+                                </Suspense>
 
-                            <Suspense fallback={<LoadingComponent />}>
-                                <Await resolve={addressesLoaderData}>
-                                    <Addresses />
-                                </Await>
-                            </Suspense>
-
+                                <Suspense fallback={<LoadingComponent />}>
+                                    <Await resolve={addressesLoaderData}>
+                                        <Addresses />
+                                    </Await>
+                                </Suspense>
+                            </CalendarProvider>
                         </AddressProvider>
                     </AppointmentProvider>
                 </CustomerProvider>

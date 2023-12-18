@@ -1,30 +1,49 @@
-import { TAppointmentWithCustomerName } from "@types";
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext } from 'react';
+import { TAppointmentWithCustomerNameAndFullAddress } from '@types';
 
 type AppointmentContextType = {
-  appointments: TAppointmentWithCustomerName[];
-  setAppointments: React.Dispatch<React.SetStateAction<TAppointmentWithCustomerName[]>>;
-  currentAppointment: TAppointmentWithCustomerName | null;
-  setCurrentAppointment: React.Dispatch<React.SetStateAction<TAppointmentWithCustomerName | null>>
-}
+    appointments: TAppointmentWithCustomerNameAndFullAddress[];
+    setAppointments: React.Dispatch<
+        React.SetStateAction<TAppointmentWithCustomerNameAndFullAddress[]>
+    >;
+    currentAppointment: TAppointmentWithCustomerNameAndFullAddress | null;
+    setCurrentAppointment: React.Dispatch<
+        React.SetStateAction<TAppointmentWithCustomerNameAndFullAddress | null>
+    >;
+};
 
 const AppointmentContext = createContext<AppointmentContextType | null>(null);
 
-export function AppointmentProvider({ children }: { children: React.ReactNode }) {
-  const [ currentAppointment, setCurrentAppointment ] = useState<null | TAppointmentWithCustomerName>(null);
-  const [ appointments, setAppointments ] = useState<TAppointmentWithCustomerName[]>([]);
-  const value = { appointments, setAppointments, currentAppointment, setCurrentAppointment };
-  return <AppointmentContext.Provider value={value}>
-    {children}
-  </ AppointmentContext.Provider>
+export function AppointmentProvider({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    const [currentAppointment, setCurrentAppointment] =
+        useState<null | TAppointmentWithCustomerNameAndFullAddress>(null);
+    const [appointments, setAppointments] = useState<
+        TAppointmentWithCustomerNameAndFullAddress[]
+    >([]);
+    const value = {
+        appointments,
+        setAppointments,
+        currentAppointment,
+        setCurrentAppointment,
+    };
+    return (
+        <AppointmentContext.Provider value={value}>
+            {children}
+        </AppointmentContext.Provider>
+    );
 }
 
 export function useAppointmentContext() {
-  const context = useContext(AppointmentContext);
+    const context = useContext(AppointmentContext);
 
-  if (!context) {
-    throw new Error('useAppointmentContext must be used within a AppointmentsProvider')
-  }
-  return context
+    if (!context) {
+        throw new Error(
+            'useAppointmentContext must be used within a AppointmentsProvider'
+        );
+    }
+    return context;
 }
-

@@ -1,25 +1,23 @@
+import { useLoaderData } from '@remix-run/react';
+import { useEffect } from 'react';
 import { Customer_Card, useCustomers } from '@components';
 import { TCustomer } from '@types';
-import Table, { Caption, Row, TD, TH } from '../table/table';
-import { useLoaderData } from '@remix-run/react';
 import { loaderType } from '~/routes/_index';
-import { useEffect } from 'react';
+import Table, { Caption, Row, TD, TH } from '../table/table';
 
 function Main() {
     const { customersLoaderData } = useLoaderData<loaderType>();
 
-    const { setCustomer, currentCustomer, customersData, setCustomers } = useCustomers();
+    const { setCustomer, currentCustomer, customersData, setCustomers } =
+        useCustomers();
 
     useEffect(() => {
-        console.log(" useEffect setCustomers")
+        console.log(' useEffect setCustomers');
         setCustomers(customersLoaderData as any);
-    }, [ setCustomers, customersLoaderData ]);
-    
+    }, [setCustomers, customersLoaderData]);
+
     return (
-        <Customers
-            setCustomer={setCustomer}
-            customers={customersData as any}
-        >
+        <Customers setCustomer={setCustomer} customers={customersData as any}>
             {currentCustomer ? (
                 <Customer_Card
                     clearCustomer={setCustomer}
@@ -48,20 +46,19 @@ function Customers({ customers, setCustomer, children }: customersProps) {
                 {/* <TH>Note</TH> */}
                 {customers
                     ? customers.map((customer) => {
-                        const { id, firstName, lastName, contact } =
-                            customer;
-                        return (
-                            <Row
-                                key={id + firstName + lastName}
-                                cb={() => setCustomer(id)}
-                            >
-                                <TD>{firstName}</TD>
-                                <TD>{lastName}</TD>
-                                <TD>{contact}</TD>
-                                {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
-                            </Row>
-                        );
-                    })
+                          const { id, firstName, lastName, contact } = customer;
+                          return (
+                              <Row
+                                  key={id + firstName + lastName}
+                                  cb={() => setCustomer(id)}
+                              >
+                                  <TD>{firstName}</TD>
+                                  <TD>{lastName}</TD>
+                                  <TD>{contact}</TD>
+                                  {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
+                              </Row>
+                          );
+                      })
                     : null}
             </Table>
         </section>

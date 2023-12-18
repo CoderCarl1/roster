@@ -1,11 +1,10 @@
 import { createId } from '@paralleldrive/cuid2';
-import { Address, Customer } from '@prisma/client';
+import { Address, Customer, Prisma } from '@prisma/client';
 import { AddressOperationError, CustomerOperationError } from '@errors';
 import {
     TAddress_data_for_creation,
     TCustomerDataWithAddresses_for_creation,
     TCustomer_data_for_creation,
-    inclusionTypes,
 } from '@types';
 import { prisma } from '~/db.server';
 import { log } from '~/functions/helpers/functions';
@@ -112,7 +111,7 @@ export async function customer_create_many(
  */
 export async function customer_find(
     customerId: string,
-    include?: inclusionTypes
+    include?: Prisma.CustomerInclude | undefined
 ): Promise<Customer | CustomerOperationError> {
     try {
         console.log('customer_find args', include);
@@ -146,7 +145,7 @@ export async function customer_find(
  * @returns A promise that resolves to an array of customers or an error if an issue occurs.
  */
 export async function customer_find_many(
-    include?: inclusionTypes,
+    include?: Prisma.CustomerInclude | undefined,
     skip?: number,
     take?: number,
     includeSuspended = false

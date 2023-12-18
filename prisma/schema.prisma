@@ -72,14 +72,13 @@ model Appointment {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
 
-  @@index([customerId])
 }
 
 model Address {
   id           String        @id @default(cuid())
-  Customer     Customer?     @relation(fields: [customerId], references: [id], onUpdate: Cascade)
+  customer     Customer?     @relation(fields: [customerId], references: [id], onUpdate: Cascade)
   customerId   String?
-  Appointments Appointment[]
+  appointments Appointment[]
   number       String?
   line1        String
   line2        String?

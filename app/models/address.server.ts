@@ -1,4 +1,4 @@
-import { Address } from '@prisma/client';
+import { Address, Prisma } from '@prisma/client';
 
 import { AddressOperationError } from '@errors';
 import { TAddress_data_for_creation } from '@types';
@@ -121,11 +121,24 @@ export async function address_find(
  *
  * @returns A promise that resolves to an array of addresses or an AddressOperationError.
  */
-export async function address_find_all(): Promise<
-    Address[] | AddressOperationError
-> {
+export async function address_find_all(
+    include?: Prisma.AddressInclude | undefined,
+    includeArchived = false,
+    whereBlock?: Prisma.AddressWhereInput | undefined
+): Promise<Address[] | AddressOperationError> {
+    console.log('address_find_all invoked');
+    console.log('address_find_all include', include ? include : null);
+    console.log(
+        'address_find_all includeArchived',
+        includeArchived ? includeArchived : null
+    );
+    console.log('address_find_all whereBlock', whereBlock ? whereBlock : null);
+
     try {
-        const addresses = await prisma.address.findMany();
+        const addresses = await prisma.address.findMany({
+            where: { archived: includeArchived, ...whereBlock },
+            include,
+        });
         if (!addresses) {
             throw new Error('no addresses found');
         }
@@ -149,7 +162,7 @@ export async function address_findby_customer(
             throw new Error(`invalid customerId: ${customerId}`);
         }
         const addresses = await prisma.address.findMany({
-            include: { Customer: true },
+            include: { customer: true },
             where: {
                 customerId: customerId,
             },

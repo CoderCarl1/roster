@@ -1,13 +1,11 @@
-const DEFAULT_VARIANT: 'default' = 'default';
-
 type ButtonProps = {
     children?: React.ReactNode;
-    variant?: 'primary' | 'secondary' | 'danger' | typeof DEFAULT_VARIANT;
+    variant?: 'primary' | 'secondary' | 'danger' | 'default';
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export default function Button({
     children,
-    variant = DEFAULT_VARIANT,
+    variant = 'default',
     ...props
 }: ButtonProps) {
     return (

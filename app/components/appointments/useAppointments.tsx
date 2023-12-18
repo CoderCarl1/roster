@@ -1,64 +1,74 @@
-import { TAppointmentWithCustomerName } from '@types';
-import { useCustomers } from '@components';
 import { useAppointmentContext } from '@contexts';
-import { addFullAddress, addFullName } from '@functions';
 
 function useAppointments() {
-    const { appointments, setAppointments, currentAppointment, setCurrentAppointment } = useAppointmentContext();
+    const {
+        appointments,
+        setAppointments,
+        currentAppointment,
+        setCurrentAppointment,
+    } = useAppointmentContext();
 
     function setAppointment(appointmentId?: string) {
         let data = null;
         if (appointmentId && appointments) {
-            data = appointments.find(
-                (appointment) => appointment.id === appointmentId
-            ) ?? null;
+            data =
+                appointments.find(
+                    (appointment) => appointment.id === appointmentId
+                ) ?? null;
         }
         setCurrentAppointment(data);
     }
 
-    function getAppointmentsFromCustomerContext() {
-        const { customers } = useCustomers();
-        const {setAppointments} = useAppointmentContext();
+    function getAppointmentsForDay(selectedDate: Date) {
+        return appointments.filter((appointment) => {
+            const appointmentDate = new Date(appointment.start);
 
-        const appointments = customers.reduce((appointmentsArr: TAppointmentWithCustomerName[], customer) => {
-            if (customer.appointments && customer.appointments.length) {
+            return (
+                appointmentDate.getDate() === selectedDate.getDate() &&
+                appointmentDate.getMonth() === selectedDate.getMonth() &&
+                appointmentDate.getFullYear() === selectedDate.getFullYear()
+            );
+        });
+    }
 
-                const customerWithFullName = addFullName(customer).fullName;
-                const updatedAppointments = customer.appointments.map((appointment) => {
-                    const addressForAppointment = customer.addresses?.find(
-                      (address) => address.id === appointment.addressId
-                    );
-            
-                    if (addressForAppointment) {
-                      const AddressWithFullAddress = addFullAddress(addressForAppointment).fullAddress;
-                      
-                      return {
-                        fullName: customerWithFullName,
-                        fullAddress: AddressWithFullAddress,
-                        ...appointment,
-                      }
-                    } else {
-                      throw new Error(`appointment ${appointment.id} is not associated with an address`)
-                    }
-                  })
-                  appointmentsArr.push(...updatedAppointments);
-            }
-            return appointmentsArr;
-        }, [] as TAppointmentWithCustomerName[]);
+    function getAppointmentsForWeek(selectedStartDate: Date) {
+        const selectedEndDate = new Date(selectedStartDate);
+        selectedEndDate.setDate(selectedStartDate.getDate() + 6);
 
-        setAppointments(appointments);
+        return appointments.filter((appointment) => {
+            const appointmentDate = new Date(appointment.start);
 
-        return appointments;
+            return (
+                appointmentDate >= selectedStartDate &&
+                appointmentDate <= selectedEndDate
+            );
+        });
+    }
+
+    function getAppointmentsForMonth(dateWithinMonth: Date) {
+        const startDate = new Date(dateWithinMonth);
+        const month = startDate.getMonth();
+        const year = startDate.getFullYear();
+
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+
+        return appointments.filter((appointment) => {
+            const appointmentDate = new Date(appointment.start);
+
+            return appointmentDate >= firstDay && appointmentDate <= lastDay;
+        });
     }
 
     return {
-        appointments, 
+        appointments,
         setAppointments,
         currentAppointment,
         setAppointment,
-        getAppointmentsFromCustomerContext,
+        getAppointmentsForDay,
+        getAppointmentsForWeek,
+        getAppointmentsForMonth,
     };
 }
-
 
 export { useAppointments as default };
