@@ -56,10 +56,10 @@ async function deleteAll() {
     }
 }
 
-async function seed() {
+async function seed(numberOfCustomersToCreate = 30) {
     log('magenta', '================== \n - CREATING Customers - ')
 
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < numberOfCustomersToCreate; i++) {
         const result = await createMockCustomer();
         const { id, addresses } = result as TCustomer;
         if (addresses && addresses.length) {
