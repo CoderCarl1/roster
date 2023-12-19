@@ -47,7 +47,10 @@ async function main() {
 async function deleteAll() {
     try {
         log('magenta', '================== \n - Cleaning DB before Seeding ');
-        await Promise.all([ customer_delete_many('example.com'), customer_delete_many('test.com') ]);
+        await Promise.all([ 
+            customer_delete_many('example.com'), 
+            customer_delete_many('test.com'), 
+            prisma.address.deleteMany({where: {line2: {endsWith: "example"}}})]);
         log('red', 'Deleted');
         log('magenta', '==================');
         return Promise.resolve();
@@ -56,44 +59,65 @@ async function deleteAll() {
     }
 }
 
+
 async function seed(numberOfCustomersToCreate = 30) {
-    log('magenta', '================== \n - CREATING Customers - ')
+    log('magenta', '================== \n - CREATING Customers - ');
+
+    const customers = await createCustomers(numberOfCustomersToCreate);
+    if (customers && customers.length) {
+        await createAppointments(customers);
+    }
+    log('green', `Database has been seeded. 🌱`);
+    log('magenta', '==================');
+}
+
+async function createCustomers(numberOfCustomersToCreate: number){
+    const customers: Pick<TCustomer, 'id' | 'addresses'>[] = [];
 
     for (let i = 0; i < numberOfCustomersToCreate; i++) {
-        const result = await createMockCustomer();
-        const { id, addresses } = result as TCustomer;
-        if (addresses && addresses.length) {
-            for (let i = 0; i < addresses.length; i++) {
+        const result: TCustomer = await createMockCustomer();
+        const { id, addresses } = result;
+        customers.push({ id, addresses });
+    }
+    return customers;
+}
+
+async function createAppointments(customers: Pick<TCustomer, 'id' | 'addresses'>[]) {
+    const appointmentsPromises = customers.flatMap(async ({ id, addresses }) => {
+        const nestedAppointmentsPromises = [];
+
+        if (addresses) {
+            for (const address of addresses) {
                 const appointmentData = randomAppointment();
-                const appointment = await appointment_create(id, addresses[ i ].id, appointmentData);
+                const appointment = await appointment_create(id, address.id, appointmentData);
 
                 if (appointment && !(appointment instanceof AppointmentOperationError) && appointment.frequency) {
-                    const numberOfAppointments = appointmentsPerYear(appointment.frequency);
-                    let currentNumberOfAppointmentsBooked = 1;
-                    const startDate = new Date(appointmentData.start);
-                    const endDate = new Date(appointmentData.end);
+                    const appointmentsToCreate = appointmentsPerYear(appointment.frequency) - 1;
+                    const nestedAppointmentData = Array.from({ length: appointmentsToCreate }, () => ({
+                        ...randomAppointment(),
+                        frequency: appointment.frequency,
+                    }));
 
-                    for (currentNumberOfAppointmentsBooked; currentNumberOfAppointmentsBooked < numberOfAppointments; currentNumberOfAppointmentsBooked++) {
-                        const newStartDateTime = addWeeks(startDate, currentNumberOfAppointmentsBooked);
-                        const newEndDateTime = addWeeks(endDate, currentNumberOfAppointmentsBooked);
-                        const updatedAppointmentData = { ...appointmentData, start: newStartDateTime, end: newEndDateTime }
+                    const nestedPromises = nestedAppointmentData.map((nestedAppointment) =>
+                        appointment_create(id, address.id, nestedAppointment)
+                    );
 
-                        await appointment_create(id, addresses[ i ].id, updatedAppointmentData);
-                    }
+                    nestedAppointmentsPromises.push(...nestedPromises);
                 }
             }
         }
-    }
-    log('green', `Database has been seeded. 🌱`)
-    log('magenta', '==================')
-    return Promise.resolve();
+
+        return nestedAppointmentsPromises;
+    });
+
+    await Promise.all(appointmentsPromises);
 }
 
-function addWeeks(date: Date, weeks: number) {
-    const dateCopy = new Date(date);
-    dateCopy.setDate(date.getDate() + 7 * weeks);
-    return dateCopy.toISOString();
-}
+// function addWeeks(date: Date, weeks: number) {
+//     const dateCopy = new Date(date);
+//     dateCopy.setDate(date.getDate() + 7 * weeks);
+//     return dateCopy.toISOString();
+// }
 function appointmentsPerYear(appointmentFrequency: number) {
     const daysInYear = 365;
     return Math.floor(daysInYear / appointmentFrequency);
@@ -129,28 +153,27 @@ function generateRandomFullName() {
     return [ firstName, lastName ];
 }
 
-async function createMockCustomer() {
+async function createMockCustomer(retriesLeft: number = 1) {
     try {
         const customerData = randomCustomerData();
-
         const numberOfAddresses = randomNumber(100) > 17 ? 1 : 2;
-        const addressesData = [] as TAddress_No_ID[];
+        const addressesData = Array.from({ length: numberOfAddresses }, randomAddress);
 
-        for (let i = 0; i < numberOfAddresses; i++) {
-            addressesData.push(randomAddress());
-        }
         const result = await customer_create(customerData, addressesData);
-        if (result instanceof CustomerOperationError || result instanceof AddressOperationError) {
-            return await createMockCustomer();
+
+        // There is a tiny chance that there will be a duplicate customer name so retry it once
+        if (result instanceof CustomerOperationError || result instanceof AddressOperationError ) {
+            if (retriesLeft > 0){
+                return await createMockCustomer(retriesLeft - 1);
+            } else {
+                throw result;
+            }
         }
+        
         return result;
     } catch (err) {
-        if (err instanceof CustomerOperationError || err instanceof AddressOperationError) {
-            return await createMockCustomer();
-        } else {
-            console.log("unknown error happened while generating a mock customer", err);
-            throw err;
-        }
+        console.log("unknown error happened while generating a mock customer", err);
+        throw err;    
     }
 }
 function randomCustomerData() {
@@ -181,9 +204,9 @@ function randomAddress() {
     address.number = randomNumber(100) + "";
     address.line1 = streetNames[ randomNumber(streetNames.length) - 1 ] + " " + streetTypes[ randomNumber(streetTypes.length) - 1 ];
     if (randomNumber(100) <= 17) {
-        address.line2 = addressLine2Types[ randomNumber(addressLine2Types.length) - 1 ];
+        address.line2 = addressLine2Types[ randomNumber(addressLine2Types.length) - 1 ] + " example";
     } else {
-        address.line2 = null;
+        address.line2 = "example";
     }
     address.suburb = suburbs[ randomNumber(suburbs.length) - 1 ];
     address.archived = randomNumber(10) <= 3;
