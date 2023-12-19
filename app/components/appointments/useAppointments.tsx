@@ -1,18 +1,19 @@
 import { useAppointmentContext } from '@contexts';
+import { startOfWeek } from '@functions';
 
 function useAppointments() {
     const {
-        appointments,
-        setAppointments,
+        appointmentsData,
+        setAppointmentsData,
         currentAppointment,
         setCurrentAppointment,
     } = useAppointmentContext();
 
     function setAppointment(appointmentId?: string) {
         let data = null;
-        if (appointmentId && appointments) {
+        if (appointmentId && appointmentsData) {
             data =
-                appointments.find(
+                appointmentsData.find(
                     (appointment) => appointment.id === appointmentId
                 ) ?? null;
         }
@@ -20,7 +21,7 @@ function useAppointments() {
     }
 
     function getAppointmentsForDay(selectedDate: Date) {
-        return appointments.filter((appointment) => {
+        const appointmentData = appointmentsData.filter((appointment) => {
             const appointmentDate = new Date(appointment.start);
 
             return (
@@ -29,23 +30,32 @@ function useAppointments() {
                 appointmentDate.getFullYear() === selectedDate.getFullYear()
             );
         });
+        console.log("getAppointmentsForDay appointmentData for day", appointmentData)
+        return appointmentData
+
     }
 
     function getAppointmentsForWeek(selectedStartDate: Date) {
-        const selectedEndDate = new Date(selectedStartDate);
-        selectedEndDate.setDate(selectedStartDate.getDate() + 6);
+        if (!appointmentsData) return [];
 
-        return appointments.filter((appointment) => {
+        const sunday = startOfWeek(selectedStartDate)
+        const selectedEndDate = new Date(sunday);
+        selectedEndDate.setDate(sunday.getDate() + 6);
+
+        const appointmentData = appointmentsData.filter((appointment) => {
             const appointmentDate = new Date(appointment.start);
-
             return (
                 appointmentDate >= selectedStartDate &&
                 appointmentDate <= selectedEndDate
             );
         });
+       
+        return appointmentData;
     }
 
     function getAppointmentsForMonth(dateWithinMonth: Date) {
+        if (!appointmentsData) return [];
+        
         const startDate = new Date(dateWithinMonth);
         const month = startDate.getMonth();
         const year = startDate.getFullYear();
@@ -53,16 +63,19 @@ function useAppointments() {
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
 
-        return appointments.filter((appointment) => {
+        const appointmentData =  appointmentsData.filter((appointment) => {
             const appointmentDate = new Date(appointment.start);
 
             return appointmentDate >= firstDay && appointmentDate <= lastDay;
         });
+
+        console.log("getAppointmentsForMonth appointmentData for month", appointmentData)
+        return appointmentData;
     }
 
     return {
-        appointments,
-        setAppointments,
+        appointmentsData,
+        setAppointmentsData,
         currentAppointment,
         setAppointment,
         getAppointmentsForDay,

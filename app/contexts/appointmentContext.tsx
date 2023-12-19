@@ -2,8 +2,8 @@ import { createContext, useState, useContext } from 'react';
 import { TAppointmentWithCustomerNameAndFullAddress } from '@types';
 
 type AppointmentContextType = {
-    appointments: TAppointmentWithCustomerNameAndFullAddress[];
-    setAppointments: React.Dispatch<
+    appointmentsData: TAppointmentWithCustomerNameAndFullAddress[];
+    setAppointmentsData: React.Dispatch<
         React.SetStateAction<TAppointmentWithCustomerNameAndFullAddress[]>
     >;
     currentAppointment: TAppointmentWithCustomerNameAndFullAddress | null;
@@ -21,12 +21,12 @@ export function AppointmentProvider({
 }) {
     const [currentAppointment, setCurrentAppointment] =
         useState<null | TAppointmentWithCustomerNameAndFullAddress>(null);
-    const [appointments, setAppointments] = useState<
+    const [appointmentsData, setAppointmentsData] = useState<
         TAppointmentWithCustomerNameAndFullAddress[]
     >([]);
     const value = {
-        appointments,
-        setAppointments,
+        appointmentsData,
+        setAppointmentsData,
         currentAppointment,
         setCurrentAppointment,
     };

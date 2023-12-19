@@ -14,9 +14,11 @@ function Main() {
         useCustomers();
 
     useEffect(() => {
+        console.log("customers use effect running")
+
         const customersArray = customersLoaderData.map(customer => addFullName(customer)) as TCustomer[];
         setCustomers(customersArray);
-    }, [setCustomers, customersLoaderData]);
+    }, []);
 
     return (
         <Customers setCustomer={setCustomer} customers={customersData as any}>

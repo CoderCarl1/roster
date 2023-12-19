@@ -5,25 +5,40 @@ type CalendarDateType = {
     day: number;
     month: number;
     year: number;
+    date: Date;
+    dayName: string;
 };
 type CalendarContextType = {
     currentDate: CalendarDateType;
     nextDay: () => void;
     nextWeek: () => void;
     nextMonth: () => void;
+    setDate: (date: Date) => void;
 };
 const CalendarContext = createContext<CalendarContextType | null>(null);
 
 export function CalendarProvider({ children }: { children: React.ReactNode }) {
     const today = new Date();
+    const { getDayName, getDaysInMonth } = useCalendar();
 
     const [currentDate, setCurrentDate] = useState<CalendarDateType>({
         day: today.getDate(),
         month: today.getMonth(),
         year: today.getFullYear(),
+        date: today,
+        dayName: getDayName(today),
     });
-    const { getDaysInMonth } = useCalendar();
 
+    function setDate(date: Date){
+        const today = new Date(date);
+        setCurrentDate({
+            day: today.getDate(),
+            month: today.getMonth(),
+            year: today.getFullYear(),
+            date: today,
+            dayName: getDayName(today),
+        })
+    }
     function nextDay() {
         const tomorrowDayNumber = currentDate.day + 1;
         const numberOfDaysInMonth = getDaysInMonth(
@@ -39,17 +54,23 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
                 newMonth = 1;
                 newYear = currentDate.year + 1;
             }
-
+            const day = new Date(newYear, newMonth, 1);
             setCurrentDate({
                 day: 1,
                 month: newMonth,
                 year: newYear,
+                date: day,
+                dayName: getDayName(day),
             });
         } else {
+            const day = new Date(currentDate.year, currentDate.month, tomorrowDayNumber);
+
             setCurrentDate({
                 day: tomorrowDayNumber,
                 month: currentDate.month,
                 year: currentDate.year,
+                date: day,
+                dayName: getDayName(day),
             });
         }
         console.log('set date to ', currentDate);
@@ -71,18 +92,24 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
                 newMonth = 0; // Reset to January
                 newYear += 1; // Increment the year
             }
-
+            const day = new Date(newYear, newMonth, tomorrowDayNumber - numberOfDaysInMonth);
             setCurrentDate({
                 day: tomorrowDayNumber - numberOfDaysInMonth,
                 month: newMonth,
                 year: newYear,
+                date: day,
+                dayName: getDayName(day),
             });
         } else {
             // If the next week stays within the current month
+            const day = new Date(currentDate.year, currentDate.month, tomorrowDayNumber);
+
             setCurrentDate({
                 day: tomorrowDayNumber,
                 month: currentDate.month,
                 year: currentDate.year,
+                date: day,
+                dayName: getDayName(day),
             });
         }
     }
@@ -94,14 +121,18 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
             newMonth = 0; // Reset to January
             newYear += 1; // Increment the year
         }
+        const day = new Date(newYear, newMonth, currentDate.day);
 
         setCurrentDate({
             day: currentDate.day,
             month: newMonth,
             year: newYear,
+            date: day,
+            dayName: getDayName(day),
         });
     }
-    const value = { currentDate, nextDay, nextWeek, nextMonth };
+
+    const value = { currentDate, nextDay, nextWeek, nextMonth, setDate };
     return (
         <CalendarContext.Provider value={value}>
             {children}

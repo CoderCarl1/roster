@@ -1,33 +1,39 @@
 import { TAppointmentWithCustomerName } from '@types';
 
-type CalendarAppointment = {
+export type CalendarAppointment = {
     time: string;
     appointment: TAppointmentWithCustomerName | null;
 };
-type CalendarDayType = CalendarAppointment[];
-type CalendarWeekType = CalendarAppointment[][];
-type CalendarMonthType = CalendarAppointment[][][];
+export type CalendarDayType = {
+    date: Date,
+    data: CalendarAppointment[]
+};
+export type CalendarWeekType = CalendarDayType[];
+export type CalendarMonthType = CalendarDayType[][];
 
+export type CalendarType = CalendarDayType | CalendarWeekType | CalendarMonthType
 function useCalendar() {
     function getDaysInMonth(year: number, month: number) {
         const nextMonth = new Date(year, month, 0);
         return nextMonth.getDate();
     }
-
-    function incrementDayByOne(date: Date) {
-        date.setDate(date.getDate() + 1);
-        return date;
+    function incrementDayByOne(date: Date): Date {
+        const nextDate = new Date(date);
+        nextDate.setDate(date.getDate() + 1);
+        return nextDate;
     }
-
+    function getDayName(date: Date) {
+        const options: Intl.DateTimeFormatOptions = { weekday: 'long' };
+        return date.toLocaleDateString('en-US', options);
+    }
     function getDay(
         selectedDate: Date,
         appointments: TAppointmentWithCustomerName[]
     ): CalendarDayType {
-        const calendar: {
+        const calendarData: {
             time: string;
             appointment: TAppointmentWithCustomerName | null;
         }[] = [];
-
         for (let i = 0; i < 24; i++) {
             const hour = i < 10 ? `0${i}` : `${i}`;
 
@@ -37,24 +43,26 @@ function useCalendar() {
 
                 const appointment =
                     appointments.find((apt) => {
-                        const appointmentStart = new Date(
-                            apt.start
-                        ).toISOString();
-                        const appointmentEnd = new Date(apt.end).toISOString();
-                        const timeStringToCompare = `${
-                            selectedDate.toISOString().split(',')[0]
-                        }, ${hour}:${minute}`;
-                        return (
+                        const appointmentStart = new Date(apt.start)
+                        const appointmentEnd = new Date(apt.end)
+                        const timeStringToCompare = new Date(selectedDate);
+                        timeStringToCompare.setHours(i, j, 0, 0);
+
+                        const found = (
                             appointmentStart <= timeStringToCompare &&
                             appointmentEnd > timeStringToCompare
                         );
+                        return found
                     }) || null;
 
-                calendar.push({ time: timeString, appointment });
+                calendarData.push({ time: timeString, appointment });
             }
         }
 
-        return calendar;
+        return {
+            date: selectedDate,
+            data: calendarData
+        };
     }
     function getWeek(
         selectedDate: Date,
@@ -64,11 +72,11 @@ function useCalendar() {
         let currentDate = new Date(selectedDate);
 
         for (let d = 0; d < 7; d++) {
+            const dayData = getDay(currentDate, appointments);
+            calendar.push(dayData);
             currentDate = incrementDayByOne(currentDate);
-
-            const day = getDay(currentDate, appointments);
-            calendar.push(day);
         }
+        console.log("calendar in get weeek", calendar)
         return calendar;
     }
     function getMonth(
@@ -98,7 +106,8 @@ function useCalendar() {
 
         return calendar;
     }
-    return { getDaysInMonth, getDay, getWeek, getMonth };
+
+    return { getDaysInMonth, getDayName, getDay, getWeek, getMonth };
 }
 
 export { useCalendar as default };

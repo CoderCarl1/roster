@@ -5,6 +5,7 @@ import {
     addFullAddressToAppointment,
     addFullName,
     formatDate,
+    useToggle,
 } from '@functions';
 import {
     TAppointment,
@@ -15,71 +16,66 @@ import { useCalendarContext } from '~/contexts';
 import { loaderType } from '~/routes/_index';
 import { useCalendar } from '../calendar';
 import Table, { Caption, Row, TD, TH } from '../table/table';
+import Calendar from '../calendar/calendar';
 
 function Main() {
     const data = useLoaderData<loaderType>();
-    const appointmentsData = data.appointmentsLoaderData as unknown as TAppointment[];
-
+    const appointmentsLoaderData = data.appointmentsLoaderData as unknown as TAppointment[];
     const {
         setAppointment,
         currentAppointment,
-        setAppointments,
-        appointments,
+        setAppointmentsData,
+        appointmentsData
     } = useAppointments();
+    
     const {
-        getAppointmentsForDay,
-        getAppointmentsForWeek,
-        getAppointmentsForMonth,
     } = useAppointments();
-    const { getDay, getWeek, getMonth } = useCalendar();
-    const { currentDate, nextDay } = useCalendarContext();
-    const selectedDate = new Date(
-        currentDate.year,
-        currentDate.month,
-        currentDate.day
-    );
-
  
     useEffect(() => {
-        const appointmentsWithCustomerName = appointmentsData.map(
+        const appointmentsWithCustomerName = appointmentsLoaderData.map(
             (appointment) => {
                 let updatedAppointment = addFullName(appointment) as TAppointmentWithCustomerName;
                 return addFullAddressToAppointment(updatedAppointment);
             }
         );
+        setAppointmentsData(appointmentsWithCustomerName);
+    }, []);
 
-        setAppointments(appointmentsWithCustomerName);
-    }, [ appointmentsData ]);
+    useEffect(() => {
+        console.log("appointmentsData here", appointmentsData)
+    })
 
-    return (
-        <Appointments
-            setAppointment={setAppointment}
-            appointments={appointments as any}
-            className={currentAppointment ? 'disabled' : ''}
-        >
-            <button onClick={nextDay}>DAY ++ </button>
-            {currentAppointment ? (
-                <Appointment_Card
-                    clearAppointment={setAppointment}
-                    appointment={currentAppointment}
-                />
-            ) : null}
-        </Appointments>
-    );
+    if (appointmentsData && appointmentsData.length){
+        return <Calendar type="week" />
+    }
+    // return (
+        // {appointmentsData && <Calendar type="day" />}
+        // {appointmentsData && <Calendar type="week" />}
+
+    //     <Appointments
+    //         className={currentAppointment ? 'disabled' : ''}
+    //     >
+    //     {currentAppointment ? (
+    //         <Appointment_Card
+    //             clearAppointment={setAppointment}
+    //             appointment={currentAppointment}
+    //         />
+    //     ) : null}
+    // </Appointments>
+        
+    // );
 }
 
 type appointmentProps = {
-    appointments: null | TAppointmentWithCustomerName[];
-    setAppointment: (appointmentId?: string) => void;
     children?: React.ReactNode;
 } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
 function Appointments({
-    appointments = [],
-    setAppointment,
     children,
     ...props
 }: appointmentProps) {
+
+    const {appointmentsData, setAppointment} = useAppointments()
     return (
         <section  {...props} className={"section-wrapper" + props.className}>
             {children}
@@ -91,19 +87,16 @@ function Appointments({
                 <TH>Start</TH>
                 <TH>End</TH>
                 <TH>Recurring</TH>
-                <TH>Frequency</TH>
                 <TH>Completed</TH>
-                {/* <th>Note</th> */}
 
-                {appointments
-                    ? appointments.map((appointment) => {
+                {appointmentsData
+                    ? appointmentsData.map((appointment) => {
                         const {
                             id,
                             fullName,
                             start,
                             end,
                             recurring,
-                            frequency,
                             completed,
                         } = appointment;
 
@@ -115,11 +108,8 @@ function Appointments({
                                 <TD>{fullName}</TD>
                                 <TD>{formatDate(start)}</TD>
                                 <TD>{formatDate(end)}</TD>
-                                <TD>{recurring ? 'Yes' : 'No'}</TD>
-                                <TD>{frequency}</TD>
+                                <TD>{recurring ? '🔁' : ''}</TD>
                                 <TD>{completed ? '✅' : '❌'}</TD>
-
-                                {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
                             </Row>
                         );
                     })
