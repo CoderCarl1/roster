@@ -67,19 +67,19 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
         throw new Response('Appointments Not Found', { status: 404 });
     }
 
-    const addressesLoaderData = [];
-    // await address_find_all({
-    //     customer: true,
-    //     appointments: true
-    // });
-    // if (
-    //     !addressesLoaderData ||
-    //     addressesLoaderData instanceof CustomerOperationError ||
-    //     addressesLoaderData instanceof AddressOperationError ||
-    //     addressesLoaderData instanceof AppointmentOperationError
-    // ) {
-    //     throw new Response('addresses Not Found', { status: 404 });
-    // }
+    // const addressesLoaderData = [];
+    const addressesLoaderData = await address_find_all({
+        customer: true,
+        appointments: true
+    });
+    if (
+        !addressesLoaderData ||
+        addressesLoaderData instanceof CustomerOperationError ||
+        addressesLoaderData instanceof AddressOperationError ||
+        addressesLoaderData instanceof AppointmentOperationError
+    ) {
+        throw new Response('addresses Not Found', { status: 404 });
+    }
 
     console.log('about to return data');
 

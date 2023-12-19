@@ -23,6 +23,7 @@ type optionalFullAddress = {
 };
 
 type optionalCustomer = { customer?: TCustomer };
+type optionalAddress = {address?: TAddress};
 
 export type TCustomer = {
     suspendedAt: Date | string | null;
@@ -35,12 +36,17 @@ export type TCustomer = {
     optionalFullAddress;
 
 export type TAddress = optionalCustomer & Address;
+export type TAddressWithCustomerName = optionalFullName &
+    TAddress;
+export type TAddressWithFullAddress = optionalFullAddress &
+    TAddress;
+
 export type TAddressWithCustomerNameAndFullAddress = optionalFullName &
     optionalFullAddress &
     TAddress;
 
-export type TAppointment = { address: Address } & optionalCustomer &
-    Appointment;
+
+export type TAppointment = optionalCustomer & optionalAddress & Appointment;
 export type TAppointmentWithCustomerName = optionalFullName & TAppointment;
 export type TAppointmentWithCustomerNameAndFullAddress =
     TAppointmentWithCustomerName & optionalFullAddress;

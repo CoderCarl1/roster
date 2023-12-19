@@ -4,16 +4,18 @@ import { Customer_Card, useCustomers } from '@components';
 import { TCustomer } from '@types';
 import { loaderType } from '~/routes/_index';
 import Table, { Caption, Row, TD, TH } from '../table/table';
+import { addFullName } from '@functions';
 
 function Main() {
-    const { customersLoaderData } = useLoaderData<loaderType>();
+    const data = useLoaderData<loaderType>();
+    const customersLoaderData = data.customersLoaderData as TCustomer[];
 
     const { setCustomer, currentCustomer, customersData, setCustomers } =
         useCustomers();
 
     useEffect(() => {
-        console.log(' useEffect setCustomers');
-        setCustomers(customersLoaderData as any);
+        const customersArray = customersLoaderData.map(customer => addFullName(customer)) as TCustomer[];
+        setCustomers(customersArray);
     }, [setCustomers, customersLoaderData]);
 
     return (
@@ -40,20 +42,18 @@ function Customers({ customers, setCustomer, children }: customersProps) {
             {children}
             <Table>
                 <Caption>Customers</Caption>
-                <TH>First Name</TH>
-                <TH>Last Name</TH>
+                <TH>Name</TH>
                 <TH>Contact</TH>
                 {/* <TH>Note</TH> */}
                 {customers
                     ? customers.map((customer) => {
-                          const { id, firstName, lastName, contact } = customer;
+                          const { id, fullName, contact } = customer;
                           return (
                               <Row
-                                  key={id + firstName + lastName}
+                                  key={id}
                                   cb={() => setCustomer(id)}
                               >
-                                  <TD>{firstName}</TD>
-                                  <TD>{lastName}</TD>
+                                  <TD>{fullName}</TD>
                                   <TD>{contact}</TD>
                                   {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
                               </Row>

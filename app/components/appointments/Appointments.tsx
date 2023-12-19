@@ -7,6 +7,7 @@ import {
     formatDate,
 } from '@functions';
 import {
+    TAppointment,
     TAppointmentWithCustomerName,
     TAppointmentWithCustomerNameAndFullAddress,
 } from '@types';
@@ -16,7 +17,8 @@ import { useCalendar } from '../calendar';
 import Table, { Caption, Row, TD, TH } from '../table/table';
 
 function Main() {
-    const { appointmentsLoaderData } = useLoaderData<loaderType>();
+    const data = useLoaderData<loaderType>();
+    const appointmentsData = data.appointmentsLoaderData as unknown as TAppointment[];
 
     const {
         setAppointment,
@@ -37,41 +39,17 @@ function Main() {
         currentDate.day
     );
 
+ 
     useEffect(() => {
-        console.log(
-            'getAppointmentsForWeek searched appointments for',
-            selectedDate
-        );
-        const appointmentsArray = getAppointmentsForMonth(selectedDate);
-        const filteredAppointments = getDay(
-            selectedDate,
-            appointmentsArray
-        ).filter((apt) => apt.appointment !== null);
-        // const appointmentsForWeek = getWeek(selectedDate, appointmentsArray)
-        // const appointmentsForMonth = getMonth(selectedDate, appointmentsArray)
-        console.log('total filtered Appointments', filteredAppointments.length);
-        console.log('filtered Appointments left with', filteredAppointments);
-        // console.log("appointmentsForWeek found ", appointmentsForWeek)
-        // console.log("appointmentsForMonth found ", appointmentsForMonth)
-    }, [selectedDate]);
-    useEffect(() => {
-        console.log(' useEffect setAppointments');
-        const appointmentsWithCustomerName = appointmentsLoaderData.map(
-            (item) => {
-                let updatedAppointment = addFullName(
-                    item as any
-                ) as TAppointmentWithCustomerName;
-                updatedAppointment =
-                    addFullAddressToAppointment(updatedAppointment);
-                return updatedAppointment;
+        const appointmentsWithCustomerName = appointmentsData.map(
+            (appointment) => {
+                let updatedAppointment = addFullName(appointment) as TAppointmentWithCustomerName;
+                return addFullAddressToAppointment(updatedAppointment);
             }
         );
-        console.log(
-            'appointmentsWithCustomerName',
-            appointmentsWithCustomerName
-        );
+
         setAppointments(appointmentsWithCustomerName);
-    }, [appointmentsLoaderData]);
+    }, [ appointmentsData ]);
 
     return (
         <Appointments
@@ -103,7 +81,7 @@ function Appointments({
     ...props
 }: appointmentProps) {
     return (
-        <section className="section-wrapper" {...props}>
+        <section  {...props} className={"section-wrapper" + props.className}>
             {children}
 
             <Table>
@@ -119,32 +97,32 @@ function Appointments({
 
                 {appointments
                     ? appointments.map((appointment) => {
-                          const {
-                              id,
-                              fullName,
-                              start,
-                              end,
-                              recurring,
-                              frequency,
-                              completed,
-                          } = appointment;
+                        const {
+                            id,
+                            fullName,
+                            start,
+                            end,
+                            recurring,
+                            frequency,
+                            completed,
+                        } = appointment;
 
-                          return (
-                              <Row
-                                  key={id + fullName}
-                                  cb={() => setAppointment(id)}
-                              >
-                                  <TD>{fullName}</TD>
-                                  <TD>{formatDate(start)}</TD>
-                                  <TD>{formatDate(end)}</TD>
-                                  <TD>{recurring ? 'Yes' : 'No'}</TD>
-                                  <TD>{frequency}</TD>
-                                  <TD>{completed ? '✅' : '❌'}</TD>
+                        return (
+                            <Row
+                                key={id + fullName}
+                                cb={() => setAppointment(id)}
+                            >
+                                <TD>{fullName}</TD>
+                                <TD>{formatDate(start)}</TD>
+                                <TD>{formatDate(end)}</TD>
+                                <TD>{recurring ? 'Yes' : 'No'}</TD>
+                                <TD>{frequency}</TD>
+                                <TD>{completed ? '✅' : '❌'}</TD>
 
-                                  {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
-                              </Row>
-                          );
-                      })
+                                {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
+                            </Row>
+                        );
+                    })
                     : null}
             </Table>
         </section>
