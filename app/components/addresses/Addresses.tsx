@@ -48,7 +48,6 @@ function Addresses({ addresses = [], setAddress, children }: addressesProps) {
             <Table>
                 <Caption>Addresses</Caption>
                 <TH>Customer Name</TH>
-                <TH>Customer ID</TH>
                 <TH>Address</TH>
                 {/* <TH>Note</TH> */}
                 {addresses
@@ -60,8 +59,6 @@ function Addresses({ addresses = [], setAddress, children }: addressesProps) {
                                 cb={() => setAddress(id)}
                             >
                                 <TD>{fullName}</TD>
-                                <TD>{address.customerId}</TD>
-
                                 <TD>{fullAddress}</TD>
                                 {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
                             </Row>
