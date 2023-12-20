@@ -1,39 +1,37 @@
-import { TAppointmentWithCustomerName } from '@types';
+import { TAppointmentWithCustomerNameAndFullAddress } from '@types';
+import {dates} from '@functions';
 
 export type CalendarAppointment = {
     time: string;
-    appointment: TAppointmentWithCustomerName | null;
+    appointment: TAppointmentWithCustomerNameAndFullAddress | null;
 };
 export type CalendarDayType = {
-    date: Date,
-    data: CalendarAppointment[]
+    date: String;
+    dayName: String;
+    data: CalendarAppointment[];
 };
 export type CalendarWeekType = CalendarDayType[];
 export type CalendarMonthType = CalendarDayType[][];
 
 export type CalendarType = CalendarDayType | CalendarWeekType | CalendarMonthType
 function useCalendar() {
-    function getDaysInMonth(year: number, month: number) {
-        const nextMonth = new Date(year, month, 0);
-        return nextMonth.getDate();
-    }
-    function incrementDayByOne(date: Date): Date {
-        const nextDate = new Date(date);
-        nextDate.setDate(date.getDate() + 1);
-        return nextDate;
-    }
-    function getDayName(date: Date) {
-        const options: Intl.DateTimeFormatOptions = { weekday: 'long' };
-        return date.toLocaleDateString('en-US', options);
-    }
+   /**
+     * Gets the calendar data for a day, 
+     *
+     * @param selectedDate - The selected date.
+     * @param appointments - The list of appointments.
+     * @returns CalendarDayType - {date: date, dayname: string, data: calendar data}.
+    */
     function getDay(
         selectedDate: Date,
-        appointments: TAppointmentWithCustomerName[]
+        appointments: TAppointmentWithCustomerNameAndFullAddress[]
     ): CalendarDayType {
         const calendarData: {
             time: string;
-            appointment: TAppointmentWithCustomerName | null;
+            appointment: TAppointmentWithCustomerNameAndFullAddress | null;
         }[] = [];
+        const timeStringToCompare = new Date(selectedDate);
+
         for (let i = 0; i < 24; i++) {
             const hour = i < 10 ? `0${i}` : `${i}`;
 
@@ -45,28 +43,39 @@ function useCalendar() {
                     appointments.find((apt) => {
                         const appointmentStart = new Date(apt.start)
                         const appointmentEnd = new Date(apt.end)
-                        const timeStringToCompare = new Date(selectedDate);
+                       
                         timeStringToCompare.setHours(i, j, 0, 0);
 
-                        const found = (
+                        return (
                             appointmentStart <= timeStringToCompare &&
                             appointmentEnd > timeStringToCompare
                         );
-                        return found
+                       
                     }) || null;
 
-                calendarData.push({ time: timeString, appointment });
+                const data = appointment ? {...appointment, start: dates.formatDate(appointment?.start)} : null
+                calendarData.push({ time: timeString, appointment: data });
             }
         }
 
         return {
-            date: selectedDate,
+            date: dates.dayNumberFromDate(selectedDate),
+            dayName: dates.getDayName(selectedDate),
             data: calendarData
         };
     }
+
+    /**
+     * Gets the calendar data for a week, 
+     * the week will always start on a sunday and end on a saturday
+     *
+     * @param selectedDate - The selected date within the week.
+     * @param appointments - The list of appointments.
+     * @returns The calendar data for the week.
+    */
     function getWeek(
         selectedDate: Date,
-        appointments: TAppointmentWithCustomerName[]
+        appointments: TAppointmentWithCustomerNameAndFullAddress[]
     ): CalendarWeekType {
         const calendar: CalendarDayType[] = [];
         let currentDate = new Date(selectedDate);
@@ -74,31 +83,43 @@ function useCalendar() {
         for (let d = 0; d < 7; d++) {
             const dayData = getDay(currentDate, appointments);
             calendar.push(dayData);
-            currentDate = incrementDayByOne(currentDate);
+            currentDate = dates.incrementDayByOne(currentDate);
         }
         console.log("calendar in get weeek", calendar)
         return calendar;
     }
+
+    /**
+     * Gets the calendar data for a month, 
+     * the days will always start on a sunday and end on a saturday
+     *
+     * @param selectedDate - The selected date within the month.
+     * @param appointments - The list of appointments.
+     * @returns The calendar data for the month.
+    */
     function getMonth(
         selectedDate: Date,
-        appointments: TAppointmentWithCustomerName[]
+        appointments: TAppointmentWithCustomerNameAndFullAddress[]
     ): CalendarMonthType {
         const calendar: CalendarWeekType[] = [];
         let currentDate = new Date(selectedDate);
+        const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        let startDate = dates.startOfWeek(firstDayOfMonth);
 
-        const daysInMonth = getDaysInMonth(
-            currentDate.getFullYear(),
-            currentDate.getMonth()
-        );
-        const numberOfWeeks = Math.ceil(daysInMonth / 7);
+        const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
+        const endDate = dates.endOfWeek(lastDayOfMonth);
+
+        const totalDays = dates.getNumberOfDays(startDate, endDate);
+        const numberOfWeeks = Math.ceil(totalDays / 7);
+
         for (let week = 0; week < numberOfWeeks; week++) {
             const calendarWeek: CalendarWeekType = [];
 
             for (let day = 0; day < 7; day++) {
-                const calendarDay = getDay(currentDate, appointments);
+                const calendarDay = getDay(startDate, appointments);
                 calendarWeek.push(calendarDay);
 
-                currentDate = incrementDayByOne(currentDate);
+                startDate = dates.incrementDayByOne(startDate);
             }
 
             calendar.push(calendarWeek);
@@ -107,7 +128,7 @@ function useCalendar() {
         return calendar;
     }
 
-    return { getDaysInMonth, getDayName, getDay, getWeek, getMonth };
+    return { getDay, getWeek, getMonth };
 }
 
 export { useCalendar as default };

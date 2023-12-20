@@ -13,6 +13,7 @@ function Main() {
     const { setAddress, currentAddress, setAddresses, addresses } = useAddresses();
 
     useEffect(() => {
+        console.log("addresses use effect running")
 
         const addressesWithCustomerName: TAddressWithCustomerNameAndFullAddress[] = addressesData.map((address) => {
             let updatedAddress = addFullAddress(address);

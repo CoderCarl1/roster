@@ -1,5 +1,5 @@
 import { useAppointmentContext } from '@contexts';
-import { startOfWeek } from '@functions';
+import { dates } from '@functions';
 
 function useAppointments() {
     const {
@@ -21,35 +21,35 @@ function useAppointments() {
     }
 
     function getAppointmentsForDay(selectedDate: Date) {
+        const day = new Date(selectedDate);
         const appointmentData = appointmentsData.filter((appointment) => {
             const appointmentDate = new Date(appointment.start);
 
             return (
-                appointmentDate.getDate() === selectedDate.getDate() &&
-                appointmentDate.getMonth() === selectedDate.getMonth() &&
-                appointmentDate.getFullYear() === selectedDate.getFullYear()
+                appointmentDate.getDate() === day.getDate() &&
+                appointmentDate.getMonth() === day.getMonth() &&
+                appointmentDate.getFullYear() === day.getFullYear()
             );
         });
         console.log("getAppointmentsForDay appointmentData for day", appointmentData)
         return appointmentData
-
     }
 
     function getAppointmentsForWeek(selectedStartDate: Date) {
         if (!appointmentsData) return [];
 
-        const sunday = startOfWeek(selectedStartDate)
-        const selectedEndDate = new Date(sunday);
-        selectedEndDate.setDate(sunday.getDate() + 6);
+        const startOfWeek = new Date(selectedStartDate)
+        const selectedEndDate = new Date(startOfWeek);
+        selectedEndDate.setDate(startOfWeek.getDate() + 6);
 
         const appointmentData = appointmentsData.filter((appointment) => {
             const appointmentDate = new Date(appointment.start);
             return (
-                appointmentDate >= selectedStartDate &&
+                appointmentDate >= startOfWeek &&
                 appointmentDate <= selectedEndDate
             );
         });
-       
+        
         return appointmentData;
     }
 
@@ -57,19 +57,24 @@ function useAppointments() {
         if (!appointmentsData) return [];
         
         const startDate = new Date(dateWithinMonth);
-        const month = startDate.getMonth();
-        const year = startDate.getFullYear();
-
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-
-        const appointmentData =  appointmentsData.filter((appointment) => {
+    
+        // Check if the start date is not a Sunday, and adjust it to the nearest Sunday
+        if (startDate.getDay() !== 0) {
+            const nearestSunday = dates.startOfWeek(startDate).getTime();
+            startDate.setTime(nearestSunday);
+        }
+    
+        // Calculate the end date by getting the end of the week for the last day of the month
+        const lastDay = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+        const endDate = dates.endOfWeek(lastDay);
+    
+        const appointmentData = appointmentsData.filter((appointment) => {
             const appointmentDate = new Date(appointment.start);
-
-            return appointmentDate >= firstDay && appointmentDate <= lastDay;
+    
+            return appointmentDate >= startDate && appointmentDate <= endDate;
         });
-
-        console.log("getAppointmentsForMonth appointmentData for month", appointmentData)
+    
+        console.log("getAppointmentsForMonth appointmentData for month", appointmentData);
         return appointmentData;
     }
 

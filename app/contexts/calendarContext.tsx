@@ -1,5 +1,5 @@
 import { createContext, useState, useContext } from 'react';
-import { useCalendar } from '~/components/calendar';
+import { dates } from '~/functions';
 
 type CalendarDateType = {
     day: number;
@@ -19,14 +19,12 @@ const CalendarContext = createContext<CalendarContextType | null>(null);
 
 export function CalendarProvider({ children }: { children: React.ReactNode }) {
     const today = new Date();
-    const { getDayName, getDaysInMonth } = useCalendar();
-
     const [currentDate, setCurrentDate] = useState<CalendarDateType>({
         day: today.getDate(),
         month: today.getMonth(),
         year: today.getFullYear(),
         date: today,
-        dayName: getDayName(today),
+        dayName: dates.getDayName(today),
     });
 
     function setDate(date: Date){
@@ -36,12 +34,12 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
             month: today.getMonth(),
             year: today.getFullYear(),
             date: today,
-            dayName: getDayName(today),
+            dayName: dates.getDayName(today),
         })
     }
     function nextDay() {
         const tomorrowDayNumber = currentDate.day + 1;
-        const numberOfDaysInMonth = getDaysInMonth(
+        const numberOfDaysInMonth = dates.getDaysInMonth(
             currentDate.year,
             currentDate.month
         );
@@ -60,7 +58,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
                 month: newMonth,
                 year: newYear,
                 date: day,
-                dayName: getDayName(day),
+                dayName: dates.getDayName(day),
             });
         } else {
             const day = new Date(currentDate.year, currentDate.month, tomorrowDayNumber);
@@ -70,7 +68,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
                 month: currentDate.month,
                 year: currentDate.year,
                 date: day,
-                dayName: getDayName(day),
+                dayName: dates.getDayName(day),
             });
         }
         console.log('set date to ', currentDate);
@@ -78,7 +76,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     function nextWeek() {
         const daysInWeek = 7;
         const tomorrowDayNumber = currentDate.day + daysInWeek;
-        const numberOfDaysInMonth = getDaysInMonth(
+        const numberOfDaysInMonth = dates.getDaysInMonth(
             currentDate.year,
             currentDate.month
         );
@@ -98,7 +96,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
                 month: newMonth,
                 year: newYear,
                 date: day,
-                dayName: getDayName(day),
+                dayName: dates.getDayName(day),
             });
         } else {
             // If the next week stays within the current month
@@ -109,7 +107,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
                 month: currentDate.month,
                 year: currentDate.year,
                 date: day,
-                dayName: getDayName(day),
+                dayName: dates.getDayName(day),
             });
         }
     }
@@ -128,7 +126,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
             month: newMonth,
             year: newYear,
             date: day,
-            dayName: getDayName(day),
+            dayName: dates.getDayName(day),
         });
     }
 
