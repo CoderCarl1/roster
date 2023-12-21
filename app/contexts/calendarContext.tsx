@@ -13,13 +13,16 @@ type CalendarContextType = {
     nextDay: () => void;
     nextWeek: () => void;
     nextMonth: () => void;
+    prevDay: () => void;
+    prevWeek: () => void;
+    prevMonth: () => void;
     setDate: (date: Date) => void;
 };
 const CalendarContext = createContext<CalendarContextType | null>(null);
 
 export function CalendarProvider({ children }: { children: React.ReactNode }) {
     const today = new Date();
-    const [currentDate, setCurrentDate] = useState<CalendarDateType>({
+    const [ currentDate, setCurrentDate ] = useState<CalendarDateType>({
         day: today.getDate(),
         month: today.getMonth(),
         year: today.getFullYear(),
@@ -27,7 +30,8 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         dayName: dates.getDayName(today),
     });
 
-    function setDate(date: Date){
+
+    function setDate(date: Date) {
         const today = new Date(date);
         setCurrentDate({
             day: today.getDate(),
@@ -37,100 +41,102 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
             dayName: dates.getDayName(today),
         })
     }
+
     function nextDay() {
-        const tomorrowDayNumber = currentDate.day + 1;
-        const numberOfDaysInMonth = dates.getDaysInMonth(
-            currentDate.year,
-            currentDate.month
-        );
-
-        if (tomorrowDayNumber > numberOfDaysInMonth) {
-            let newMonth = currentDate.month + 1;
-            let newYear = currentDate.year;
-
-            if (newMonth > 11) {
-                newMonth = 1;
-                newYear = currentDate.year + 1;
-            }
-            const day = new Date(newYear, newMonth, 1);
-            setCurrentDate({
-                day: 1,
-                month: newMonth,
-                year: newYear,
-                date: day,
-                dayName: dates.getDayName(day),
-            });
-        } else {
-            const day = new Date(currentDate.year, currentDate.month, tomorrowDayNumber);
-
-            setCurrentDate({
-                day: tomorrowDayNumber,
-                month: currentDate.month,
-                year: currentDate.year,
-                date: day,
-                dayName: dates.getDayName(day),
-            });
-        }
-        console.log('set date to ', currentDate);
+        const nextDayDate = calculateFutureDate(1);
+        setDate(nextDayDate);
     }
     function nextWeek() {
-        const daysInWeek = 7;
-        const tomorrowDayNumber = currentDate.day + daysInWeek;
-        const numberOfDaysInMonth = dates.getDaysInMonth(
-            currentDate.year,
-            currentDate.month
-        );
-
-        if (tomorrowDayNumber > numberOfDaysInMonth) {
-            // If the next week exceeds the current month, calculate the new month and year
-            let newMonth = currentDate.month + 1;
-            let newYear = currentDate.year;
-
-            if (newMonth > 11) {
-                newMonth = 0; // Reset to January
-                newYear += 1; // Increment the year
-            }
-            const day = new Date(newYear, newMonth, tomorrowDayNumber - numberOfDaysInMonth);
-            setCurrentDate({
-                day: tomorrowDayNumber - numberOfDaysInMonth,
-                month: newMonth,
-                year: newYear,
-                date: day,
-                dayName: dates.getDayName(day),
-            });
-        } else {
-            // If the next week stays within the current month
-            const day = new Date(currentDate.year, currentDate.month, tomorrowDayNumber);
-
-            setCurrentDate({
-                day: tomorrowDayNumber,
-                month: currentDate.month,
-                year: currentDate.year,
-                date: day,
-                dayName: dates.getDayName(day),
-            });
-        }
+        const nextWeekDate = calculateFutureDate(7)
+        setDate(nextWeekDate);
     }
     function nextMonth() {
-        let newMonth = currentDate.month + 1;
-        let newYear = currentDate.year;
+        const daysToAdd = dates.getDaysInMonth(
+            currentDate.year,
+            currentDate.month
+        ) - currentDate.day;
 
-        if (newMonth > 11) {
-            newMonth = 0; // Reset to January
-            newYear += 1; // Increment the year
-        }
-        const day = new Date(newYear, newMonth, currentDate.day);
+        const nextMonthDate = calculateFutureDate(daysToAdd)
+        setDate(nextMonthDate);
+    }
+    function prevDay() {
+        const nextDayDate = calculatePastDate(1);
+        setDate(nextDayDate);
+    }
+    function prevWeek() {
+        const nextDayDate = calculatePastDate(7);
+        setDate(nextDayDate);
+    }
+    function prevMonth() {
+        const daysToMinus = dates.getDaysInMonth(
+            currentDate.year,
+            currentDate.month - 1
+        ) + currentDate.day;
 
-        setCurrentDate({
-            day: currentDate.day,
-            month: newMonth,
-            year: newYear,
-            date: day,
-            dayName: dates.getDayName(day),
-        });
+        const prevMonthDate = calculatePastDate(daysToMinus)
+        setDate(prevMonthDate);
     }
 
-    const value = { currentDate, nextDay, nextWeek, nextMonth, setDate };
+    function calculateFutureDate(dayNumber: number) {
+        console.log("calculateFutureDate day number to add", dayNumber)
+        let newDay = currentDate.day;
+        let newMonth = currentDate.month;
+        let newYear = currentDate.year;
+        const daysInCurrentMonth = dates.getDaysInMonth(newYear, newMonth);
+    
+        if (newDay + dayNumber <= daysInCurrentMonth) {
+            newDay += dayNumber;
+        } else {
+            let daysToAdd = dayNumber - (daysInCurrentMonth - newDay);
+            while (daysToAdd > 0) {
+                newMonth += 1;
+    
+                if (newMonth > 11) {
+                    newMonth = 0;
+                    newYear += 1;
+                }
+    
+                const daysInNextMonth = dates.getDaysInMonth(newYear, newMonth);
+                newDay = daysToAdd <= daysInNextMonth ? daysToAdd : daysInNextMonth;
+                daysToAdd -= daysInNextMonth;
+            }
+        }
+    
+        return new Date(newYear, newMonth, newDay);
+    }
+
+    function calculatePastDate(dayNumber: number) {
+        let newDay = currentDate.day;
+        let newMonth = currentDate.month;
+        let newYear = currentDate.year;
+
+        if (newDay >= dayNumber) {
+            newDay -= dayNumber;
+        } else {
+            let daysInPreviousMonth = dates.getDaysInMonth(
+                currentDate.year,
+                currentDate.month - 1
+            );
+
+            while (newDay < dayNumber) {
+                newMonth -= 1;
+
+                if (newMonth < 0) {
+                    newMonth = 11;
+                    newYear -= 1;
+                }
+
+                newDay += daysInPreviousMonth;
+                daysInPreviousMonth = dates.getDaysInMonth(newYear, newMonth - 1);
+            }
+
+            newDay -= dayNumber;
+        }
+
+        return new Date(newYear, newMonth, newDay);
+    }
+
+    const value = { currentDate, nextDay, prevDay, nextWeek, prevWeek, nextMonth, prevMonth, setDate };
     return (
         <CalendarContext.Provider value={value}>
             {children}

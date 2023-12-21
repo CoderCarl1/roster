@@ -4,37 +4,33 @@ import { useAppointments } from "../appointments";
 import { useEffect, useMemo, useState } from "react";
 import { useCalendarContext } from "~/contexts";
 import { CalendarAppointment, CalendarDayType, CalendarMonthType, CalendarType, CalendarWeekType } from "./useCalendar";
-import Table, { Caption, TH } from "../table/table";
-import { LoadingComponent } from "..";
+// import Table, { Caption, TH } from "../table/table";
+import { Button, LoadingComponent } from '@components';
 import { dates } from "~/functions";
 import React from "react";
 
-type calendarRanges = 'day' | 'week' | 'month';
-
 type mainProps = {
-  type: calendarRanges;
-}
+  type: 'day' | 'week' | 'month';
+} & React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
 
-export default function Main({ type = 'day' }: mainProps) {
+export default function Main({ type = 'day', ...props }: mainProps) {
   const [ calendarData, setCalendarData ] = useState<CalendarType | null>(null);
 
   const { getAppointmentsForDay, getAppointmentsForWeek, getAppointmentsForMonth, appointmentsData } = useAppointments();
   const { getDay, getWeek, getMonth } = useCalendar();
-  const { currentDate, setDate } = useCalendarContext();
+  const { currentDate, setDate, nextDay, nextWeek, nextMonth, prevDay, prevWeek, prevMonth } = useCalendarContext();
 
   useEffect(() => {
-    console.log("CALENDAR use effect running")
-
     let appointments;
-    let calendarSlots;
-
+    console.log("currentDate.date", currentDate.date)
+    console.log("type", type)
     const setData = {
       day: () => {
         appointments = getAppointmentsForDay(currentDate.date);
         if (appointments.length) {
-          calendarSlots = getDay(currentDate.date, appointments);
-          setCalendarData(calendarSlots);
+          const dayCalendarData = getDay(currentDate.date, appointments);
+          setCalendarData(dayCalendarData);
         }
       },
       week: () => {
@@ -42,41 +38,80 @@ export default function Main({ type = 'day' }: mainProps) {
         setDate(sunday);
         appointments = getAppointmentsForWeek(sunday);
         if (appointments.length) {
-          calendarSlots = getWeek(sunday, appointments);
-          setCalendarData(calendarSlots);
+          const weekCalendarData = getWeek(sunday, appointments);
+          setCalendarData(weekCalendarData);
         }
       },
       month: () => {
         appointments = getAppointmentsForMonth(currentDate.date);
         if (appointments.length) {
-          calendarSlots = getMonth(currentDate.date, appointments);
-          setCalendarData(calendarSlots);
+          const monthCalendarData = getMonth(currentDate.date, appointments);
+          setCalendarData(monthCalendarData);
         }
       }
     }
-
     setData[ type ]();
 
-  }, [ type, appointmentsData ])
+  }, [ type, currentDate.date, appointmentsData ])
 
+  function handleNext() {
+    switch (type.toLowerCase()) {
+      case 'day':
+        console.log("next day")
+        nextDay();
+        break;
+      case 'week':
+        console.log("next week")
+        nextWeek()
+        break;
+      case 'month':
+        console.log("next month")
+        nextMonth();
+        break;
+      default:
+        return null;
+    }
+  }
+
+  function handlePrev() {
+    switch (type.toLowerCase()) {
+      case 'day':
+        console.log("prev day")
+        prevDay();
+        break;
+      case 'week':
+        console.log("prev week")
+        prevWeek()
+        break;
+      case 'month':
+        console.log("prev month")
+        prevMonth();
+        break;
+      default:
+        return null;
+    }
+  }
 
   if (!calendarData) {
-    <LoadingComponent />
+    return <LoadingComponent />
   }
-  if (type.toLowerCase() === 'day' && calendarData) {
-    return <DayCalendar calendarData={calendarData as CalendarDayType} />
-  }
-  if (type.toLowerCase() === 'week' && calendarData) {
-    return <WeekCalendar calendarData={calendarData as CalendarWeekType} />
-  }
-  if (type.toLowerCase() === 'month' && calendarData) {
-    return <MonthCalendar calendarData={calendarData as CalendarMonthType} />
-  }
-
-  return <>
-    <h1> no type of calendar - this should be impossibru </h1>
-  </>
-
+  return (
+    <section {...props}>
+      <div><Button onClick={handlePrev}>prev</Button><Button onClick={handleNext}>next</Button></div>
+      {(() => {
+        switch (type.toLowerCase()) {
+          case 'day':
+            return <DayCalendar calendarData={calendarData as CalendarDayType} />;
+          case 'week':
+            return <WeekCalendar calendarData={calendarData as CalendarWeekType} />;
+          case 'month':
+            return <MonthCalendar calendarData={calendarData as CalendarMonthType} />;
+          default:
+            return <h1>Invalid calendar type - this should be impossibru</h1>;
+        }
+      })()}
+    </section>
+  )
 }
 
 type dayProps = {
