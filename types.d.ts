@@ -23,19 +23,18 @@ type optionalFullAddress = {
 };
 
 type optionalCustomer = { customer?: TCustomer };
-type optionalAddress = {address?: TAddress};
+type optionalAddress = { address?: TAddress };
 
 export type TCustomer = {
-    suspendedAt: Date | string | null;
-    updatedAt: Date | string | null;
-    createdAt: Date | string | null;
-    appointments?: Appointment[] | TAppointmentWithCustomerName[];
-    addresses?: Address[] | TAddressWithCustomerNameAndFullAddress[];
+    appointments?: TAppointmentWithCustomerNameAndFullAddress[];
+    addresses?: TAddressWithCustomerNameAndFullAddress[];
 } & Customer &
     optionalFullName &
     optionalFullAddress;
 
-export type TAddress = optionalCustomer & Address;
+export type TAddress = {
+    appointments?: TAppointmentWithCustomerNameAndFullAddress[];
+} & optionalCustomer & Address;
 export type TAddressWithCustomerName = optionalFullName &
     TAddress;
 export type TAddressWithFullAddress = optionalFullAddress &
@@ -88,12 +87,12 @@ export type TCustomer_Appointments_Addresses_for_creation =
 export type TCustomer_Appointments_Addresses =
     | Customer
     | (Customer & {
-          addresses: Address[];
-      })
+        addresses: Address[];
+    })
     | (Customer & {
-          addresses: Address[];
-          appointments: Appointment[];
-      });
+        addresses: Address[];
+        appointments: Appointment[];
+    });
 
 // Types used for Seeding
 export type TCustomer_No_ID = Omit<Customer, 'id'>;

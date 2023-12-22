@@ -1,7 +1,10 @@
 import {
+    TAddressWithCustomerNameAndFullAddress,
     TAppointmentWithCustomerName,
     TAppointmentWithCustomerNameAndFullAddress,
+    TCustomer,
 } from '@types';
+import { isAddress, isCustomer } from '@functions';
 
 // export function getAppointmentsFromCustomerArray(customersArray: TCustomer[] = []) {
 //   console.log(" getAppointmentsFromCustomerArray START")
@@ -55,4 +58,25 @@ export function addFullAddressToAppointment(
         ...appointmentObj,
         fullAddress: null,
     };
+}
+
+
+export function isAppointment(value: TAppointmentWithCustomerNameAndFullAddress | TAddressWithCustomerNameAndFullAddress |  TCustomer): value is TAppointmentWithCustomerNameAndFullAddress {
+    value = value as TAppointmentWithCustomerNameAndFullAddress
+
+    return Boolean(
+        value?.id &&
+        value?.recurring &&
+        (value?.frequency === null || value.frequency) &&
+        value?.customerId &&
+        value?.addressId &&
+        value?.start &&
+        value?.end &&
+        value?.completed &&
+        (value?.completedAt === null || value.completedAt) &&
+        value?.createdAt &&
+        (value?.updatedAt === null || value.updatedAt) &&
+        value?.address && isAddress(value.address) &&
+        value?.customer && isCustomer(value.customer)
+    );
 }

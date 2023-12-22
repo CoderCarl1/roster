@@ -1,9 +1,9 @@
-import { addFullName } from '@functions';
 import {
     TCustomer,
+    TAppointmentWithCustomerNameAndFullAddress,
     TAddressWithCustomerNameAndFullAddress,
-    TAddress,
 } from '@types';
+import { isAddress, isAppointment, isCustomer } from '@functions';
 
 // export function getAddressesFromCustomerArray(customers: TCustomer[] = []) {
 //   console.log(" getAddressesFromCustomerArray START")
@@ -26,10 +26,29 @@ import {
 //   return addresses;
 // }
 
-export function addFullAddress(addressObj: TAddress) {
-    const addressLine2 = addressObj.line2 ? ` ${addressObj.line2}` : '';
-    return {
-        ...addressObj,
-        fullAddress: `${addressObj.number} ${addressObj.line1}${addressLine2}, ${addressObj.suburb}`,
-    };
+export function addFullAddress(obj: TAppointmentWithCustomerNameAndFullAddress | TAddressWithCustomerNameAndFullAddress) {
+
+    if (isAppointment(obj)){
+        const { address } = obj;
+        if (address && isAddress(address)) {
+            const addressLine2 = address.line2 ? ` ${address.line2}` : '';
+            return {
+                ...obj,
+                fullAddress: `${address.number} ${address.line1}${addressLine2}, ${address.suburb}`,
+            };
+        }
+    }
+    if (isAddress(obj)){
+        const addressLine2 = obj.line2 ? ` ${obj.line2}` : '';
+        return {
+            ...obj,
+            fullAddress: `${obj.number} ${obj.line1}${addressLine2}, ${obj.suburb}`,
+        };
+    }
+
+    return obj && typeof obj === 'object'
+    ? { ...(obj as Record<string, unknown>), fullAddress: null }
+    : null;
 }
+
+

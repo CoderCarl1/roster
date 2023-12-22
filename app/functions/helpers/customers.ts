@@ -1,36 +1,45 @@
 import {
-    TAddress,
-    TAddressWithCustomerName,
     TAddressWithCustomerNameAndFullAddress,
-    TAddressWithFullAddress,
-    TAppointment,
-    TAppointmentWithCustomerName,
     TAppointmentWithCustomerNameAndFullAddress,
     TCustomer,
 } from '@types';
+import { isAddress, isAppointment, isCustomer } from '@functions';
 
 export function addFullName(
-    obj: TCustomer | TAddress | TAddressWithFullAddress | TAppointment
+    obj: TCustomer | TAddressWithCustomerNameAndFullAddress | TAppointmentWithCustomerNameAndFullAddress
 ) {
-
-    if ('customerId' in obj) {
-        const { customer } = obj;
-        return {
-            ...obj,
-            fullName: `${customer?.firstName} ${customer?.lastName}`.trim(),
-        } as TAppointmentWithCustomerName | TAppointmentWithCustomerNameAndFullAddress |  TAddressWithCustomerName |TAddressWithCustomerNameAndFullAddress;
-    }
-
-    if ('firstName' in obj && 'lastName' in obj) {
+    if (isCustomer(obj)) {
         return {
             ...obj,
             fullName: `${obj.firstName} ${obj.lastName}`.trim(),
         } as TCustomer;
     }
 
-    if (typeof obj === 'object' && obj !== null) {
-        return { ...(obj as Record<string, unknown>), fullName: null };
-    }
+    if (isAddress(obj)) {
+        const {customer} = obj;
+        if (customer && isCustomer(customer)) {
+          return {
+            ...obj,
+            fullName: `${customer.firstName} ${customer.lastName}`.trim(),
+          } as TAddressWithCustomerNameAndFullAddress;
+        }
+      }
 
-    return { fullName: null };
+      if (isAppointment(obj)) {
+        const {customer} = obj;
+        if (customer && isCustomer(customer)) {
+          return {
+            ...obj,
+            fullName: `${customer.firstName} ${customer.lastName}`.trim(),
+          } as TAppointmentWithCustomerNameAndFullAddress;
+        }
+      }
+
+    return obj && typeof obj === 'object'
+    ? { ...(obj as Record<string, unknown>), fullName: null }
+    : null;
 }
+
+
+
+
