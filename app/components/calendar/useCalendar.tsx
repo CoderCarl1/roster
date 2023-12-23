@@ -1,5 +1,5 @@
 import { TAppointmentWithCustomerNameAndFullAddress } from '@types';
-import {dates} from '@functions';
+import {dates, log} from '@functions';
 
 export type CalendarAppointment = {
     time: string;
@@ -24,7 +24,7 @@ function useCalendar() {
     */
     function getDay(
         selectedDate: Date,
-        appointments: TAppointmentWithCustomerNameAndFullAddress[]
+        appointments: TAppointmentWithCustomerNameAndFullAddress[] = []
     ): CalendarDayType {
         const calendarData: {
             time: string;
@@ -32,7 +32,7 @@ function useCalendar() {
         }[] = [];
         const timeStringToCompare = new Date(selectedDate);
 
-        for (let i = 0; i < 24; i++) {
+        for (let i = 4; i < 19; i++) {
             const hour = i < 10 ? `0${i}` : `${i}`;
 
             for (let j = 0; j < 60; j += 15) {
@@ -85,7 +85,6 @@ function useCalendar() {
             calendar.push(dayData);
             currentDate = dates.incrementDayByOne(currentDate);
         }
-        console.log("calendar in get weeek", calendar)
         return calendar;
     }
 

@@ -53,8 +53,8 @@ export function startOfWeek(date: Date){
  * @returns The end of the week date.
  * @example
  * const inputDate = new Date('2023-12-15');
- * const endOfWeekDate = endOfWeek(inputDate);
- * console.log(endOfWeekDate); // Output: Sat Dec 17 2023 23:59:59 GMT+0000 (Coordinated Universal Time)
+ * endOfWeek(inputDate);
+ * Output: Sat Dec 17 2023 23:59:59 GMT+0000 (Coordinated Universal Time)
  */
 export function endOfWeek(date: Date) {
     const currentDate = new Date(date);
@@ -81,8 +81,8 @@ export function getDaysInMonth(year: number, month: number) {
 * @example
 * const startDate = new Date('2023-12-15');
 * const endDate = new Date('2023-12-20');
-* const daysBetween = getNumberOfDays(startDate, endDate);
-* console.log(daysBetween); // Output: 6
+* getNumberOfDays(startDate, endDate);
+* Output: 6
 */
 export function getNumberOfDays(startDate: Date, endDate: Date): number {
     const oneDay = 24 * 60 * 60 * 1000;

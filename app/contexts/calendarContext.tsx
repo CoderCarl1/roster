@@ -1,5 +1,5 @@
 import { createContext, useState, useContext } from 'react';
-import { dates } from '~/functions';
+import { dates, log } from '~/functions';
 
 type CalendarDateType = {
     day: number;
@@ -7,6 +7,7 @@ type CalendarDateType = {
     year: number;
     date: Date;
     dayName: string;
+    monthName: string;
 };
 type CalendarContextType = {
     currentDate: CalendarDateType;
@@ -28,6 +29,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         year: today.getFullYear(),
         date: today,
         dayName: dates.getDayName(today),
+        monthName: today.toLocaleString(undefined, { month: 'long' })
     });
 
 
@@ -39,6 +41,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
             year: today.getFullYear(),
             date: today,
             dayName: dates.getDayName(today),
+            monthName: today.toLocaleString(undefined, { month: 'long' })
         })
     }
 
@@ -54,7 +57,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         const daysToAdd = dates.getDaysInMonth(
             currentDate.year,
             currentDate.month
-        ) - currentDate.day;
+        ) - currentDate.day + 1;
 
         const nextMonthDate = calculateFutureDate(daysToAdd)
         setDate(nextMonthDate);
@@ -78,7 +81,6 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     }
 
     function calculateFutureDate(dayNumber: number) {
-        console.log("calculateFutureDate day number to add", dayNumber)
         let newDay = currentDate.day;
         let newMonth = currentDate.month;
         let newYear = currentDate.year;

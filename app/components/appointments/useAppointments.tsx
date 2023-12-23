@@ -1,5 +1,5 @@
 import { useAppointmentContext } from '@contexts';
-import { dates } from '@functions';
+import { dates, log } from '@functions';
 
 function useAppointments() {
     const {
@@ -21,6 +21,7 @@ function useAppointments() {
     }
 
     function getAppointmentsForDay(selectedDate: Date) {
+        if (!appointmentsData.length) return [];
         const day = new Date(selectedDate);
         const appointmentData = appointmentsData.filter((appointment) => {
             const appointmentDate = new Date(appointment.start);
@@ -31,12 +32,11 @@ function useAppointments() {
                 appointmentDate.getFullYear() === day.getFullYear()
             );
         });
-        console.log("getAppointmentsForDay appointmentData for day", appointmentData)
         return appointmentData
     }
 
     function getAppointmentsForWeek(selectedStartDate: Date) {
-        if (!appointmentsData) return [];
+        if (!appointmentsData.length) return [];
 
         const startOfWeek = new Date(selectedStartDate)
         const selectedEndDate = new Date(startOfWeek);
@@ -49,32 +49,29 @@ function useAppointments() {
                 appointmentDate <= selectedEndDate
             );
         });
-        
         return appointmentData;
     }
 
     function getAppointmentsForMonth(dateWithinMonth: Date) {
-        if (!appointmentsData) return [];
-        
+        if (!appointmentsData.length) return [];
+
         const startDate = new Date(dateWithinMonth);
-    
+
         // Check if the start date is not a Sunday, and adjust it to the nearest Sunday
         if (startDate.getDay() !== 0) {
             const nearestSunday = dates.startOfWeek(startDate).getTime();
             startDate.setTime(nearestSunday);
         }
-    
+
         // Calculate the end date by getting the end of the week for the last day of the month
         const lastDay = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
         const endDate = dates.endOfWeek(lastDay);
-    
+
         const appointmentData = appointmentsData.filter((appointment) => {
             const appointmentDate = new Date(appointment.start);
-    
+
             return appointmentDate >= startDate && appointmentDate <= endDate;
         });
-    
-        console.log("getAppointmentsForMonth appointmentData for month", appointmentData);
         return appointmentData;
     }
 
