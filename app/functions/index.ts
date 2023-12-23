@@ -1,8 +1,17 @@
 import {
-    addFullAddress, /**, getAddressesFromCustomerArray */
+    addFullAddress /**, getAddressesFromCustomerArray */,
 } from './helpers/addresses';
 import { addFullName } from './helpers/customers';
-import { dayNumberFromDate, endOfWeek, formatDate, getDayName, getDaysInMonth, getNumberOfDays, incrementDayByOne, startOfWeek } from './helpers/dates';
+import {
+    dayNumberFromDate,
+    endOfWeek,
+    formatDate,
+    getDayName,
+    getDaysInMonth,
+    getNumberOfDays,
+    incrementDayByOne,
+    startOfWeek,
+} from './helpers/dates';
 import { log } from './helpers/functions';
 import { removePropertiesFromObject } from './helpers/objects';
 import { isAddress, isAppointment, isCustomer } from './helpers/typechecks';
@@ -16,9 +25,9 @@ const dates = {
     dayNumberFromDate,
     getDaysInMonth,
     getNumberOfDays,
-    incrementDayByOne, 
-    getDayName
-}
+    incrementDayByOne,
+    getDayName,
+};
 export {
     addFullName,
     addFullAddress,
@@ -30,5 +39,5 @@ export {
     // getAddressesFromCustomerArray,
     removePropertiesFromObject,
     useToggle,
-    dates
+    dates,
 };

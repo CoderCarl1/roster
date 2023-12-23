@@ -5,8 +5,10 @@ import { useEffect, useState } from 'react';
  */
 
 export default function useToggle(newState: boolean | Event = false) {
-    const [toggle, setToggle] = useState<boolean>(typeof newState === 'boolean' ? newState : false);
-    
+    const [toggle, setToggle] = useState<boolean>(
+        typeof newState === 'boolean' ? newState : false
+    );
+
     /**
      * Set the toggle state based on the provided value or toggle it if no value is provided.
      *

@@ -1,12 +1,15 @@
+import { isAddress, isAppointment, isCustomer } from '@functions';
 import {
     TAddressWithCustomerNameAndFullAddress,
     TAppointmentWithCustomerNameAndFullAddress,
     TCustomer,
 } from '@types';
-import { isAddress, isAppointment, isCustomer } from '@functions';
 
 export function addFullName(
-    obj: TCustomer | TAddressWithCustomerNameAndFullAddress | TAppointmentWithCustomerNameAndFullAddress
+    obj:
+        | TCustomer
+        | TAddressWithCustomerNameAndFullAddress
+        | TAppointmentWithCustomerNameAndFullAddress
 ) {
     if (isCustomer(obj)) {
         return {
@@ -16,29 +19,27 @@ export function addFullName(
     }
 
     if (isAddress(obj)) {
-        const {customer} = obj;
+        const { customer } = obj;
         if (customer && isCustomer(customer)) {
-          return {
-            ...obj,
-            fullName: `${customer.firstName} ${customer.lastName}`.trim(),
-          } as TAddressWithCustomerNameAndFullAddress;
+            return {
+                ...obj,
+                fullName: `${customer.firstName} ${customer.lastName}`.trim(),
+            } as TAddressWithCustomerNameAndFullAddress;
         }
-      }
+    }
 
-      if (isAppointment(obj)) {
-        const {customer} = obj;
+    if (isAppointment(obj)) {
+        const { customer } = obj;
         if (customer && isCustomer(customer)) {
-            const updatedAppointment: TAppointmentWithCustomerNameAndFullAddress = {
-            ...obj,
-            fullName: `${customer.firstName} ${customer.lastName}`.trim(),
-          } 
-          return updatedAppointment;
+            const updatedAppointment: TAppointmentWithCustomerNameAndFullAddress =
+                {
+                    ...obj,
+                    fullName:
+                        `${customer.firstName} ${customer.lastName}`.trim(),
+                };
+            return updatedAppointment;
         }
-      }
+    }
 
     return obj;
 }
-
-
-
-

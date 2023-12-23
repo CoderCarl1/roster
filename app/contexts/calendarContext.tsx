@@ -23,15 +23,14 @@ const CalendarContext = createContext<CalendarContextType | null>(null);
 
 export function CalendarProvider({ children }: { children: React.ReactNode }) {
     const today = new Date();
-    const [ currentDate, setCurrentDate ] = useState<CalendarDateType>({
+    const [currentDate, setCurrentDate] = useState<CalendarDateType>({
         day: today.getDate(),
         month: today.getMonth(),
         year: today.getFullYear(),
         date: today,
         dayName: dates.getDayName(today),
-        monthName: today.toLocaleString(undefined, { month: 'long' })
+        monthName: today.toLocaleString(undefined, { month: 'long' }),
     });
-
 
     function setDate(date: Date) {
         const today = new Date(date);
@@ -41,8 +40,8 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
             year: today.getFullYear(),
             date: today,
             dayName: dates.getDayName(today),
-            monthName: today.toLocaleString(undefined, { month: 'long' })
-        })
+            monthName: today.toLocaleString(undefined, { month: 'long' }),
+        });
     }
 
     function nextDay() {
@@ -50,16 +49,16 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         setDate(nextDayDate);
     }
     function nextWeek() {
-        const nextWeekDate = calculateFutureDate(7)
+        const nextWeekDate = calculateFutureDate(7);
         setDate(nextWeekDate);
     }
     function nextMonth() {
-        const daysToAdd = dates.getDaysInMonth(
-            currentDate.year,
-            currentDate.month
-        ) - currentDate.day + 1;
+        const daysToAdd =
+            dates.getDaysInMonth(currentDate.year, currentDate.month) -
+            currentDate.day +
+            1;
 
-        const nextMonthDate = calculateFutureDate(daysToAdd)
+        const nextMonthDate = calculateFutureDate(daysToAdd);
         setDate(nextMonthDate);
     }
     function prevDay() {
@@ -71,12 +70,11 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         setDate(nextDayDate);
     }
     function prevMonth() {
-        const daysToMinus = dates.getDaysInMonth(
-            currentDate.year,
-            currentDate.month - 1
-        ) + currentDate.day;
+        const daysToMinus =
+            dates.getDaysInMonth(currentDate.year, currentDate.month - 1) +
+            currentDate.day;
 
-        const prevMonthDate = calculatePastDate(daysToMinus)
+        const prevMonthDate = calculatePastDate(daysToMinus);
         setDate(prevMonthDate);
     }
 
@@ -85,25 +83,26 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         let newMonth = currentDate.month;
         let newYear = currentDate.year;
         const daysInCurrentMonth = dates.getDaysInMonth(newYear, newMonth);
-    
+
         if (newDay + dayNumber <= daysInCurrentMonth) {
             newDay += dayNumber;
         } else {
             let daysToAdd = dayNumber - (daysInCurrentMonth - newDay);
             while (daysToAdd > 0) {
                 newMonth += 1;
-    
+
                 if (newMonth > 11) {
                     newMonth = 0;
                     newYear += 1;
                 }
-    
+
                 const daysInNextMonth = dates.getDaysInMonth(newYear, newMonth);
-                newDay = daysToAdd <= daysInNextMonth ? daysToAdd : daysInNextMonth;
+                newDay =
+                    daysToAdd <= daysInNextMonth ? daysToAdd : daysInNextMonth;
                 daysToAdd -= daysInNextMonth;
             }
         }
-    
+
         return new Date(newYear, newMonth, newDay);
     }
 
@@ -129,7 +128,10 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
                 }
 
                 newDay += daysInPreviousMonth;
-                daysInPreviousMonth = dates.getDaysInMonth(newYear, newMonth - 1);
+                daysInPreviousMonth = dates.getDaysInMonth(
+                    newYear,
+                    newMonth - 1
+                );
             }
 
             newDay -= dayNumber;
@@ -138,7 +140,16 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         return new Date(newYear, newMonth, newDay);
     }
 
-    const value = { currentDate, nextDay, prevDay, nextWeek, prevWeek, nextMonth, prevMonth, setDate };
+    const value = {
+        currentDate,
+        nextDay,
+        prevDay,
+        nextWeek,
+        prevWeek,
+        nextMonth,
+        prevMonth,
+        setDate,
+    };
     return (
         <CalendarContext.Provider value={value}>
             {children}

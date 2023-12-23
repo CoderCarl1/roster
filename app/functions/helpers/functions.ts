@@ -107,11 +107,13 @@ function logStackTrace(stackTrace: string): void {
 export function log(...args: unknown[]): void {
     if (process.env.NODE_ENV === 'production') {
         return;
-      }
+    }
     let color: colorKey = 'reset'; // Default color
 
     // Check if 'color' is present in the arguments
-    const colorArgIndex = args.findIndex(arg => typeof arg === 'object' && arg !== null && 'color' in arg);
+    const colorArgIndex = args.findIndex(
+        (arg) => typeof arg === 'object' && arg !== null && 'color' in arg
+    );
 
     if (colorArgIndex !== -1) {
         color = (args[colorArgIndex] as { color: colorKey }).color || 'reset';
@@ -119,7 +121,7 @@ export function log(...args: unknown[]): void {
         // Remove the 'color' argument from the array
         args.splice(colorArgIndex, 1);
     }
-    
+
     const colorCode = colors[color];
     let formattedText = '';
     const nonText: unknown[] = [];
@@ -134,10 +136,14 @@ export function log(...args: unknown[]): void {
             formattedText += `${colors.red}${arg.message}${colors.reset}`;
             errStack = arg.stack;
         } else if (typeof arg === 'object' && arg !== null) {
-            if ('errorData' in arg){
+            if ('errorData' in arg) {
                 formattedText += `${colors.red}${arg.errorData}${colors.reset}`;
             } else if ('data' in arg) {
-                formattedText += `${colorCode}${JSON.stringify(arg.data, null, 2)}${colors.reset}`;
+                formattedText += `${colorCode}${JSON.stringify(
+                    arg.data,
+                    null,
+                    2
+                )}${colors.reset}`;
             }
         } else {
             nonText.push(arg);

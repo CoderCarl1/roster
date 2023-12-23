@@ -21,7 +21,7 @@ export function formatDate(dateString: Date | string) {
     return date.toLocaleString(undefined, options);
 }
 
-export function dayNumberFromDate(dateString: Date | string){
+export function dayNumberFromDate(dateString: Date | string) {
     const date = new Date(dateString);
 
     // Check if the date is valid
@@ -30,17 +30,17 @@ export function dayNumberFromDate(dateString: Date | string){
     }
 
     const options: Intl.DateTimeFormatOptions = {
-        day: 'numeric',        
+        day: 'numeric',
     };
     return date.toLocaleString(undefined, options);
 }
 
 // const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-export function startOfWeek(date: Date){
+export function startOfWeek(date: Date) {
     const currentDate = new Date(date);
-    const currentDayIndex =  currentDate.getDay()
-    
+    const currentDayIndex = currentDate.getDay();
+
     const sundayDate = new Date(currentDate);
     sundayDate.setDate(currentDate.getDate() - currentDayIndex);
     return sundayDate;
@@ -67,28 +67,35 @@ export function endOfWeek(date: Date) {
     return endOfWeekDate;
 }
 
-
 export function getDaysInMonth(year: number, month: number) {
     const nextMonth = new Date(year, month, 0);
     return nextMonth.getDate();
 }
 /**
-* Calculates the number of days between two dates, inclusive.
-*
-* @param {Date} startDate - The start date.
-* @param {Date} endDate - The end date.
-* @returns {number} - The number of days between the two dates, inclusive.
-* @example
-* const startDate = new Date('2023-12-15');
-* const endDate = new Date('2023-12-20');
-* getNumberOfDays(startDate, endDate);
-* Output: 6
-*/
+ * Calculates the number of days between two dates, inclusive.
+ *
+ * @param {Date} startDate - The start date.
+ * @param {Date} endDate - The end date.
+ * @returns {number} - The number of days between the two dates, inclusive.
+ * @example
+ * const startDate = new Date('2023-12-15');
+ * const endDate = new Date('2023-12-20');
+ * getNumberOfDays(startDate, endDate);
+ * Output: 6
+ */
 export function getNumberOfDays(startDate: Date, endDate: Date): number {
     const oneDay = 24 * 60 * 60 * 1000;
 
-    const startUtc = Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-    const endUtc = Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+    const startUtc = Date.UTC(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate()
+    );
+    const endUtc = Date.UTC(
+        endDate.getFullYear(),
+        endDate.getMonth(),
+        endDate.getDate()
+    );
 
     return Math.abs(Math.round((endUtc - startUtc) / oneDay)) + 1;
 }
@@ -98,7 +105,7 @@ export function incrementDayByOne(date: Date): Date {
     return nextDate;
 }
 export function getDayName(date: Date) {
-    const dateClone = new Date(date)
+    const dateClone = new Date(date);
     const options: Intl.DateTimeFormatOptions = { weekday: 'long' };
     return dateClone.toLocaleDateString('en-US', options);
 }

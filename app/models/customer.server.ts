@@ -219,8 +219,10 @@ export async function customer_update(
             return customer;
         });
         if (!updatedCustomer) {
-            log({color: 'red'}, 'Failed Updating Customer, dumping data', {data: customerData});            
-            if (addressData) log("addressData: ", {data: addressData});
+            log({ color: 'red' }, 'Failed Updating Customer, dumping data', {
+                data: customerData,
+            });
+            if (addressData) log('addressData: ', { data: addressData });
             throw new Error();
         }
         return updatedCustomer;
@@ -312,7 +314,10 @@ export async function customer_delete_many(
             where: { contact: { endsWith: string } },
         });
         if (deletedCustomers) {
-            log({color: 'magenta'}, `DELETED all records containing the words ${string}`);
+            log(
+                { color: 'magenta' },
+                `DELETED all records containing the words ${string}`
+            );
         }
     } catch (err) {
         return new CustomerOperationError('unable to delete customers', err);

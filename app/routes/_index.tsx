@@ -44,7 +44,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
         addresses: true,
         appointments: true,
     });
-    
+
     if (
         !customersLoaderData ||
         customersLoaderData instanceof CustomerOperationError ||
@@ -70,7 +70,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     // const addressesLoaderData = [];
     const addressesLoaderData = await address_find_all({
         customer: true,
-        appointments: true
+        appointments: true,
     });
     if (
         !addressesLoaderData ||
@@ -109,7 +109,7 @@ export default function Index() {
 
                                 <Suspense fallback={<LoadingComponent />}>
                                     <Await resolve={appointmentsLoaderData}>
-                                        <Appointments className="dashboard__section appointments"/>
+                                        <Appointments className="dashboard__section appointments" />
                                     </Await>
                                 </Suspense>
 

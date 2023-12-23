@@ -157,7 +157,7 @@ function generateRandomFullName() {
     return [ firstName, lastName ];
 }
 
-async function createMockCustomer(retriesLeft: number = 1) {
+async function createMockCustomer(retriesLeft = 1) {
     try {
         const customerData = randomCustomerData();
         const numberOfAddresses = randomNumber(100) > 17 ? 1 : 2;

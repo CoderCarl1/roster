@@ -22,7 +22,7 @@ function Appointment_card({ appointment, clearAppointment, ...rest }: props) {
     // TODO: add a submit that calls update customer
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        log('fake submission of appointment card form', {data: formData});
+        log('fake submission of appointment card form', { data: formData });
     };
 
     // TODO: add basic styling

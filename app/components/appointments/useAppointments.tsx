@@ -32,13 +32,13 @@ function useAppointments() {
                 appointmentDate.getFullYear() === day.getFullYear()
             );
         });
-        return appointmentData
+        return appointmentData;
     }
 
     function getAppointmentsForWeek(selectedStartDate: Date) {
         if (!appointmentsData.length) return [];
 
-        const startOfWeek = new Date(selectedStartDate)
+        const startOfWeek = new Date(selectedStartDate);
         const selectedEndDate = new Date(startOfWeek);
         selectedEndDate.setDate(startOfWeek.getDate() + 6);
 
@@ -64,7 +64,11 @@ function useAppointments() {
         }
 
         // Calculate the end date by getting the end of the week for the last day of the month
-        const lastDay = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+        const lastDay = new Date(
+            startDate.getFullYear(),
+            startDate.getMonth() + 1,
+            0
+        );
         const endDate = dates.endOfWeek(lastDay);
 
         const appointmentData = appointmentsData.filter((appointment) => {

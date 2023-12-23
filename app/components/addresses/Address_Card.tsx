@@ -24,7 +24,7 @@ function Address_card({ address, clearAddress, ...rest }: props) {
     // TODO: add a submit that calls update address
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        log('fake submission of address card form', {data: formData});
+        log('fake submission of address card form', { data: formData });
     };
 
     // TODO: add basic styling

@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
-import { TprismaErrorDataType } from '@types';
 import { log } from '@functions';
+import { TprismaErrorDataType } from '@types';
 
 export class OperationError extends Error {
     constructor(
@@ -36,9 +36,9 @@ export class OperationError extends Error {
     }
 
     public _log() {
-        let dataToLog: unknown[] = [`[${this.name}] ${this.message}`];
+        const dataToLog: unknown[] = [`[${this.name}] ${this.message}`];
         if (this.errorData && Object.keys(this.errorData).length) {
-            dataToLog.push({errorData: this.errorData})
+            dataToLog.push({ errorData: this.errorData });
         }
         log(...dataToLog);
     }

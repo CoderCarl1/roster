@@ -22,7 +22,9 @@ export async function address_create(
         });
 
         if (!createdAddress) {
-            log({color: 'red'}, 'Failed Creating Address, dumping data', {data: addressData});
+            log({ color: 'red' }, 'Failed Creating Address, dumping data', {
+                data: addressData,
+            });
             throw new Error(JSON.stringify(addressData));
         }
 

@@ -22,8 +22,7 @@ function Customer_card({ customer, clearCustomer, ...rest }: props) {
     // TODO: add a submit that calls update customer
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        log('fake submission of customer card form', {data: formData});
-
+        log('fake submission of customer card form', { data: formData });
     };
 
     // TODO: add basic styling
