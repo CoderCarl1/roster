@@ -44,7 +44,7 @@ type addressesProps = {
 
 function Addresses({ addresses = [], setAddress, children }: addressesProps) {
     return (
-        <section className="section-wrapper">
+        <section className="dashboard__section-wrapper">
             {children}
             <Table>
                 <Caption>Addresses</Caption>
