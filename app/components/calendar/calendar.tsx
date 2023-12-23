@@ -99,8 +99,10 @@ export default function Main({ displayType, setLoading, loading, children, ...pr
     <section {...props}>
       <div className="calendar__controls">
         <span className="date__information">{dateInformation()}</span>
-       {children}
         <Button onClick={handlePrev}>prev</Button><Button onClick={handleNext}>next</Button></div>
+        <div>
+        {children}
+       </div>
 
       {!calendarData || loading ? (
         <LoadingComponent />
