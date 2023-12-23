@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * @param newState default is FALSE, accepts new boolean
  */
 
 export default function useToggle(newState: boolean | Event = false) {
-    const [toggle, setToggle] = useState(newState);
-
+    const [toggle, setToggle] = useState<boolean>(typeof newState === 'boolean' ? newState : false);
+    
     /**
      * Set the toggle state based on the provided value or toggle it if no value is provided.
      *
@@ -23,8 +23,8 @@ export default function useToggle(newState: boolean | Event = false) {
             retval = value;
         } else {
             value.preventDefault();
-            retval = !toggle;
-            setToggle((prev) => !prev);
+            retval = Boolean(!toggle);
+            setToggle((prev) => Boolean(!prev));
         }
 
         return retval;
