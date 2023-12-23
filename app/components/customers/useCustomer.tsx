@@ -1,5 +1,6 @@
 import { useCustomerContext } from '@contexts';
 import { TCustomer } from '@types';
+import { log } from '~/functions';
 
 function useCustomers() {
     const {
@@ -20,7 +21,7 @@ function useCustomers() {
     }
 
     function setCustomers(customers: TCustomer[]) {
-        console.log('set customers invoked');
+        log('set customers invoked');
         setCustomersData(customers);
     }
 

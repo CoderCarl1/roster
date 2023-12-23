@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Input, Card } from '@components';
-import { useToggle } from '@functions';
+import { log, useToggle } from '@functions';
 import { TAppointmentWithCustomerName } from '@types';
 
 type props = {
@@ -22,8 +22,7 @@ function Appointment_card({ appointment, clearAppointment, ...rest }: props) {
     // TODO: add a submit that calls update customer
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('fake submission of appointment card form');
-        console.dir(formData);
+        log('fake submission of appointment card form', {data: formData});
     };
 
     // TODO: add basic styling

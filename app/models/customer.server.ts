@@ -114,12 +114,10 @@ export async function customer_find(
     include?: Prisma.CustomerInclude | undefined
 ): Promise<Customer | CustomerOperationError> {
     try {
-        console.log('customer_find args', include);
         const customer = await prisma.customer.findUnique({
             where: { id: customerId },
             include,
         });
-        console.log('customer_find customer', customer);
         if (!customer)
             throw new CustomerOperationError(
                 'failed to find customer',
@@ -221,9 +219,8 @@ export async function customer_update(
             return customer;
         });
         if (!updatedCustomer) {
-            log('red', 'Failed Updating Customer, dumping data');
-            console.log(customerData);
-            if (addressData) console.log(addressData);
+            log({color: 'red'}, 'Failed Updating Customer, dumping data', {data: customerData});            
+            if (addressData) log("addressData: ", {data: addressData});
             throw new Error();
         }
         return updatedCustomer;
@@ -315,10 +312,7 @@ export async function customer_delete_many(
             where: { contact: { endsWith: string } },
         });
         if (deletedCustomers) {
-            log(
-                'magenta',
-                `DELETED all records containing the words ${string}`
-            );
+            log({color: 'magenta'}, `DELETED all records containing the words ${string}`);
         }
     } catch (err) {
         return new CustomerOperationError('unable to delete customers', err);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useToggle } from '@functions';
+import { log, useToggle } from '@functions';
 import { TCustomer } from '@types';
 import { Input, Card } from '~/components';
 
@@ -22,8 +22,8 @@ function Customer_card({ customer, clearCustomer, ...rest }: props) {
     // TODO: add a submit that calls update customer
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('fake submission of customer card form');
-        console.dir(formData);
+        log('fake submission of customer card form', {data: formData});
+
     };
 
     // TODO: add basic styling

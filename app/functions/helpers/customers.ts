@@ -28,16 +28,15 @@ export function addFullName(
       if (isAppointment(obj)) {
         const {customer} = obj;
         if (customer && isCustomer(customer)) {
-          return {
+            const updatedAppointment: TAppointmentWithCustomerNameAndFullAddress = {
             ...obj,
             fullName: `${customer.firstName} ${customer.lastName}`.trim(),
-          } as TAppointmentWithCustomerNameAndFullAddress;
+          } 
+          return updatedAppointment;
         }
       }
 
-    return obj && typeof obj === 'object'
-    ? { ...(obj as Record<string, unknown>), fullName: null }
-    : null;
+    return obj;
 }
 
 

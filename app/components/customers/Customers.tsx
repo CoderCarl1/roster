@@ -4,24 +4,23 @@ import { Customer_Card, useCustomers } from '@components';
 import { TCustomer } from '@types';
 import { loaderType } from '~/routes/_index';
 import Table, { Caption, Row, TD, TH } from '../table/table';
-import { addFullName } from '@functions';
+import { addFullName, log } from '@functions';
 
-function Main() {
+function Main(props?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
     const data = useLoaderData<loaderType>();
-    const customersLoaderData = data.customersLoaderData as TCustomer[];
+    const customersLoaderData = data.customersLoaderData as unknown as TCustomer[];
+    customersLoaderData.length = 1;
 
     const { setCustomer, currentCustomer, customersData, setCustomers } =
         useCustomers();
 
     useEffect(() => {
-        console.log("customers use effect running")
-
         const customersArray = customersLoaderData.map(customer => addFullName(customer)) as TCustomer[];
         setCustomers(customersArray);
     }, []);
 
     return (
-        <Customers setCustomer={setCustomer} customers={customersData as any}>
+        <Customers setCustomer={setCustomer} customers={customersData as any} {...props} >
             {currentCustomer ? (
                 <Customer_Card
                     clearCustomer={setCustomer}
@@ -36,17 +35,15 @@ type customersProps = {
     customers: TCustomer[];
     setCustomer: (customerId?: string) => void;
     children?: React.ReactNode;
-};
+} & React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
-function Customers({ customers, setCustomer, children }: customersProps) {
+function Customers({ customers, setCustomer, children, ...props }: customersProps) {
     return (
-        <section className="section-wrapper">
+        <section {...props}>
             {children}
             <Table>
                 <Caption>Customers</Caption>
                 <TH>Name</TH>
-                <TH>Contact</TH>
-                {/* <TH>Note</TH> */}
                 {customers
                     ? customers.map((customer) => {
                           const { id, fullName, contact } = customer;
@@ -56,8 +53,6 @@ function Customers({ customers, setCustomer, children }: customersProps) {
                                   cb={() => setCustomer(id)}
                               >
                                   <TD>{fullName}</TD>
-                                  <TD>{contact}</TD>
-                                  {/* <TD>{note ? <Note note={note} /> : null}</TD> */}
                               </Row>
                           );
                       })

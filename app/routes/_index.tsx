@@ -44,7 +44,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
         addresses: true,
         appointments: true,
     });
-
+    
     if (
         !customersLoaderData ||
         customersLoaderData instanceof CustomerOperationError ||
@@ -81,8 +81,6 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
         throw new Response('addresses Not Found', { status: 404 });
     }
 
-    console.log('about to return data');
-
     return json({
         customersLoaderData,
         addressesLoaderData,
@@ -105,21 +103,21 @@ export default function Index() {
                             <CalendarProvider>
                                 <Suspense fallback={<LoadingComponent />}>
                                     <Await resolve={customersLoaderData}>
-                                        <Customers />
+                                        <Customers className="dashboard__section customers" />
                                     </Await>
                                 </Suspense>
 
                                 <Suspense fallback={<LoadingComponent />}>
                                     <Await resolve={appointmentsLoaderData}>
-                                        <Appointments />
+                                        <Appointments className="dashboard__section appointments"/>
                                     </Await>
                                 </Suspense>
 
-                                <Suspense fallback={<LoadingComponent />}>
+                                {/* <Suspense fallback={<LoadingComponent />}>
                                     <Await resolve={addressesLoaderData}>
                                         <Addresses />
                                     </Await>
-                                </Suspense>
+                                </Suspense> */}
                             </CalendarProvider>
                         </AddressProvider>
                     </AppointmentProvider>

@@ -27,13 +27,13 @@ try {
     main();
 } catch (err) {
     if (process.env.SEEDING === 'true') {
-        log('red', 'SEEDING ERROR', err)
+        log({color: 'red'}, 'SEEDING ERROR', {errorData: err})
     } else {
-        log('red', 'Error', err)
+        log({color: 'red'}, 'Error',  {errorData: err})
     }
 } finally {
     async () => {
-        await prisma.$disconnect().then(() => log('yellow', 'disconnected'))
+        await prisma.$disconnect().then(() => log({color: 'yellow'}, 'disconnected'))
     }
 }
 
@@ -46,29 +46,32 @@ async function main() {
 
 async function deleteAll() {
     try {
-        log('magenta', '================== \n - Cleaning DB before Seeding ');
+        log({color: 'magenta'}, '================== \n 🧹 🗑️ Cleaning DB before Seeding ');
         await Promise.all([ 
             customer_delete_many('example.com'), 
             customer_delete_many('test.com'), 
             prisma.address.deleteMany({where: {line2: {endsWith: "example"}}})]);
-        log('red', 'Deleted');
-        log('magenta', '==================');
+        log({color: 'red'}, 'Deleted');
+        log({color: 'magenta'}, '==================');
         return Promise.resolve();
     } catch (err) {
-        console.log("error occured deleting records");
+        log({color: 'red'}, "error occured deleting records");
     }
 }
 
 
 async function seed(numberOfCustomersToCreate = 30) {
-    log('magenta', '================== \n - CREATING Customers - ');
+    log({color:'magenta'}, '================== \n - CREATING Customers - ');
 
     const customers = await createCustomers(numberOfCustomersToCreate);
     if (customers && customers.length) {
-        await createAppointments(customers);
+        const appointments = await createAppointments(customers);
+
+        if (appointments && appointments.length) {
+            log({color: 'green'}, `Database has been seeded. 🌱`);
+            log({color: 'magenta'}, '==================');
+        }
     }
-    log('green', `Database has been seeded. 🌱`);
-    log('magenta', '==================');
 }
 
 async function createCustomers(numberOfCustomersToCreate: number){
@@ -79,7 +82,7 @@ async function createCustomers(numberOfCustomersToCreate: number){
         const { id, addresses } = result;
         customers.push({ id, addresses });
     }
-    return customers;
+    return Promise.resolve(customers);
 }
 
 async function createAppointments(customers: Pick<TCustomer, 'id' | 'addresses'>[]) {
@@ -110,7 +113,8 @@ async function createAppointments(customers: Pick<TCustomer, 'id' | 'addresses'>
         return nestedAppointmentsPromises;
     });
 
-    await Promise.all(appointmentsPromises);
+    return await Promise.all(appointmentsPromises);
+    
 }
 
 // function addWeeks(date: Date, weeks: number) {
@@ -172,14 +176,13 @@ async function createMockCustomer(retriesLeft: number = 1) {
         
         return result;
     } catch (err) {
-        console.log("unknown error happened while generating a mock customer", err);
+        log({color: 'red'}, "unknown error happened while generating a mock customer", {errorData: err});
         throw err;    
     }
 }
 function randomCustomerData() {
     const customer = {} as TCustomer_No_ID;
     const [ first, last ] = generateRandomFullName();
-    console.log("GENERATING DATA FOR  ", first, last)
     customer.firstName = first;
     customer.lastName = last;
     customer.contact = `${customer.firstName}.${customer.lastName}@example.com`;

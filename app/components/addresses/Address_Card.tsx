@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Input, Card } from '@components';
-import { useToggle } from '@functions';
+import { log, useToggle } from '@functions';
 import { TAddressWithCustomerNameAndFullAddress } from '@types';
 
 type props = {
@@ -24,8 +24,7 @@ function Address_card({ address, clearAddress, ...rest }: props) {
     // TODO: add a submit that calls update address
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('fake submission of address card form');
-        console.dir(formData);
+        log('fake submission of address card form', {data: formData});
     };
 
     // TODO: add basic styling

@@ -43,8 +43,7 @@ export async function appointment_create(
         });
 
         if (!createdAppointment) {
-            log('red', 'Failed Creating appointment, dumping data');
-            console.log(appointmentData);
+            log({color: 'red'}, 'Failed Creating appointment, dumping data', {data: appointmentData});
             throw new Error(JSON.stringify(appointmentData));
         }
         return createdAppointment;
@@ -319,9 +318,6 @@ export async function appointment_update(
             throw new Error(`appointment with ID ${id} not updated.`);
         }
 
-        console.log(
-            `Customer with ID ${id} and associated data updated successfully.`
-        );
         updatedAppointment = addLocaleDates(updatedAppointment);
         return updatedAppointment;
     } catch (err) {

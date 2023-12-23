@@ -22,8 +22,7 @@ export async function address_create(
         });
 
         if (!createdAddress) {
-            log('red', 'Failed Creating Address, dumping data');
-            console.log(addressData);
+            log({color: 'red'}, 'Failed Creating Address, dumping data', {data: addressData});
             throw new Error(JSON.stringify(addressData));
         }
 
@@ -126,14 +125,6 @@ export async function address_find_all(
     includeArchived = false,
     whereBlock?: Prisma.AddressWhereInput | undefined
 ): Promise<Address[] | AddressOperationError> {
-    console.log('address_find_all invoked');
-    console.log('address_find_all include', include ? include : null);
-    console.log(
-        'address_find_all includeArchived',
-        includeArchived ? includeArchived : null
-    );
-    console.log('address_find_all whereBlock', whereBlock ? whereBlock : null);
-
     try {
         const addresses = await prisma.address.findMany({
             where: { archived: includeArchived, ...whereBlock },
@@ -192,10 +183,6 @@ export async function address_update(
             where: { id },
             data: addressData,
         });
-
-        console.log(
-            `Customer with ID ${id} and associated data updated successfully.`
-        );
 
         return updatedAddress;
     } catch (err) {

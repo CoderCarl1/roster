@@ -4,7 +4,7 @@ import { useAddresses, Address_Card } from '@components';
 import { TAddress, TAddressWithCustomerNameAndFullAddress } from '@types';
 import { loaderType } from '~/routes/_index';
 import Table, { Caption, Row, TD, TH } from '../table/table';
-import { addFullAddress, addFullName } from '@functions';
+import { addFullAddress, addFullName, log } from '@functions';
 
 function Main() {
     const data = useLoaderData<loaderType>();
@@ -13,7 +13,7 @@ function Main() {
     const { setAddress, currentAddress, setAddresses, addresses } = useAddresses();
 
     useEffect(() => {
-        console.log("addresses use effect running")
+        log("addresses use effect running")
 
         const addressesWithCustomerName: TAddressWithCustomerNameAndFullAddress[] = addressesData.map((address) => {
             let updatedAddress = addFullAddress(address);
