@@ -1,7 +1,17 @@
 @use "sass:map";
+@use "breakpoints" as *;
 @use "colors" as *;
 @use "typography" as *;
 @use "sizes" as *;
+
+
+@function bp($breakpoint){
+  @if map.has-key($breakpoints, $breakpoint){
+    @return map.get($breakpoints, $breakpoint);
+  } @else {
+    @error '$breakpoints does not have that size!';
+  }
+}
 
 @function clr($color, $shade) {
   @if map.has-key($colors, $color, $shade) {

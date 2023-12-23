@@ -1,4 +1,14 @@
+@use '../abstracts/' as *;
 
 .dashboard {
   display: flex;
+  width: min(100% - 2rem, bp(large));
+  margin-inline: auto;
+
+  &__section-wrapper {
+    max-height: 75dvh;
+    overflow-y: scroll;
+    flex: 1 1 20%;
+  }
 }
+

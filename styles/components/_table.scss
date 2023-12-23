@@ -1,0 +1,10 @@
+@use '../abstracts/'as *;
+
+.table {
+  tr {
+    &:hover {
+      background-color: clr(secondary, 100);
+      cursor: pointer;
+    }
+  }
+}

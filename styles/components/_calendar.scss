@@ -1,0 +1,66 @@
+@use '../abstracts/' as *;
+
+.dashboard__section-wrapper.calendar {
+  flex: 1 1 50%;
+}
+.calendar {
+  &__month {
+    @include grid($gap: size(4));
+  }
+  
+  &__week {
+    @include grid($columns: 7, $gap: size(4));
+  }
+  
+  .weekday_initials {
+    @include grid($columns: 7, $gap: size(4));
+    
+    .initial {
+      width: 100%;
+      text-align: center;
+      font-size: fs(600);
+      font-weight: 700;
+      color: clr(neutral, 100);
+      background-color: clr(neutral, 400);
+    }
+  }
+  &__day {
+    --_bg-color: var(--bg-color, #{clr(neutral, 100)});
+
+    background-color: var(--_bg-color);
+
+    &:hover {
+      --bg-color: #fff;
+      cursor: pointer;
+
+    }
+  }
+  &__day.compressed {
+    padding: size(4);
+
+    .compressed {
+      &__date {
+        color: clr(neutral, 300);
+        font-size:  fs(500);
+      }    
+    }
+  }
+}
+
+.compressed__slots--appointment {
+  display: block;
+  padding: 0.15em 0.25em;
+  @for $i from 1 through 4 {
+    &:nth-child(#{$i}) {
+      --_bg-color: var(--slot-bg-color, #{clr(accent, $i * 100)});
+      --_border-color: var(--border-color, transparent);
+
+      background-color: var(--_bg-color);
+      border: 1px solid var(--_border-color);
+
+      &:hover {
+        --border-color: #{darken(clr(accent, $i * 100), 25)};
+      }
+    }
+  }
+}

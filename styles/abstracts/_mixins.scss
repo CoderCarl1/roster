@@ -1,0 +1,36 @@
+@use "sass:map";
+@use 'sass:meta';
+@use 'sass:math';
+@use 'breakpoints' as *;
+
+@mixin mq($size) {
+  
+  @if map.has-key($breakpoints, $size) {
+    $breakpoint: map.get($breakpoints, $size);
+    @media screen and (min-width: $breakpoint) {
+      @content;
+    }
+  } @else {
+    @if meta.type-of($size) == number {
+      @if math.is-unitless($size){
+        @error 'no unit was given with number #{$size}';
+      } @else {
+        @warn '#{$size} is not a breakpoint inside abstracts/breakpoints';
+        @media screen and (min-width: $size) {
+          @content;
+        }
+      }
+    } @else {
+      @error '#{$size} breakpoint does not exist, possibles are: small, medium, large, xl'
+    }
+  }
+};
+
+
+
+@mixin grid($columns: 1, $rows: 1, $gap: 0px) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  grid-template-rows: repeat($rows, 1fr);
+  gap: $gap;
+}
