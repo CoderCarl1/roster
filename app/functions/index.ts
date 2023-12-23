@@ -1,10 +1,11 @@
 import {
-    addFullAddress /**, getAddressesFromCustomerArray */,
+    addFullAddress, /**, getAddressesFromCustomerArray */
 } from './helpers/addresses';
-import { addFullAddressToAppointment } from './helpers/appointments';
 import { addFullName } from './helpers/customers';
 import { dayNumberFromDate, endOfWeek, formatDate, getDayName, getDaysInMonth, getNumberOfDays, incrementDayByOne, startOfWeek } from './helpers/dates';
+import { log } from './helpers/functions';
 import { removePropertiesFromObject } from './helpers/objects';
+import { isAddress, isAppointment, isCustomer } from './helpers/typechecks';
 import useToggle from './helpers/useToggle';
 // import {getAppointmentsFromCustomerArray} from "./helpers/appointments";
 
@@ -21,7 +22,10 @@ const dates = {
 export {
     addFullName,
     addFullAddress,
-    addFullAddressToAppointment,
+    isCustomer,
+    isAddress,
+    isAppointment,
+    log,
     // getAppointmentsFromCustomerArray,
     // getAddressesFromCustomerArray,
     removePropertiesFromObject,
