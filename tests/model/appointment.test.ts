@@ -33,7 +33,6 @@ describe('APPOINTMENT FUNCTIONS', () => {
     ];
 
     beforeEach(async () => {
-        console.log(' APPOINTMENT BEFORE EACH ');
         customerRef = 0;
         addressRef = 0;
         appointmentRef = 1;
@@ -102,29 +101,17 @@ describe('APPOINTMENT FUNCTIONS', () => {
             expect(result?.message).toBe('Failed creating appointment');
         });
         it('appointment_create returns an AppointmentOperationError if the appointment time is already taken', async () => {
-            console.log(
-                'appointment_create appointment_create appointment_create'
-            );
             const mockData = {
                 ...appointments[appointmentRef++],
                 start: validAppointmentData.start,
                 end: validAppointmentData.end,
             };
 
-            console.log({ mockData });
-            const existingAppointment = await prisma.appointment.findFirst({
-                where: { start: validAppointmentData.start },
-            });
-            console.log(
-                'existingAppointmentexistingAppointmentexistingAppointment'
-            );
-            console.log({ existingAppointment });
             const errorResult = await appointment_create(
                 validCustomerId,
                 validAddressId,
                 mockData
             );
-            console.log('errorResult errorResult errorResult ', errorResult);
             expect(errorResult).toBeInstanceOf(AppointmentOperationError);
             // expect((errorResult as AppointmentOperationError).errorData.reason).toBe();
         });
@@ -170,8 +157,6 @@ describe('APPOINTMENT FUNCTIONS', () => {
         //     const result = await appointment_findbyAddress(validAddressId) as Appointment[];
 
         //     expect(Array.isArray(result)).toBe(true);
-        //     console.log("length", result.length)
-        //     console.log("result", result)
         //     expect(result.length).toBe(multipleApppointmentArray.length);
         // });
         it('appointment_findbyAddress returns AppointmentOperationError if throws', async () => {
