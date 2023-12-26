@@ -31,6 +31,6 @@
 @mixin grid($columns: 1, $rows: 1, $gap: 0px) {
   display: grid;
   grid-template-columns: repeat($columns, 1fr);
-  grid-template-rows: repeat($rows, 1fr);
+  // grid-template-rows: repeat($rows, 1fr);
   gap: $gap;
 }

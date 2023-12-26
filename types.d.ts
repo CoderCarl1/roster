@@ -43,7 +43,13 @@ export type TAddressWithCustomerNameAndFullAddress = optionalFullName &
     optionalFullAddress &
     TAddress;
 
-export type TAppointment = optionalCustomer & optionalAddress & Appointment;
+export type TAppointment = optionalCustomer & optionalAddress & Appointment & {
+    localTime?: {
+        start: string;
+        end: string;
+        completedAt: string; // Adjust the type accordingly
+      };
+};
 export type TAppointmentWithCustomerName = optionalFullName & TAppointment;
 export type TAppointmentWithCustomerNameAndFullAddress =
     TAppointmentWithCustomerName & optionalFullAddress;

@@ -35,7 +35,7 @@ export default function Main({
     children,
     ...props
 }: mainProps) {
-    const [calendarData, setCalendarData] = useState<CalendarType | null>(null);
+    const [ calendarData, setCalendarData ] = useState<CalendarType | null>(null);
     const {
         getAppointmentsForDay,
         getAppointmentsForWeek,
@@ -76,9 +76,9 @@ export default function Main({
             },
         };
 
-        setData[displayType]();
+        setData[ displayType ]();
         setLoading(false);
-    }, [displayType, currentDate.date]);
+    }, [ displayType, currentDate.date ]);
 
     const handleNext = useCallback(() => {
         switch (displayType.toLowerCase()) {
@@ -94,7 +94,7 @@ export default function Main({
             default:
                 return null;
         }
-    }, [displayType, nextDay, nextWeek, nextMonth]);
+    }, [ displayType, nextDay, nextWeek, nextMonth ]);
 
     const handlePrev = useCallback(() => {
         switch (displayType.toLowerCase()) {
@@ -110,15 +110,14 @@ export default function Main({
             default:
                 return null;
         }
-    }, [displayType, prevDay, prevWeek, prevMonth]);
+    }, [ displayType, prevDay, prevWeek, prevMonth ]);
 
     const dateInformation = () => {
         let dateString = '';
 
         if (displayType === 'day')
-            dateString += `${currentDate.dayName.slice(0, 3)} ${
-                currentDate.day
-            }`;
+            dateString += `${currentDate.dayName.slice(0, 3)} ${currentDate.day
+                }`;
         if (displayType === 'week')
             dateString += `${currentDate.day} - ${currentDate.day + 6}`;
         dateString += ` ${currentDate.monthName}`;
@@ -156,6 +155,7 @@ export default function Main({
 
 type dayProps = {
     dayData: CalendarDayType;
+    weekView?: boolean;
 };
 type weekProps = {
     weekData: CalendarWeekType;
@@ -164,91 +164,86 @@ type monthProps = {
     monthData: CalendarMonthType;
 };
 
-function DayCalendar({ dayData }: dayProps) {
-    const { data, dayName } = dayData;
-
+function DayCalendar({ dayData, weekView = false }: dayProps) {
+    const { data, dayNumber, date, dayName } = dayData;
     return (
-        <div className="calendar__day">
-            <h3>{dayName ? dayName : null}</h3>
+        <div className="calendar__day long">
+            {!weekView && <h3 className="calendar__day--name">{dayName} {dayNumber}</h3>}
+            {data.map((slot, idx) => {
+                const slotTime = slot.time.endsWith(":00") ? slot.time : null;
+                const showTime = slotTime !== null;
+                const showAddress = showTime && idx > 0 && data[idx - 1].appointment?.fullAddress !== slot.appointment?.fullAddress;
 
-            {data.length
-                ? data.map((slot, idx) => (
-                      <div key={idx + slot.time}>
-                          Time: {slot.time}, Appointment ID:{' '}
-                          {slot.appointment?.id}
-                      </div>
-                  ))
-                : null}
+                return (
+                    <div className="calendar__slot" key={date + slot.time}>
+                        {showTime && <span className="calendar__slot--time">{slotTime}{' '}</span>}
+                        {showAddress && <span className="calendar__slot--address">{slot.appointment?.fullAddress}</span>}
+                    </div>
+                );
+            })}
         </div>
     );
 }
 
+
 function WeekCalendar({ weekData }: weekProps) {
+    console.log({ weekData })
     return (
         <div className="calendar__week">
             <div className="weekday_initials">
-                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((initial, idx) => (
+                {[ 'S', 'M', 'T', 'W', 'T', 'F', 'S' ].map((initial, idx) => (
                     <span className="initial" key={initial + idx}>
                         {initial}
                     </span>
                 ))}
             </div>
-            {weekData.map((day) => (
-                <div key={day.date.toString()} className="calendar__day">
-                    {day.data.length
-                        ? day.data.map((slot, idx) => (
-                              <div key={idx + slot.time}>
-                                  Time: {slot.time}, Appointment ID:{' '}
-                                  {slot.appointment?.id}
-                              </div>
-                          ))
-                        : null}
-                </div>
-            ))}
-            {/* {weekData.map(({data}) => (
-          <div key={idx + data.time}>
-            Time: {data.time}, Appointment ID: {data.appointment?.id}
-          </div>
-      ))} */}
+            {weekData.map((day) =>
+                <DayCalendar key={day.date.toString()} dayData={day} weekView={true} />
+            )}
         </div>
     );
 }
+// type CalendarDayType = {
+//     date: string;
+//     dayName: string;
+//     data: CalendarAppointment[];
+// }
 
-function CompressedDay({ date, data }: CalendarDayType) {
-    const dataToRender = useMemo(() => {
-        return data.filter(
-            (slot) =>
-                (slot.appointment !== null || slot.appointment !== undefined) &&
-                slot.appointment?.start === slot.time
-        );
-    }, [data]);
+// function CompressedDay({ date, data }: CalendarDayType) {
+//     const dataToRender = useMemo(() => {
+//         console.log("data", data)
+//         return data.filter(
+//             (slot) =>
+//                 (slot.appointment !== null || slot.appointment !== undefined) &&
+//                 slot.appointment?.localTime?.start === slot.time
+//         );
+//     }, [ data ]);
 
-    return (
-        <div className="calendar__day compressed">
-            <div className="compressed__date">
-                <h2>{date}</h2>
-            </div>
-            <div className="compressed__slots">
-                {dataToRender.map((slot) => {
-                    return (
-                        <span
-                            className="compressed__slots--appointment"
-                            key={slot.time}
-                        >
-                            [ {slot.time}] {slot.appointment?.fullAddress}
-                        </span>
-                    );
-                })}
-            </div>
-        </div>
-    );
-}
+//     return (
+//         <div className="calendar__day compressed">
+//             <h2 className="compressed__date">{date}</h2>
+//             <div className="calendar__slots compressed">
+//                 {dataToRender.map((slot) => {
+//                     return (
+//                         <span
+//                             className="calendar__slot compressed"
+//                             key={slot.time}
+//                         >
+//                             <span className="calendar__slot--time">{slot.time}{' '}</span>
+//                             <span className="calendar__slot--address">{slot.appointment?.fullAddress}</span>
+//                         </span>
+//                     );
+//                 })}
+//             </div>
+//         </div>
+//     );
+// }
 
 function MonthCalendar({ monthData }: monthProps) {
     return (
         <div className="calendar__month">
-            <div className="weekday_initials">
-                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((initial, idx) => (
+            {/* <div className="weekday_initials">
+                {[ 'S', 'M', 'T', 'W', 'T', 'F', 'S' ].map((initial, idx) => (
                     <span className="initial" key={initial + idx}>
                         {initial}
                     </span>
@@ -256,20 +251,18 @@ function MonthCalendar({ monthData }: monthProps) {
             </div>
             {monthData.length
                 ? monthData.map((week: CalendarWeekType, idx) => {
-                      return (
-                          <div
-                              key={idx + week[idx].date.toString()}
-                              className="calendar__week"
-                          >
-                              {week.map((day: CalendarDayType) => (
-                                  <React.Fragment key={day.date.toString()}>
-                                      {day ? <CompressedDay {...day} /> : null}
-                                  </React.Fragment>
-                              ))}
-                          </div>
-                      );
-                  })
-                : null}
+                    return (
+                        <div
+                            key={idx + week[ idx ].date.toString()}
+                            className="calendar__week"
+                        >
+                            {week.map((day: CalendarDayType) => (
+                                <CompressedDay key={day.date.toString()} {...day} />
+                            ))}
+                        </div>
+                    );
+                })
+                : null} */}
         </div>
     );
 }

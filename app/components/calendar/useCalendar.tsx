@@ -8,6 +8,7 @@ export type CalendarAppointment = {
 export type CalendarDayType = {
     date: string;
     dayName: string;
+    dayNumber: string;
     data: CalendarAppointment[];
 };
 export type CalendarWeekType = CalendarDayType[];
@@ -18,6 +19,9 @@ export type CalendarType =
     | CalendarWeekType
     | CalendarMonthType;
 function useCalendar() {
+
+    const DAYSTART = 4;
+    const DAYEND = 18;
     /**
      * Gets the calendar data for a day,
      *
@@ -35,7 +39,7 @@ function useCalendar() {
         }[] = [];
         const timeStringToCompare = new Date(selectedDate);
 
-        for (let i = 4; i < 19; i++) {
+        for (let i = DAYSTART; i < DAYEND; i++) {
             const hour = i < 10 ? `0${i}` : `${i}`;
 
             for (let j = 0; j < 60; j += 15) {
@@ -66,7 +70,8 @@ function useCalendar() {
         }
 
         return {
-            date: dates.dayNumberFromDate(selectedDate),
+            dayNumber: dates.dayNumberFromDate(selectedDate),
+            date: timeStringToCompare.toLocaleString(),
             dayName: dates.getDayName(selectedDate),
             data: calendarData,
         };
@@ -141,6 +146,7 @@ function useCalendar() {
 
         return calendar;
     }
+
 
     return { getDay, getWeek, getMonth };
 }

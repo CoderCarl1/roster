@@ -1,9 +1,10 @@
 import { Appointment, Prisma } from '@prisma/client';
 import { AppointmentOperationError } from '@errors';
-import { TAppointment_data_for_creation } from '@types';
+import { TAppointment, TAppointment_data_for_creation } from '@types';
 import { prisma } from '~/db.server';
 import { dates } from '~/functions';
 import { log } from '~/functions/helpers/functions';
+
 
 /**
  * Creates a new appointment.
@@ -17,7 +18,7 @@ export async function appointment_create(
     customerId: string,
     addressId: string,
     appointmentData: TAppointment_data_for_creation
-): Promise<Appointment | AppointmentOperationError> {
+): Promise<TAppointment | AppointmentOperationError> {
     try {
         if (!customerId) throw new Error('no customer ID');
         if (!addressId) throw new Error('no address ID');
@@ -48,7 +49,7 @@ export async function appointment_create(
             });
             throw new Error(JSON.stringify(appointmentData));
         }
-        return createdAppointment;
+        return addLocaleDates(createdAppointment);
     } catch (err) {
         if (err instanceof AppointmentOperationError) {
             return err;
@@ -102,7 +103,7 @@ export async function appointment_create_many(
     customerId: string,
     addressId: string,
     appointmentDataArray: TAppointment_data_for_creation[]
-): Promise<Appointment[] | AppointmentOperationError> {
+): Promise<TAppointment[] | AppointmentOperationError> {
     try {
         const createdAppointments = await prisma.$transaction(async (tx) => {
             const appointments = await Promise.all(
@@ -127,6 +128,8 @@ export async function appointment_create_many(
                     ) {
                         throw timeConflictExists;
                     }
+
+
                     const appointment = await tx.appointment.create({
                         data: { ...appointmentData, customerId, addressId },
                     });
@@ -138,7 +141,7 @@ export async function appointment_create_many(
                             )}`
                         );
                     }
-                    return appointment;
+                    return addLocaleDates(appointment);
                 })
             );
             return appointments;
@@ -166,13 +169,6 @@ export async function appointment_create_many(
     }
 }
 
-type AppointmentWithLocalDates = Appointment & {
-    localTime: {
-        start: string;
-        end: string;
-        completedAt: string;
-    };
-};
 /**
  * Retrieves all appointments from the database.
  * @param include - Optional. Specify the related entities to include in the result.
@@ -182,7 +178,7 @@ type AppointmentWithLocalDates = Appointment & {
 export async function appointment_find_many(
     include?: Prisma.AppointmentInclude | undefined,
     whereBlock?: Prisma.AppointmentWhereInput | undefined
-): Promise<AppointmentWithLocalDates[] | AppointmentOperationError> {
+): Promise<TAppointment[] | AppointmentOperationError> {
     try {
         const appointments = await prisma.appointment.findMany({
             where: { completed: false, ...whereBlock },
@@ -193,8 +189,7 @@ export async function appointment_find_many(
         if (!appointments) {
             return [];
         }
-        const appointmentsWithLocaleDate = appointments.map(addLocaleDates);
-        return appointmentsWithLocaleDate;
+        return appointments.map(addLocaleDates);
     } catch (err) {
         return new AppointmentOperationError(
             `Error while retrieving appointments \n ${JSON.stringify(
@@ -210,7 +205,7 @@ export async function appointment_find_many(
  * @returns A promise that resolves to an array of appointments or an AppointmentOperationError.
  */
 export async function appointment_find_many_completed(): Promise<
-    Appointment[] | AppointmentOperationError
+TAppointment[] | AppointmentOperationError
 > {
     return await appointment_find_many({}, { completed: true });
 }
@@ -222,7 +217,7 @@ export async function appointment_find_many_completed(): Promise<
  */
 export async function appointment_findbyCustomer(
     customerId: string
-): Promise<AppointmentWithLocalDates[] | AppointmentOperationError> {
+): Promise<TAppointment[] | AppointmentOperationError> {
     try {
         const appointments = await appointment_find_many(undefined, {
             customerId,
@@ -244,7 +239,7 @@ export async function appointment_findbyCustomer(
  */
 export async function appointment_findbyAddress(
     addressId: string
-): Promise<AppointmentWithLocalDates[] | AppointmentOperationError> {
+): Promise<TAppointment[] | AppointmentOperationError> {
     try {
         const appointments = await appointment_find_many(undefined, {
             addressId,
@@ -265,14 +260,13 @@ export async function appointment_findbyAddress(
  */
 export async function appointment_findbyId(
     appointmentId: string
-): Promise<Appointment | AppointmentOperationError> {
+): Promise<TAppointment | AppointmentOperationError> {
     try {
         const appointment = await prisma.appointment.findUniqueOrThrow({
             where: { id: appointmentId },
         });
 
-        const updatedAppointment = addLocaleDates(appointment);
-        return updatedAppointment;
+        return addLocaleDates(appointment);
     } catch (err) {
         return new AppointmentOperationError(
             `Error while retrieving appointment ${appointmentId}`,
@@ -291,7 +285,7 @@ export async function appointment_findbyId(
 export async function appointment_update(
     id: string,
     { ...args }: Omit<Partial<Appointment>, 'id' | 'updatedAt' | 'createdAt'>
-): Promise<Appointment | AppointmentOperationError> {
+): Promise<TAppointment | AppointmentOperationError> {
     try {
         const existingAppointment = await appointment_findbyId(id);
 
@@ -316,15 +310,15 @@ export async function appointment_update(
 
         let updatedAppointment = await prisma.appointment.update({
             where: { id },
-            data: { ...args },
+            data: {...args},
         });
 
         if (!updatedAppointment) {
             throw new Error(`appointment with ID ${id} not updated.`);
         }
 
-        updatedAppointment = addLocaleDates(updatedAppointment);
-        return updatedAppointment;
+        return addLocaleDates(updatedAppointment);
+        
     } catch (err) {
         if (err instanceof AppointmentOperationError) {
             return err;
@@ -335,6 +329,7 @@ export async function appointment_update(
         );
     }
 }
+
 
 /**
  * Deletes an appointment in the database.
@@ -356,7 +351,8 @@ export async function appointment_delete(appointmentId: string) {
     }
 }
 
-function addLocaleDates(appointment: Appointment) {
+
+function addLocaleDates(appointment: TAppointment): TAppointment {
     const localTime = {
         start: dates.formatDate(new Date(appointment.start)),
         end: dates.formatDate(new Date(appointment.end)),
