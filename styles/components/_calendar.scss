@@ -5,6 +5,8 @@
 }
 
 .calendar {
+  width: 100%;
+
   &__month {
     @include grid($gap: size(4));
   }
@@ -17,56 +19,139 @@
     }
 
     .calendar__day {
-      overflow: hidden;
+      // overflow: hidden;
     }
   }
 
   &__day {
-    --_bg-color: var(--bg-color, #{clr(neutral, 100)});
+    --_day-borderclr: var(--day-borderclr, transparent);
+    --_day-border: var(--day-border, 1px solid var(--_day-borderclr));
+    --_day-bgcolor: var(--day-bgcolor, #{clr(neutral, 100)});
 
-    background-color: var(--_bg-color);
+    display: grid;
+    grid-auto-rows: var(--slot-height);
+    padding: var(--day-padding);
+    border: var(--_day-border);
+    background-color: var(--_day-bgcolor);
+    z-index: 0;
 
     &:hover {
-      --bg-color: #fff;
-      cursor: pointer;
-    }
-
-    .calendar__slots {
-      // display: block;
-    
-     
+      --day-bgcolor: #fff;
+      --day-borderclr: #{clr(neutral,200)};
     }
 
     .calendar__slot {
-      display: block;
+      --_grid-rows: var(--grid-rows, 1);
+      --_slot-color: var(--slot-color, #{clr(neutral,200)});
+      --_slot-bgcolor: var(--slot-bgcolor, --_day-bgcolor);
+      --_slot-border-color: var(--slot-border-color, transparent);
+      z-index: 100;
+      position: relative;
+      // slot grid
+      display: grid;
+      grid-template-rows: subgrid;
+      justify-items: stretch;
+
+      color: var(--_slot-color);
+      background-color: var(--_slot-bgcolor);
+      border: 1px solid var(--_slot-border-color);
       padding: 4px;
-      &--address {
-        @for $i from 1 through 9 {
-          &:nth-child(#{$i}) {
-            --_bg-color: var(--slot-bg-color, #{clr(calendar_slot_colors, $i * 100)});
-            --_border-color: var(--border-color, transparent);
-      
-            background-color: var(--_bg-color);
-            border: 1px solid var(--_border-color);
-      
-            &:hover {
-              --border-color: #{darken(clr(calendar_slot_colors, $i * 100), 25)};
-            }
-          }
+
+      @for $i from 1 through 9 {
+
+        // &:has(.calendar__slot--appointment):nth-child(#{$i})
+        &.occupied:nth-of-type(#{$i}) {
+          --slot-bgcolor: #{clr(calendar_slot_colors, $i * 100)};
+          --slot-border-color: #{darken(clr(calendar_slot_colors, $i * 100), 25)};
         }
       }
-      // &--address {
-      //   margin-
-      // }
+
+
+      // appointment
+      &--appointment {
+        --_padding-x: #{size(8)};
+        --_padding-y: #{size(4)};
+        --_padding: var(--_padding-y) var(--_padding-x);
+
+        position: absolute;
+        border: 1px solid clr(neutral, 300);
+        transform: translateY(calc(var(--_padding-y) + 3px));
+        height: calc((var(--slot-height) * var(--grid-rows)) - 2px);
+        background-color: #fff;
+        margin-left: size(12);
+        border-radius: size(4);
+        padding: var(--_padding);
+        grid-row: span var(--_grid-rows);
+        cursor: pointer;
+      }
     }
   }
 
   &__day.compressed {
+    --day-padding: #{size(4)};
+    --slot-height: 1.25lh;
 
+    .compressed__date {
+      color: clr(neutral, 200);
+    }
   }
+
   &__day.long {
-    
+    --day-padding: #{size(8)};
+    --slot-height: 1.25lh;
+    .calendar__day--name {
+      padding-block-end: size(16);
+    }
+
+    .calendar__slot {
+
+      // time in hours
+      &::before {
+        content: var(--slot-time, '');
+        position: absolute;
+        z-index: 200;
+        left: 0;
+        top: 0;
+        transform: translate(0, -25%);
+        color: clr(neutral, 200);
+        font-size: fs(500);
+      }
+
+      // underline at half hours
+      &::after {
+        content: '';
+        position: absolute;
+        z-index: 200;
+        top: 0;
+        background-color: darken(clr(neutral, 100), 5);
+        display: block;
+        height: 1px;
+        width: calc(var(--decoration-width, 1) * 10px);
+        margin-block: size(4);
+        margin-inline-start: calc(size(12) - (var(--decoration-width) * 4px));
+      }
+    }
   }
+
+
+  .calendar__slot {
+
+
+
+    // &--time {
+    //   display: block;
+    //   color: clr(neutral,200);
+    // }
+
+
+    &.compressed {
+      .calendar__slot--appointment {}
+
+    }
+
+    &.long {}
+  }
+
 
   .weekday_initials {
     @include grid($columns: 7, $gap: size(4));
@@ -85,44 +170,4 @@
 
 
 
-  .calendar__slot {
-    &.compressed {}
-
-    &.long {}
-  }
-
-  &.compressed {
-    padding: size(4);
-
-    .compressed {
-      &__date {
-        display: block;
-        color: clr(neutral, 300);
-        font-size: fs(500);
-      }
-    }
-  }
 }
-
-.calendar__slot {
-  &.compressed {}
-}
-
-// .calendar__slots {
-//   display: block;
-//   padding: 0.15em 0.25em;
-
-//   @for $i from 1 through 4 {
-//     &:nth-child(#{$i}) {
-//       --_bg-color: var(--slot-bg-color, #{clr(accent, $i * 100)});
-//       --_border-color: var(--border-color, transparent);
-
-//       background-color: var(--_bg-color);
-//       border: 1px solid var(--_border-color);
-
-//       &:hover {
-//         --border-color: #{darken(clr(accent, $i * 100), 25)};
-//       }
-//     }
-//   }
-// }

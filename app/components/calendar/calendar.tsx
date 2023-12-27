@@ -166,24 +166,46 @@ type monthProps = {
 
 function DayCalendar({ dayData, weekView = false }: dayProps) {
     const { data, dayNumber, date, dayName } = dayData;
+    const appointmentSlotLength = data.reduce((obj, b) => {
+        if (b.appointment?.id !== null && b.appointment?.id !== undefined) {
+            obj[b.appointment.id] = {
+                initial: (obj[b.appointment.id]?.initial ?? 0) + 1,
+                available: (obj[b.appointment.id]?.available ?? 0) + 1,
+              };
+        }
+        return obj;
+    }, {} as Record<string, {initial: number, available: number}>);
+
     return (
         <div className="calendar__day long">
             {!weekView && <h3 className="calendar__day--name">{dayName} {dayNumber}</h3>}
-            {data.map((slot, idx) => {
-                const slotTime = slot.time.endsWith(":00") ? slot.time : null;
-                const showTime = slotTime !== null;
-                const showAddress = showTime && idx > 0 && data[idx - 1].appointment?.fullAddress !== slot.appointment?.fullAddress;
-
+            {data.map((slot) => {
+                const isHour = slot.time.endsWith(":00");
+                const isHalf = slot.time.endsWith(":30");
+                const decorationWidth = isHour ? 0 : isHalf ? 3 : 1;
+                const shouldShowAppointment = slot.appointment && appointmentSlotLength[slot.appointment.id].initial === appointmentSlotLength[slot.appointment.id].available--;;
+              
+                const slotStyles = {
+                    '--decoration-width': `${decorationWidth}`,
+                    '--slot-time': `'${isHour ? slot.time : ''}'`,
+                    '--grid-rows': 1,
+                };
+                if (slot.appointment && shouldShowAppointment) {
+                    slotStyles['--grid-rows'] =  appointmentSlotLength[slot.appointment.id].initial;
+                }
                 return (
-                    <div className="calendar__slot" key={date + slot.time}>
-                        {showTime && <span className="calendar__slot--time">{slotTime}{' '}</span>}
-                        {showAddress && <span className="calendar__slot--address">{slot.appointment?.fullAddress}</span>}
+                    <div 
+                    className={`calendar__slot ${slot.appointment ? 'occupied' : 'unoccupied'}`} 
+                    style={slotStyles} 
+                    key={date + slot.time}>
+                        {shouldShowAppointment && <span className="calendar__slot--appointment" >{slot.appointment?.fullAddress}</span>}
                     </div>
                 );
             })}
         </div>
     );
 }
+
 
 
 function WeekCalendar({ weekData }: weekProps) {
@@ -203,46 +225,43 @@ function WeekCalendar({ weekData }: weekProps) {
         </div>
     );
 }
-// type CalendarDayType = {
-//     date: string;
-//     dayName: string;
-//     data: CalendarAppointment[];
-// }
 
-// function CompressedDay({ date, data }: CalendarDayType) {
-//     const dataToRender = useMemo(() => {
-//         console.log("data", data)
-//         return data.filter(
-//             (slot) =>
-//                 (slot.appointment !== null || slot.appointment !== undefined) &&
-//                 slot.appointment?.localTime?.start === slot.time
-//         );
-//     }, [ data ]);
+function CompressedDay({ dayData }: dayProps) {
+    const { data, dayNumber, date, dayName } = dayData;
 
-//     return (
-//         <div className="calendar__day compressed">
-//             <h2 className="compressed__date">{date}</h2>
-//             <div className="calendar__slots compressed">
-//                 {dataToRender.map((slot) => {
-//                     return (
-//                         <span
-//                             className="calendar__slot compressed"
-//                             key={slot.time}
-//                         >
-//                             <span className="calendar__slot--time">{slot.time}{' '}</span>
-//                             <span className="calendar__slot--address">{slot.appointment?.fullAddress}</span>
-//                         </span>
-//                     );
-//                 })}
-//             </div>
-//         </div>
-//     );
-// }
+    const dataToRender = useMemo(() => {
+        const updatedData = data.filter(
+            (slot) =>
+                (slot.appointment !== null || slot.appointment !== undefined) &&
+                slot.appointment?.localTime?.start === slot.time
+        );
+        return updatedData;
+    }, [ data ]);
+
+    return (
+        <div className="calendar__day compressed">
+             <h2 className="compressed__date">{dayNumber}</h2>
+            <div className="calendar__slots compressed">
+                {dataToRender.map((slot) => {
+                    return (
+                        <span
+                            className="calendar__slot compressed"
+                            key={slot.time}
+                        >
+                            <span className="calendar__slot--time">{slot.time}</span>
+                            <span className="calendar__slot--appointment">{slot.appointment?.fullAddress}</span>
+                        </span>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
 
 function MonthCalendar({ monthData }: monthProps) {
     return (
         <div className="calendar__month">
-            {/* <div className="weekday_initials">
+            <div className="weekday_initials">
                 {[ 'S', 'M', 'T', 'W', 'T', 'F', 'S' ].map((initial, idx) => (
                     <span className="initial" key={initial + idx}>
                         {initial}
@@ -257,12 +276,12 @@ function MonthCalendar({ monthData }: monthProps) {
                             className="calendar__week"
                         >
                             {week.map((day: CalendarDayType) => (
-                                <CompressedDay key={day.date.toString()} {...day} />
+                                <CompressedDay key={day.date.toString()} dayData={day} />
                             ))}
                         </div>
                     );
                 })
-                : null} */}
+                : null}
         </div>
     );
 }
