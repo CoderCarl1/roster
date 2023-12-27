@@ -152,3 +152,12 @@ export type TprismaErrorDataType = {
     duplicateField?: Record<string, unknown> | undefined;
     reason?: string;
 };
+
+
+
+// make sure css variables are accepted
+declare module 'react' {
+    interface CSSProperties {
+        [key: `--${string}`]: string | number
+    }
+}
