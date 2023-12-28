@@ -150,10 +150,8 @@ export type TprismaError =
 export type TprismaErrorDataType = {
     code?: string;
     duplicateField?: Record<string, unknown> | undefined;
-    reason?: string;
+    reason?: unknown;
 };
-
-
 
 // make sure css variables are accepted
 declare module 'react' {

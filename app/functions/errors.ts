@@ -1,11 +1,12 @@
 import { Prisma } from '@prisma/client';
 import { log } from '@functions';
 import { TprismaErrorDataType } from '@types';
+import { isDataErrorType } from './helpers/typechecks';
 
 export class OperationError extends Error {
     constructor(
         message: string,
-        public errorData?: unknown,
+        public errorData?: TprismaErrorDataType | unknown,
         public stackTrace?: string,
         public componentName?: string
     ) {
@@ -35,10 +36,11 @@ export class OperationError extends Error {
         };
     }
 
+    // Expand on this
     public _log() {
         const dataToLog: unknown[] = [`[${this.name}] ${this.message}`];
-        if (this.errorData && Object.keys(this.errorData).length) {
-            dataToLog.push({ errorData: this.errorData });
+        if (this.errorData && isDataErrorType(this.errorData)) {
+            dataToLog.push({ errorData: JSON.stringify({...this.errorData}) });
         }
         log(...dataToLog);
     }
@@ -81,7 +83,7 @@ export class OperationError extends Error {
             prismaErrorData.code = this.errorCode;
             // may occur when initializing or making a request.
         }
-        this.errorData = { data: this.errorData, ...prismaErrorData };
+        this.errorData = {...prismaErrorData };
         this.stackTrace = prismaErrorStack;
         this.message = prismaErrorMessage;
     }
@@ -90,3 +92,4 @@ export class OperationError extends Error {
 export class CustomerOperationError extends OperationError {}
 export class AddressOperationError extends OperationError {}
 export class AppointmentOperationError extends OperationError {}
+
