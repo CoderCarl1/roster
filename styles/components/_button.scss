@@ -1,24 +1,22 @@
 @use '../abstracts/' as *;
 
 .button {
-  --_bg-color: var(--button-bg-color, transparent);
-  --_color: var(--button-color, #{clr(primary, 400)});
-  --_border-color: var(--button-border-color, #{clr(primary, 100)});
-  --_outline-color: var(--button-color, #{clr(primary, 100)});
-  --_border: 1px solid var(--button-border-color);
-  --_border-radius: var(--button-border-radius, 0.125em);
-  --_padding: var(--button-padding, 0.5em 1.125em);
+  --_button-bg-color: var(--button-bg-color, transparent);
+  --_button-color: var(--button-color, #{clr(primary, 400)});
+  --_button-border-color: var(--button-border-color, #{clr(primary, 100)});
+  --_button-outline-color: var(--button-color, #{clr(primary, 100)});
+  --_button-border-radius: var(--button-border-radius, 0.125em);
+  --_button-padding: var(--button-padding, 0.5em 1.125em);
 
-  background-color: var(--_bg-color);
-  color: var(--_color);
+  background-color: var(--_button-bg-color);
+  color: var(--_button-color);
   cursor: pointer;
-  display: inline-block;
-  padding: var(--_padding);
+  padding: var(--_button-padding);
   text-align: center;
   text-decoration: none;
   transition: all 250ms;
-  border: var(--_border, 0);
-  border-radius: var(--_border-radius);
+  border: 1px solid var(--_button-border-color);
+  border-radius: var(--_button-border-radius);
   text-transform: capitalize;
 }
 
@@ -40,7 +38,6 @@
 }
 
 .button[disabled] {
-  // --button-bg-color: #{clr(neutral, 200)};
   --button-color: #{clr(neutral, 200)};
   font-style: italic;
   cursor: default;
