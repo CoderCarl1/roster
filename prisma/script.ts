@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 import { log } from '~/functions';
+import { createAppointments, createCustomers } from '~/lib';
 import { customer_delete_many } from '~/models/customer.server';
 import { singleton } from '~/singleton.server';
-import { createAppointments, createCustomers } from '~/lib';
 
 const seedingFlagIndex = process.argv.indexOf('--seeding') + 1
 if (seedingFlagIndex !== -1) {
@@ -45,7 +45,8 @@ async function deleteAll() {
         await Promise.all([ 
             customer_delete_many('example.com'), 
             customer_delete_many('test.com'), 
-            prisma.address.deleteMany({where: {line2: {endsWith: "example"}}})]);
+            prisma.address.deleteMany()
+        ]);
         log({color: 'red'}, 'Deleted');
         log({color: 'magenta'}, '==================');
         return Promise.resolve();

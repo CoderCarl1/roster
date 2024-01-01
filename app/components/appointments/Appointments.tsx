@@ -27,7 +27,7 @@ function Main(
         data.appointmentsLoaderData as unknown as TAppointmentWithCustomerNameAndFullAddress[];
     const { toggle: loading, setToggleStatus: setLoading } = useToggle(true);
 
-    const [displayType, setDisplayType] = useState<displayTypeEnum>('month');
+    const [displayType, setDisplayType] = useState<displayTypeEnum>('week');
     const {
         setAppointment,
         currentAppointment,

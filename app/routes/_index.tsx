@@ -5,15 +5,7 @@ import {
 } from '@remix-run/node';
 import { Await, useLoaderData } from '@remix-run/react';
 import { Suspense } from 'react';
-import {
-    Addresses,
-    Appointments,
-    Customers,
-    LoadingComponent,
-    useAddresses,
-    useAppointments,
-    useCustomers,
-} from '@components';
+import { Appointments, Customers, LoadingComponent } from '@components';
 import {
     CustomerProvider,
     AppointmentProvider,

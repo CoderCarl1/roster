@@ -1,4 +1,4 @@
-import log from "./log";
+import log from './log';
 
 /**
  * Parses a date or date string and returns a valid Date object.
@@ -169,8 +169,8 @@ export function getDateRange(
             throw new Error('Days must be a non-negative number.');
         }
         const dateObj = parseDate(date);
-        const adjustedDate = future ?
-            calculateFutureDate(dateObj, days)
+        const adjustedDate = future
+            ? calculateFutureDate(dateObj, days)
             : calculatePastDate(dateObj, days);
 
         adjustedDate.setHours(0, 0, 0, 0);
@@ -189,13 +189,13 @@ export function getDateRange(
 
         return { from: startDateString, to: endDateString };
     } catch (err) {
-        log("getDateRange threw", {errorData: err});
-        return { from: 'Invalid Date', to: 'Invalid Date' }
+        log('getDateRange threw', { errorData: err });
+        return { from: 'Invalid Date', to: 'Invalid Date' };
     }
 }
 
 export function calculateFutureDate(date: Date, dayNumber: number) {
-    const clonedDate = new Date(date);
+    const clonedDate = parseDate(date);
     let newDay = clonedDate.getDate();
     let newMonth = clonedDate.getMonth();
     let newYear = clonedDate.getFullYear();
@@ -214,8 +214,7 @@ export function calculateFutureDate(date: Date, dayNumber: number) {
             }
 
             const daysInNextMonth = getDaysInMonth(newYear, newMonth);
-            newDay =
-                daysToAdd <= daysInNextMonth ? daysToAdd : daysInNextMonth;
+            newDay = daysToAdd <= daysInNextMonth ? daysToAdd : daysInNextMonth;
             daysToAdd -= daysInNextMonth;
         }
     }
@@ -223,8 +222,8 @@ export function calculateFutureDate(date: Date, dayNumber: number) {
 }
 
 export function calculatePastDate(date: Date, dayNumber: number) {
-    const clonedDate = new Date(date);
-
+    const clonedDate = parseDate(date);
+    console.log('calculatePastDate 1');
     let newDay = clonedDate.getDate();
     let newMonth = clonedDate.getMonth();
     let newYear = clonedDate.getFullYear();
@@ -232,10 +231,7 @@ export function calculatePastDate(date: Date, dayNumber: number) {
     if (newDay >= dayNumber) {
         newDay -= dayNumber;
     } else {
-        let daysInPreviousMonth = getDaysInMonth(
-            newYear,
-            newMonth - 1
-        );
+        let daysInPreviousMonth = getDaysInMonth(newYear, newMonth - 1);
 
         while (newDay < dayNumber) {
             newMonth -= 1;
@@ -246,10 +242,7 @@ export function calculatePastDate(date: Date, dayNumber: number) {
             }
 
             newDay += daysInPreviousMonth;
-            daysInPreviousMonth = getDaysInMonth(
-                newYear,
-                newMonth - 1
-            );
+            daysInPreviousMonth = getDaysInMonth(newYear, newMonth - 1);
         }
 
         newDay -= dayNumber;
@@ -272,4 +265,4 @@ export default {
     incrementDayByOne,
     parseDate,
     startOfWeek,
-}
+};

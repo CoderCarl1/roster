@@ -1,4 +1,3 @@
-
 type colorKey =
     | 'reset'
     | 'red'
@@ -81,5 +80,4 @@ function log(...args: unknown[]): void {
     }
 }
 
-
-export default log
+export default log;

@@ -1,6 +1,6 @@
 import { Address, Appointment, Customer } from '@prisma/client';
-import { AppointmentOperationError } from '~/functions/errors';
 import { prisma } from '~/db.server';
+import { AppointmentOperationError } from '~/functions/errors';
 import { address_create } from '~/models/address.server';
 import {
     appointment_create,
@@ -240,7 +240,7 @@ describe('APPOINTMENT FUNCTIONS', () => {
                 );
             });
         });
-        
+
         /**
          * FIND MANY fails when tested in suite.
          */

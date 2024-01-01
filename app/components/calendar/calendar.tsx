@@ -1,13 +1,10 @@
-// import { TAppointment } from "@types";
-import { useCallback, useEffect, useMemo, useState } from 'react';
-// import Table, { Caption, TH } from "../table/table";
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, LoadingComponent } from '@components';
 import { useCalendarContext } from '~/contexts';
-import { dates, log } from '~/functions';
+import { dates, randomHSLValues } from '~/functions';
 import { useAppointments } from '../appointments';
-import { displayTypeEnum } from '../appointments/Appointments';
 import {
+    CalendarAppointment,
     CalendarDayType,
     CalendarMonthType,
     CalendarType,
@@ -35,12 +32,11 @@ export default function Main({
     children,
     ...props
 }: mainProps) {
-    const [ calendarData, setCalendarData ] = useState<CalendarType | null>(null);
+    const [calendarData, setCalendarData] = useState<CalendarType | null>(null);
     const {
         getAppointmentsForDay,
         getAppointmentsForWeek,
         getAppointmentsForMonth,
-        appointmentsData,
     } = useAppointments();
     const { getDay, getWeek, getMonth } = useCalendar();
     const {
@@ -52,6 +48,16 @@ export default function Main({
         prevWeek,
         prevMonth,
     } = useCalendarContext();
+    const [dateRange, setDateRange] = useState<{ from: string; to: string }>({
+        from: '',
+        to: '',
+    });
+    const { from, to } = dateRange;
+
+    useEffect(() => {
+        const { from, to } = dates.getDateRange(currentDate.date, 7);
+        setDateRange({ from, to });
+    }, [currentDate.date]);
 
     useEffect(() => {
         const setData = {
@@ -76,9 +82,9 @@ export default function Main({
             },
         };
 
-        setData[ displayType ]();
+        setData[displayType]();
         setLoading(false);
-    }, [ displayType, currentDate.date ]);
+    }, [displayType, currentDate.date]);
 
     const handleNext = useCallback(() => {
         switch (displayType.toLowerCase()) {
@@ -94,7 +100,7 @@ export default function Main({
             default:
                 return null;
         }
-    }, [ displayType, nextDay, nextWeek, nextMonth ]);
+    }, [displayType, nextDay, nextWeek, nextMonth]);
 
     const handlePrev = useCallback(() => {
         switch (displayType.toLowerCase()) {
@@ -110,25 +116,18 @@ export default function Main({
             default:
                 return null;
         }
-    }, [ displayType, prevDay, prevWeek, prevMonth ]);
-
-    const dateInformation = () => {
-        let dateString = '';
-
-        if (displayType === 'day')
-            dateString += `${currentDate.dayName.slice(0, 3)} ${currentDate.day
-                }`;
-        if (displayType === 'week')
-            dateString += `${currentDate.day} - ${currentDate.day + 6}`;
-        dateString += ` ${currentDate.monthName}`;
-
-        return dateString;
-    };
+    }, [displayType, prevDay, prevWeek, prevMonth]);
 
     return (
         <section {...props}>
             <div className="calendar__controls">
-                <span className="date__information">{dateInformation()}</span>
+                <span className="date__information">
+                    {displayType === 'day'
+                        ? `${currentDate.dayName.slice(0, 3)} ${from}`
+                        : displayType === 'week'
+                          ? `${from} - ${to}`
+                          : `${currentDate.monthName}`}
+                </span>
                 <Button onClick={handlePrev}>prev</Button>
                 <Button onClick={handleNext}>next</Button>
             </div>
@@ -146,6 +145,7 @@ export default function Main({
                 (displayType === 'month' && (
                     <MonthCalendar
                         monthData={calendarData as CalendarMonthType}
+                        monthName={currentDate.monthName}
                     />
                 ))
             )}
@@ -160,45 +160,75 @@ type dayProps = {
 type weekProps = {
     weekData: CalendarWeekType;
 };
-type monthProps = {
-    monthData: CalendarMonthType;
-};
 
 function DayCalendar({ dayData, weekView = false }: dayProps) {
     const { data, dayNumber, date, dayName } = dayData;
-    const appointmentSlotLength = data.reduce((obj, b) => {
-        if (b.appointment?.id !== null && b.appointment?.id !== undefined) {
-            obj[b.appointment.id] = {
-                initial: (obj[b.appointment.id]?.initial ?? 0) + 1,
-                available: (obj[b.appointment.id]?.available ?? 0) + 1,
-              };
-        }
-        return obj;
-    }, {} as Record<string, {initial: number, available: number}>);
+    const appointmentSlotLength = appointmentSlotTallies(data);
+    const { setAppointment } = useAppointments();
+    function appointmentSlotTallies(appointmentArray: CalendarAppointment[]) {
+        return appointmentArray.reduce(
+            (obj, b) => {
+                if (
+                    b.appointment?.id !== null &&
+                    b.appointment?.id !== undefined
+                ) {
+                    obj[b.appointment.id] = {
+                        initial: (obj[b.appointment.id]?.initial ?? 0) + 1,
+                        available: (obj[b.appointment.id]?.available ?? 0) + 1,
+                    };
+                }
+                return obj;
+            },
+            {} as Record<string, { initial: number; available: number }>
+        );
+    }
 
     return (
         <div className="calendar__day long">
-            {!weekView && <h3 className="calendar__day--name">{dayName} {dayNumber}</h3>}
+            {!weekView ? <h3 className="calendar__day--name">
+                    {dayName} {dayNumber}
+                </h3> : null}
             {data.map((slot) => {
-                const isHour = slot.time.endsWith(":00");
-                const isHalf = slot.time.endsWith(":30");
+                const isHour = slot.time.endsWith(':00');
+                const isHalf = slot.time.endsWith(':30');
                 const decorationWidth = isHour ? 0 : isHalf ? 3 : 1;
-                const shouldShowAppointment = slot.appointment && appointmentSlotLength[slot.appointment.id].initial === appointmentSlotLength[slot.appointment.id].available--;;
-              
-                const slotStyles = {
+                const shouldShowAppointment =
+                    slot.appointment &&
+                    appointmentSlotLength[slot.appointment.id].initial ===
+                        appointmentSlotLength[slot.appointment.id].available--;
+                const { hue, saturation, lightness } = randomHSLValues();
+                const slotStyles: Record<string, any> = {
                     '--decoration-width': `${decorationWidth}`,
-                    '--slot-time': `'${isHour ? slot.time : ''}'`,
-                    '--grid-rows': 1,
+                };
+                if (slot.time && isHour) {
+                    slotStyles['--slot-time'] = `'${slot.time}'`;
+                }
+                const appointmentStyles: Record<string, any> = {
+                    '--button-border-color': `hsla${hue}, ${saturation}%, ${lightness}%, 0.25)`,
+                    '--button-bg-color': `hsla(${hue}, ${saturation}%, ${lightness}%, 0.15)`,
                 };
                 if (slot.appointment && shouldShowAppointment) {
-                    slotStyles['--grid-rows'] =  appointmentSlotLength[slot.appointment.id].initial;
+                    appointmentStyles['--grid-rows'] =
+                        appointmentSlotLength[slot.appointment.id].initial;
                 }
                 return (
-                    <div 
-                    className={`calendar__slot ${slot.appointment ? 'occupied' : 'unoccupied'}`} 
-                    style={slotStyles} 
-                    key={date + slot.time}>
-                        {shouldShowAppointment && <span className="calendar__slot--appointment" >{slot.appointment?.fullAddress}</span>}
+                    <div
+                        className={`calendar__slot ${
+                            slot.appointment ? 'occupied' : 'unoccupied'
+                        }`}
+                        style={slotStyles}
+                        // data-appointment={slot.appointment?.id}
+                        key={date + slot.time}
+                    >
+                        {shouldShowAppointment ? <Button
+                                onClick={() =>
+                                    setAppointment(slot.appointment?.id)
+                                }
+                                className="calendar__slot--appointment"
+                                style={appointmentStyles}
+                            >
+                                {slot.appointment?.fullAddress}
+                            </Button> : null}
                     </div>
                 );
             })}
@@ -206,25 +236,32 @@ function DayCalendar({ dayData, weekView = false }: dayProps) {
     );
 }
 
-
-
 function WeekCalendar({ weekData }: weekProps) {
-    console.log({ weekData })
+    console.log({ weekData });
     return (
         <div className="calendar__week">
             <div className="weekday_initials">
-                {[ 'S', 'M', 'T', 'W', 'T', 'F', 'S' ].map((initial, idx) => (
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((initial, idx) => (
                     <span className="initial" key={initial + idx}>
                         {initial}
                     </span>
                 ))}
             </div>
-            {weekData.map((day) =>
-                <DayCalendar key={day.date.toString()} dayData={day} weekView={true} />
-            )}
+            {weekData.map((day) => (
+                <DayCalendar
+                    key={day.date.toString()}
+                    dayData={day}
+                    weekView={true}
+                />
+            ))}
         </div>
     );
 }
+
+type monthProps = {
+    monthData: CalendarMonthType;
+    monthName: string;
+};
 
 function CompressedDay({ dayData }: dayProps) {
     const { data, dayNumber, date, dayName } = dayData;
@@ -236,11 +273,11 @@ function CompressedDay({ dayData }: dayProps) {
                 slot.appointment?.localTime?.start === slot.time
         );
         return updatedData;
-    }, [ data ]);
+    }, [data]);
 
     return (
         <div className="calendar__day compressed">
-             <h2 className="compressed__date">{dayNumber}</h2>
+            <h2 className="compressed__date">{dayNumber}</h2>
             <div className="calendar__slots compressed">
                 {dataToRender.map((slot) => {
                     return (
@@ -248,8 +285,11 @@ function CompressedDay({ dayData }: dayProps) {
                             className="calendar__slot compressed"
                             key={slot.time}
                         >
-                            <span className="calendar__slot--time">{slot.time}</span>
-                            <span className="calendar__slot--appointment">{slot.appointment?.fullAddress}</span>
+                            {/* <span className="calendar__slot--time">{slot.time}</span> */}
+                            <span className="calendar__slot--appointment">
+                                <div>{slot.time}</div>
+                                {slot.appointment?.fullAddress}
+                            </span>
                         </span>
                     );
                 })}
@@ -258,11 +298,12 @@ function CompressedDay({ dayData }: dayProps) {
     );
 }
 
-function MonthCalendar({ monthData }: monthProps) {
+function MonthCalendar({ monthData, monthName }: monthProps) {
     return (
         <div className="calendar__month">
+            <h2>{monthName}</h2>
             <div className="weekday_initials">
-                {[ 'S', 'M', 'T', 'W', 'T', 'F', 'S' ].map((initial, idx) => (
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((initial, idx) => (
                     <span className="initial" key={initial + idx}>
                         {initial}
                     </span>
@@ -270,17 +311,20 @@ function MonthCalendar({ monthData }: monthProps) {
             </div>
             {monthData.length
                 ? monthData.map((week: CalendarWeekType, idx) => {
-                    return (
-                        <div
-                            key={idx + week[ idx ].date.toString()}
-                            className="calendar__week"
-                        >
-                            {week.map((day: CalendarDayType) => (
-                                <CompressedDay key={day.date.toString()} dayData={day} />
-                            ))}
-                        </div>
-                    );
-                })
+                      return (
+                          <div
+                              key={idx + week[idx].date.toString()}
+                              className="calendar__week"
+                          >
+                              {week.map((day: CalendarDayType) => (
+                                  <CompressedDay
+                                      key={day.date.toString()}
+                                      dayData={day}
+                                  />
+                              ))}
+                          </div>
+                      );
+                  })
                 : null}
         </div>
     );

@@ -43,13 +43,15 @@ export type TAddressWithCustomerNameAndFullAddress = optionalFullName &
     optionalFullAddress &
     TAddress;
 
-export type TAppointment = optionalCustomer & optionalAddress & Appointment & {
-    localTime?: {
-        start: string;
-        end: string;
-        completedAt: string; // Adjust the type accordingly
-      };
-};
+export type TAppointment = optionalCustomer &
+    optionalAddress &
+    Appointment & {
+        localTime?: {
+            start: string;
+            end: string;
+            completedAt: string; // Adjust the type accordingly
+        };
+    };
 export type TAppointmentWithCustomerName = optionalFullName & TAppointment;
 export type TAppointmentWithCustomerNameAndFullAddress =
     TAppointmentWithCustomerName & optionalFullAddress;
@@ -156,6 +158,6 @@ export type TprismaErrorDataType = {
 // make sure css variables are accepted
 declare module 'react' {
     interface CSSProperties {
-        [key: `--${string}`]: string | number
+        [key: `--${string}`]: string | number;
     }
 }

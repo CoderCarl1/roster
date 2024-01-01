@@ -9,21 +9,21 @@
  */
 
 type debounceProps<T> = {
-  func: (args: T) => void;
-  delay: number;
-  args: T;
+    func: (args: T) => void;
+    delay: number;
+    args: T;
 };
 function debounce<T>({ func, delay, args }: debounceProps<T>): void {
-  let debounceTimer: NodeJS.Timeout | null = null;
+    let debounceTimer: NodeJS.Timeout | null = null;
 
-  function setTimer() {
-      if (debounceTimer) {
-          clearTimeout(debounceTimer);
-      }
-      debounceTimer = setTimeout(() => {
-          func(args);
-      }, delay);
-  }
+    function setTimer() {
+        if (debounceTimer) {
+            clearTimeout(debounceTimer);
+        }
+        debounceTimer = setTimeout(() => {
+            func(args);
+        }, delay);
+    }
 
-  setTimer();
+    setTimer();
 }

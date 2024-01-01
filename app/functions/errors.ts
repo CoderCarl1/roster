@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
-import { log } from '~/functions';
 import { TprismaErrorDataType } from '@types';
+import { log } from '~/functions';
 import { isDataErrorType } from './helpers/typechecks';
 
 export class OperationError extends Error {
@@ -40,7 +40,9 @@ export class OperationError extends Error {
     public _log() {
         const dataToLog: unknown[] = [`[${this.name}] ${this.message}`];
         if (this.errorData && isDataErrorType(this.errorData)) {
-            dataToLog.push({ errorData: JSON.stringify({...this.errorData}) });
+            dataToLog.push({
+                errorData: JSON.stringify({ ...this.errorData }),
+            });
         }
         log(...dataToLog);
     }
@@ -83,7 +85,7 @@ export class OperationError extends Error {
             prismaErrorData.code = this.errorCode;
             // may occur when initializing or making a request.
         }
-        this.errorData = {...prismaErrorData };
+        this.errorData = { ...prismaErrorData };
         this.stackTrace = prismaErrorStack;
         this.message = prismaErrorMessage;
     }
@@ -92,4 +94,3 @@ export class OperationError extends Error {
 export class CustomerOperationError extends OperationError {}
 export class AddressOperationError extends OperationError {}
 export class AppointmentOperationError extends OperationError {}
-

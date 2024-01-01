@@ -58,7 +58,10 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
             currentDate.day +
             1;
 
-        const nextMonthDate = dates.calculateFutureDate(currentDate.date, daysToAdd);
+        const nextMonthDate = dates.calculateFutureDate(
+            currentDate.date,
+            daysToAdd
+        );
         setDate(nextMonthDate);
     }
     function prevDay() {
@@ -74,11 +77,12 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
             dates.getDaysInMonth(currentDate.year, currentDate.month - 1) +
             currentDate.day;
 
-        const prevMonthDate = dates.calculatePastDate(currentDate.date, daysToMinus);
+        const prevMonthDate = dates.calculatePastDate(
+            currentDate.date,
+            daysToMinus
+        );
         setDate(prevMonthDate);
     }
-
-    
 
     const value = {
         currentDate,

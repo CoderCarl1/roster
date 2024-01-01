@@ -8,9 +8,11 @@ type props = {
     clearAppointment: () => void;
 } & React.HTMLProps<HTMLDivElement>;
 
-function Appointment_card({ appointment, clearAppointment, ...rest }: props) {
+function Appointment_card({ appointment, clearAppointment, ...props }: props) {
     const [formData, setFormData] =
         useState<Partial<TAppointmentWithCustomerName | null>>(appointment);
+
+    const { className = '', ...rest } = props;
 
     const { toggle: editable, setToggleStatus: toggleEditable } = useToggle();
 
@@ -27,7 +29,7 @@ function Appointment_card({ appointment, clearAppointment, ...rest }: props) {
 
     // TODO: add basic styling
     return (
-        <div className="appointment single" {...rest}>
+        <div className={'appointment single ' + className} {...rest}>
             <Card
                 onSubmit={handleSubmit}
                 toggleEditable={toggleEditable}

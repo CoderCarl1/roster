@@ -1,8 +1,8 @@
-import { isAddress, isAppointment } from '~/functions';
 import {
     TAppointmentWithCustomerNameAndFullAddress,
     TAddressWithCustomerNameAndFullAddress,
 } from '@types';
+import { isAddress, isAppointment } from '~/functions';
 
 export function addFullAddress(
     obj:

@@ -19,7 +19,6 @@ export type CalendarType =
     | CalendarWeekType
     | CalendarMonthType;
 function useCalendar() {
-
     const DAYSTART = 4;
     const DAYEND = 18;
     /**
@@ -59,7 +58,10 @@ function useCalendar() {
                         );
                     }) || null;
 
-                calendarData.push({ time: timeString, appointment: appointment ?? null });
+                calendarData.push({
+                    time: timeString,
+                    appointment: appointment ?? null,
+                });
             }
         }
 
@@ -106,7 +108,6 @@ function useCalendar() {
         selectedDate: Date,
         appointments: TAppointmentWithCustomerNameAndFullAddress[]
     ): CalendarMonthType {
-        console.log("GET MONTH appointments", appointments)
         const calendar: CalendarWeekType[] = [];
         const currentDate = new Date(selectedDate);
         const firstDayOfMonth = new Date(
@@ -138,10 +139,8 @@ function useCalendar() {
 
             calendar.push(calendarWeek);
         }
-        console.log("returning this calendar", calendar)
         return calendar;
     }
-
 
     return { getDay, getWeek, getMonth };
 }

@@ -1,8 +1,8 @@
 import { Appointment, Prisma } from '@prisma/client';
-import { AppointmentOperationError } from '~/functions/errors';
 import { TAppointment, TAppointment_data_for_creation } from '@types';
 import { prisma } from '~/db.server';
 import { dates, log } from '~/functions';
+import { AppointmentOperationError } from '~/functions/errors';
 
 /**
  * Creates a new appointment.
@@ -146,7 +146,6 @@ export async function appointment_create_many(
                     ) {
                         throw timeConflictExists;
                     }
-
 
                     const appointment = await tx.appointment.create({
                         data: { ...appointmentData, customerId, addressId },
@@ -326,7 +325,7 @@ export async function appointment_update(
             throw timeConflictExists;
         }
 
-        let updatedAppointment = await prisma.appointment.update({
+        const updatedAppointment = await prisma.appointment.update({
             where: { id },
             data: { ...args },
         });
@@ -336,7 +335,6 @@ export async function appointment_update(
         }
 
         return addLocaleDates(updatedAppointment);
-
     } catch (err) {
         if (err instanceof AppointmentOperationError) {
             return err;
@@ -347,7 +345,6 @@ export async function appointment_update(
         );
     }
 }
-
 
 /**
  * Deletes an appointment in the database.
@@ -368,7 +365,6 @@ export async function appointment_delete(appointmentId: string) {
         );
     }
 }
-
 
 function addLocaleDates(appointment: TAppointment): TAppointment {
     const localTime = {

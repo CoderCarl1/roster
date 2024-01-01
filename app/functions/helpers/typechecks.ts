@@ -1,10 +1,10 @@
-import { log } from '~/functions';
 import {
     TAppointmentWithCustomerNameAndFullAddress,
     TAddressWithCustomerNameAndFullAddress,
     TCustomer,
     TprismaErrorDataType,
 } from '@types';
+import { log } from '~/functions';
 
 type ObjTypes =
     | TAppointmentWithCustomerNameAndFullAddress
@@ -43,32 +43,32 @@ export function isAddress(
 
     return Boolean(
         exists('id', value) &&
-        ((value?.number && exists('number', value)) ||
-            isNull(
-                value?.number,
-                `number is not null, ${stringObject(value)}`
-            )) &&
-        exists('line1', value) &&
-        ((value?.line2 && exists('line2', value)) ||
-            isNull(
-                value?.line2,
-                `line2 is not null, ${stringObject(value)}`
-            )) &&
-        exists('suburb', value) &&
-        exists('createdAt', value) &&
-        ((value?.updatedAt && exists('updatedAt', value)) ||
-            isNull(
-                value?.updatedAt,
-                `updatedAt is not null, ${stringObject(value)}`
-            )) &&
-        isBool(value?.archived, 'archived is not a bool') &&
-        // customer
-        ((value?.customerId && exists('customerId', value)) ||
-            isNull(
-                value?.customerId,
-                `customerId is not null, ${stringObject(value)}`
-            )) &&
-        ('customer' in value ? isCustomer(value.customer!) : true)
+            ((value?.number && exists('number', value)) ||
+                isNull(
+                    value?.number,
+                    `number is not null, ${stringObject(value)}`
+                )) &&
+            exists('line1', value) &&
+            ((value?.line2 && exists('line2', value)) ||
+                isNull(
+                    value?.line2,
+                    `line2 is not null, ${stringObject(value)}`
+                )) &&
+            exists('suburb', value) &&
+            exists('createdAt', value) &&
+            ((value?.updatedAt && exists('updatedAt', value)) ||
+                isNull(
+                    value?.updatedAt,
+                    `updatedAt is not null, ${stringObject(value)}`
+                )) &&
+            isBool(value?.archived, 'archived is not a bool') &&
+            // customer
+            ((value?.customerId && exists('customerId', value)) ||
+                isNull(
+                    value?.customerId,
+                    `customerId is not null, ${stringObject(value)}`
+                )) &&
+            ('customer' in value ? isCustomer(value.customer!) : true)
     );
 }
 
@@ -92,23 +92,23 @@ export function isAppointment(
             isBool(value?.recurring, `recurring is not a bool`) &&
             value?.frequency &&
             exists('frequency', value)) ||
-        (isNull(value?.frequency, `frequency is not null`) &&
-            exists('customerId', value) &&
-            exists('addressId', value) &&
-            exists('start', value) &&
-            exists('end', value) &&
-            isBool(value?.completed, `completed is not a bool`) &&
-            ((value?.completedAt && exists('completedAt', value)) ||
-                isNull(value?.completedAt, `completedAt is not null`)) &&
-            exists('createdAt', value) &&
-            ((value?.updatedAt && exists('updatedAt', value)) ||
-                isNull(value?.updatedAt, `updatedAt is not null`)) &&
-            exists('address', value) &&
-            value?.address &&
-            isAddress(value.address) &&
-            exists('customer', value) &&
-            value?.customer &&
-            isCustomer(value.customer))
+            (isNull(value?.frequency, `frequency is not null`) &&
+                exists('customerId', value) &&
+                exists('addressId', value) &&
+                exists('start', value) &&
+                exists('end', value) &&
+                isBool(value?.completed, `completed is not a bool`) &&
+                ((value?.completedAt && exists('completedAt', value)) ||
+                    isNull(value?.completedAt, `completedAt is not null`)) &&
+                exists('createdAt', value) &&
+                ((value?.updatedAt && exists('updatedAt', value)) ||
+                    isNull(value?.updatedAt, `updatedAt is not null`)) &&
+                exists('address', value) &&
+                value?.address &&
+                isAddress(value.address) &&
+                exists('customer', value) &&
+                value?.customer &&
+                isCustomer(value.customer))
     );
 }
 
@@ -140,42 +140,41 @@ export function isCustomer(value: ObjTypes): value is TCustomer {
 
     return Boolean(
         exists('id', value) &&
-        exists('firstName', value) &&
-        exists('lastName', value) &&
-        exists('contact', value) &&
-        isBool(value.suspended, `suspended is not a bool`) &&
-        ((value?.suspendedAt && exists('suspendedAt', value)) ||
-            isNull(
-                value?.suspendedAt,
-                `suspendedAt is not null, ${stringObject(value)}`
-            )) &&
-        exists('createdAt', value) &&
-        ((value?.updatedAt && exists('updatedAt', value)) ||
-            isNull(
-                value?.updatedAt,
-                `updatedAt is not null, ${stringObject(value)}`
-            ))
+            exists('firstName', value) &&
+            exists('lastName', value) &&
+            exists('contact', value) &&
+            isBool(value.suspended, `suspended is not a bool`) &&
+            ((value?.suspendedAt && exists('suspendedAt', value)) ||
+                isNull(
+                    value?.suspendedAt,
+                    `suspendedAt is not null, ${stringObject(value)}`
+                )) &&
+            exists('createdAt', value) &&
+            ((value?.updatedAt && exists('updatedAt', value)) ||
+                isNull(
+                    value?.updatedAt,
+                    `updatedAt is not null, ${stringObject(value)}`
+                ))
         // && exists('addresses', value)
         // && (value?.addresses && Array.isArray(value.addresses) && value.addresses.every(isAddress))
     );
 }
-
-
 
 export function isDataErrorType(value: {
     code?: string;
     duplicateField?: Record<string, unknown> | undefined;
     reason?: unknown;
 }): value is TprismaErrorDataType {
-    if (value.code !== undefined && !exists('code', value)
-        || value.duplicateField !== undefined && !exists('duplicateField', value)
-        || value.reason !== undefined && !exists('reason', value)
+    if (
+        (value.code !== undefined && !exists('code', value)) ||
+        (value.duplicateField !== undefined &&
+            !exists('duplicateField', value)) ||
+        (value.reason !== undefined && !exists('reason', value))
     ) {
         return false;
     }
     return true;
 }
-
 
 function exists(
     key: string,
@@ -188,7 +187,7 @@ function exists(
     if (
         object &&
         key in (object as Record<string, unknown>) &&
-        (object as Record<string, unknown>)[ key ]
+        (object as Record<string, unknown>)[key]
     ) {
         return true;
     }
