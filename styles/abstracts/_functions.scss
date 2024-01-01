@@ -1,4 +1,5 @@
 @use "sass:map";
+@use 'sass:math';
 @use "breakpoints" as *;
 @use "colors" as *;
 @use "typography" as *;
@@ -35,4 +36,12 @@
   } @else {
     @error '$sizes does not have that size!';
   }
+}
+
+@function randomColor($alpha: 0.15){
+  $hue: random(360);
+  $saturation:  math.percentage(random(100));
+  $lightness:  math.percentage(random(70) + 15);
+  
+  @return hsla($hue, $saturation, $lightness, math.percentage($alpha));
 }

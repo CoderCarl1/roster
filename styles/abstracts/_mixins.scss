@@ -26,11 +26,16 @@
   }
 };
 
+@mixin random-background-clr($alpha: 0.15) {
+  $hue: random(360);
+  $saturation:  math.percentage(random(100));
+  $lightness:  math.percentage(random(70) + 15);
 
+  background-color: hsla($hue, $saturation, $lightness, math.percentage($alpha));
+}
 
 @mixin grid($columns: 1, $rows: 1, $gap: 0px) {
   display: grid;
   grid-template-columns: repeat($columns, 1fr);
-  // grid-template-rows: repeat($rows, 1fr);
   gap: $gap;
 }
