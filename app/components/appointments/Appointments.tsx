@@ -113,6 +113,13 @@ function Main(
                 className="calendar"
             >
                 {appointmentsControls()}
+                {currentAppointment ? (
+                    <Appointment_Card
+                        clearAppointment={setAppointment}
+                        appointment={currentAppointment}
+                        className="calendar__appointment--single"
+                    />
+                ) : null}
             </Calendar>
         ) : (
             <Appointments className={currentAppointment ? 'disabled' : ''}>
