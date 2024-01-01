@@ -1,14 +1,10 @@
 import { TAddress_No_ID, TAppointment_No_ID, TCustomer, TCustomer_No_ID } from "@types";
 import { addressLine2Types, firstNames, lastNames, streetNames, streetTypes, suburbs } from "./placeholder-data";
-import { log } from "~/functions";
+import { isCustomer, log, randomNumber } from "@functions";
 import { AddressOperationError, AppointmentOperationError, CustomerOperationError } from "~/functions/errors";
 import { customer_create } from "~/models/customer.server";
 import { appointment_create } from "~/models/appointment.server";
 
-
-function randomNumber(ceiling: number) {
-  return Math.floor(Math.random() * ceiling) + 1;
-}
 
 function randomDateInPast(days: number) {
   const pastDate = new Date();
@@ -44,14 +40,16 @@ export async function createCustomers(numberOfCustomersToCreate: number){
   const customers: Pick<TCustomer, 'id' | 'addresses'>[] = [];
 
   for (let i = 0; i < numberOfCustomersToCreate; i++) {
-      const result: TCustomer = await createMockCustomer();
-      const { id, addresses } = result;
-      customers.push({ id, addresses });
+      const result = await createMockCustomer() as TCustomer;
+      if(isCustomer(result)){
+        const { id, addresses } = result;
+        customers.push({ id, addresses });
+      }
   }
   return Promise.resolve(customers);
 }
 
-async function createMockCustomer(retriesLeft = 1) {
+async function createMockCustomer(retriesLeft = 1): Promise<TCustomer | CustomerOperationError | AddressOperationError> {
   try {
       const customerData = randomCustomerData();
       const numberOfAddresses = randomNumber(100) > 17 ? 1 : 2;
