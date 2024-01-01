@@ -29,7 +29,7 @@ function Appointment_card({ appointment, clearAppointment, ...props }: props) {
 
     // TODO: add basic styling
     return (
-        <div className={'appointment single ' + className} {...rest}>
+        <div className={'appointment single ' + className && className} {...rest}>
             <Card
                 onSubmit={handleSubmit}
                 toggleEditable={toggleEditable}

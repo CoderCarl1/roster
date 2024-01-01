@@ -75,6 +75,7 @@ module.exports = {
             groups: ["builtin", "external", "internal", "parent", "sibling"],
           },
         ],
+        "@typescript-eslint/ban-ts-comment": 'warn',
       },
     },
 

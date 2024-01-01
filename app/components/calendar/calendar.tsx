@@ -185,9 +185,11 @@ function DayCalendar({ dayData, weekView = false }: dayProps) {
 
     return (
         <div className="calendar__day long">
-            {!weekView ? <h3 className="calendar__day--name">
+            {!weekView ? (
+                <h3 className="calendar__day--name">
                     {dayName} {dayNumber}
-                </h3> : null}
+                </h3>
+            ) : null}
             {data.map((slot) => {
                 const isHour = slot.time.endsWith(':00');
                 const isHalf = slot.time.endsWith(':30');
@@ -220,7 +222,8 @@ function DayCalendar({ dayData, weekView = false }: dayProps) {
                         // data-appointment={slot.appointment?.id}
                         key={date + slot.time}
                     >
-                        {shouldShowAppointment ? <Button
+                        {shouldShowAppointment ? (
+                            <Button
                                 onClick={() =>
                                     setAppointment(slot.appointment?.id)
                                 }
@@ -228,7 +231,8 @@ function DayCalendar({ dayData, weekView = false }: dayProps) {
                                 style={appointmentStyles}
                             >
                                 {slot.appointment?.fullAddress}
-                            </Button> : null}
+                            </Button>
+                        ) : null}
                     </div>
                 );
             })}
