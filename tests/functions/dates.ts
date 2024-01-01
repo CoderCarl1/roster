@@ -415,7 +415,7 @@ describe('DATE FUNCTIONS', () => {
         });
     });
 
-    describe.only('calculatePastDate', () => {
+    describe('calculatePastDate', () => {
         const { calculatePastDate } = dates;
 
         test('should return the correct date for a past date in the same month', () => {
@@ -435,8 +435,8 @@ describe('DATE FUNCTIONS', () => {
         });
 
         test('should handle leap years correctly', () => {
-            const currentDate = new Date('2020-02-28');
-            const pastDate = new Date('2020-02-23');
+            const currentDate = new Date('2020-03-01');
+            const pastDate = new Date('2020-02-25');
             const calculatedPastDate = calculatePastDate(currentDate, 5);
 
             expect(formatDate(calculatedPastDate)).toBe(formatDate(pastDate));
