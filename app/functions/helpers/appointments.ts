@@ -1,10 +1,10 @@
-import { isAddress, isCustomer } from '@functions';
-import {
-    TAddressWithCustomerNameAndFullAddress,
-    TAppointmentWithCustomerName,
-    TAppointmentWithCustomerNameAndFullAddress,
-    TCustomer,
-} from '@types';
+// import { isAddress, isCustomer } from '~/functions';
+// import {
+//     TAddressWithCustomerNameAndFullAddress,
+//     TAppointmentWithCustomerName,
+//     TAppointmentWithCustomerNameAndFullAddress,
+//     TCustomer,
+// } from '@types';
 
 // export function getAppointmentsFromCustomerArray(customersArray: TCustomer[] = []) {
 

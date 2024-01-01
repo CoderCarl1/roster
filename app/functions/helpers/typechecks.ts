@@ -1,4 +1,4 @@
-import { log } from '@functions';
+import { log } from '~/functions';
 import {
     TAppointmentWithCustomerNameAndFullAddress,
     TAddressWithCustomerNameAndFullAddress,

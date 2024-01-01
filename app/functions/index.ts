@@ -1,33 +1,13 @@
-import {
-    addFullAddress /**, getAddressesFromCustomerArray */,
-} from './helpers/addresses';
+import { addFullAddress } from './helpers/addresses';
+import { randomHSLValues } from './helpers/colours';
 import { addFullName } from './helpers/customers';
-import {
-    dayNumberFromDate,
-    endOfWeek,
-    formatDate,
-    getDayName,
-    getDaysInMonth,
-    getNumberOfDays,
-    incrementDayByOne,
-    startOfWeek,
-} from './helpers/dates';
-import { log } from './helpers/functions';
+import dates from './helpers/dates';
+import log from './helpers/log';
+import { randomNumber } from './helpers/numbers';
 import { removePropertiesFromObject } from './helpers/objects';
 import { isAddress, isAppointment, isCustomer } from './helpers/typechecks';
 import useToggle from './helpers/useToggle';
-// import {getAppointmentsFromCustomerArray} from "./helpers/appointments";
 
-const dates = {
-    formatDate,
-    startOfWeek,
-    endOfWeek,
-    dayNumberFromDate,
-    getDaysInMonth,
-    getNumberOfDays,
-    incrementDayByOne,
-    getDayName,
-};
 export {
     addFullName,
     addFullAddress,
@@ -35,9 +15,10 @@ export {
     isAddress,
     isAppointment,
     log,
-    // getAppointmentsFromCustomerArray,
-    // getAddressesFromCustomerArray,
+    randomNumber,
+    randomHSLValues,
     removePropertiesFromObject,
     useToggle,
     dates,
 };
+

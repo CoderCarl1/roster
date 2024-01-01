@@ -1,4 +1,4 @@
-import { isAddress, isAppointment } from '@functions';
+import { isAddress, isAppointment } from '~/functions';
 import {
     TAppointmentWithCustomerNameAndFullAddress,
     TAddressWithCustomerNameAndFullAddress,

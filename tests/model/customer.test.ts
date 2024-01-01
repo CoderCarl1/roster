@@ -1,5 +1,5 @@
 import { Address, Customer } from '@prisma/client';
-import { CustomerOperationError } from '@errors';
+import { CustomerOperationError } from "~/functions/errors"
 import { prisma } from '~/db.server';
 import { address_create } from '~/models/address.server';
 import {

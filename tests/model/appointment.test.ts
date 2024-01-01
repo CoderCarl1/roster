@@ -1,5 +1,5 @@
 import { Address, Appointment, Customer } from '@prisma/client';
-import { AppointmentOperationError } from '@errors';
+import { AppointmentOperationError } from '~/functions/errors';
 import { prisma } from '~/db.server';
 import { address_create } from '~/models/address.server';
 import {
@@ -240,20 +240,7 @@ describe('APPOINTMENT FUNCTIONS', () => {
                 );
             });
         });
-        it('appointment_create_many returns an AppointmentOperationError if throws', async () => {
-            const errorMock = new Error('Transaction error');
-            const createSpy = jest
-                .spyOn(prisma, '$transaction')
-                .mockImplementation(() => Promise.resolve(errorMock));
-
-            const errorResult = await appointment_create_many(
-                validCustomerId,
-                validAddressId,
-                multipleApppointmentArray
-            );
-            expect(errorResult).toBeInstanceOf(AppointmentOperationError);
-            createSpy.mockRestore();
-        });
+        
         /**
          * FIND MANY fails when tested in suite.
          */

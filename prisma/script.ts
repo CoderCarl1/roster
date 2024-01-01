@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { log } from '~/functions/helpers/functions';
+import { log } from '~/functions';
 import { customer_delete_many } from '~/models/customer.server';
 import { singleton } from '~/singleton.server';
 import { createAppointments, createCustomers } from '~/lib';

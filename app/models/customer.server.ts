@@ -1,13 +1,13 @@
 import { createId } from '@paralleldrive/cuid2';
 import { Address, Customer, Prisma } from '@prisma/client';
-import { AddressOperationError, CustomerOperationError } from '@errors';
+import { AddressOperationError, CustomerOperationError } from '~/functions/errors';
 import {
     TAddress_data_for_creation,
     TCustomerDataWithAddresses_for_creation,
     TCustomer_data_for_creation,
 } from '@types';
 import { prisma } from '~/db.server';
-import { log } from '~/functions/helpers/functions';
+import {log} from '~/functions';
 
 /**
  * Creates a new customer with optional associated address and appointment data.

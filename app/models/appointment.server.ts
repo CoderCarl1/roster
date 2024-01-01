@@ -1,10 +1,8 @@
 import { Appointment, Prisma } from '@prisma/client';
-import { AppointmentOperationError } from '@errors';
+import { AppointmentOperationError } from '~/functions/errors';
 import { TAppointment, TAppointment_data_for_creation } from '@types';
 import { prisma } from '~/db.server';
-import { dates } from '~/functions';
-import { log } from '~/functions/helpers/functions';
-
+import { dates, log } from '~/functions';
 
 /**
  * Creates a new appointment.
@@ -70,18 +68,38 @@ export async function existingAppointmentCheck(
 
     const oneMinute = 60 * 1000; // 1 minute in milliseconds
 
+    // TODO: check that this works??
+    // const existingAppointmentsData = await prisma.appointment.findMany({
+    //     where: {
+    //         start: {
+    //             gte: new Date(startDate - oneMinute).toISOString(),
+    //             lt: new Date(endDate + oneMinute).toISOString(),
+    //         },
+    //         end: {
+    //             gte: new Date(startDate - oneMinute).toISOString(),
+    //             lt: new Date(endDate + oneMinute).toISOString(),
+    //         },
+    //     },
+    // });
     const existingAppointmentsData = await prisma.appointment.findMany({
         where: {
-            start: {
-                gte: new Date(startDate - oneMinute).toISOString(),
-                lt: new Date(endDate + oneMinute).toISOString(),
-            },
-            end: {
-                gte: new Date(startDate - oneMinute).toISOString(),
-                lt: new Date(endDate + oneMinute).toISOString(),
-            },
+            OR: [
+                {
+                    start: {
+                        lte: new Date(endDate).toISOString(),
+                        gte: new Date(startDate).toISOString(),
+                    },
+                },
+                {
+                    end: {
+                        lte: new Date(endDate).toISOString(),
+                        gte: new Date(startDate).toISOString(),
+                    },
+                },
+            ],
         },
     });
+
     if (existingAppointmentsData && existingAppointmentsData.length) {
         return new AppointmentOperationError(
             'conflicting appointments found',
@@ -205,7 +223,7 @@ export async function appointment_find_many(
  * @returns A promise that resolves to an array of appointments or an AppointmentOperationError.
  */
 export async function appointment_find_many_completed(): Promise<
-TAppointment[] | AppointmentOperationError
+    TAppointment[] | AppointmentOperationError
 > {
     return await appointment_find_many({}, { completed: true });
 }
@@ -310,7 +328,7 @@ export async function appointment_update(
 
         let updatedAppointment = await prisma.appointment.update({
             where: { id },
-            data: {...args},
+            data: { ...args },
         });
 
         if (!updatedAppointment) {
@@ -318,7 +336,7 @@ export async function appointment_update(
         }
 
         return addLocaleDates(updatedAppointment);
-        
+
     } catch (err) {
         if (err instanceof AppointmentOperationError) {
             return err;
