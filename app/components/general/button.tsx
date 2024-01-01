@@ -8,8 +8,9 @@ export default function Button({
     variant = 'default',
     ...props
 }: ButtonProps) {
+    const {className = '', ...attributes} = props;
     return (
-        <button className={`button ${variant}`} {...props}>
+        <button className={`button ${variant} ${className}`} {...attributes}>
             {children}
         </button>
     );
