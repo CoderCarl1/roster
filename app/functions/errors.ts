@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { log } from '@functions';
+import { log } from '~/functions';
 import { TprismaErrorDataType } from '@types';
 import { isDataErrorType } from './helpers/typechecks';
 
