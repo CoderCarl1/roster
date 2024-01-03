@@ -176,23 +176,10 @@ export function isDataErrorType(value: {
     return true;
 }
 
-function exists(
-    key: string,
-    object: unknown,
-    message = `missing ${key} from object`
-) {
-    if (!isObject(object)) {
-        return false;
-    }
-    if (
-        object &&
-        key in (object as Record<string, unknown>) &&
-        (object as Record<string, unknown>)[key]
-    ) {
-        return true;
-    }
-    log(message, { data: object });
-    return false;
+export function isNumber(value: unknown): value is number{
+    return Boolean(
+        !isNaN(value as number) && isFinite(value as number)
+    )
 }
 
 function isNull(value: unknown, message = 'value is not null') {
@@ -231,4 +218,23 @@ function stringObject(object: unknown) {
         return JSON.stringify(object, null, 2);
     }
     return object;
+}
+
+function exists(
+    key: string,
+    object: unknown,
+    message = `missing ${key} from object`
+) {
+    if (!isObject(object)) {
+        return false;
+    }
+    if (
+        object &&
+        key in (object as Record<string, unknown>) &&
+        (object as Record<string, unknown>)[key]
+    ) {
+        return true;
+    }
+    log(message, { data: object });
+    return false;
 }

@@ -109,17 +109,24 @@ function useCalendar() {
         appointments: TAppointmentWithCustomerNameAndFullAddress[]
     ): CalendarMonthType {
         const calendar: CalendarWeekType[] = [];
-        const currentDate = new Date(selectedDate);
+        const currentDate = dates.parseDate(selectedDate);
         const firstDayOfMonth = new Date(
             currentDate.getFullYear(),
             currentDate.getMonth(),
             1
         );
         let startDate = dates.startOfWeek(firstDayOfMonth);
-
+        let newYear = currentDate.getFullYear();
+        let newMonth = currentDate.getMonth() + 1;
+    
+        if (newMonth > 11){
+            newMonth = 1;
+            newYear = currentDate.getFullYear() + 1;
+        }
+    
         const lastDayOfMonth = new Date(
-            currentDate.getFullYear(),
-            currentDate.getMonth() + 1,
+            newYear,
+            newMonth,
             0
         );
         const endDate = dates.endOfWeek(lastDayOfMonth);

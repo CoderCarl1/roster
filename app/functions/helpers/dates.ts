@@ -48,11 +48,31 @@ export function formatDate(dateString: Date | string): string {
 
 export function dayNumberFromDate(dateString: Date | string) {
     const date = parseDate(dateString);
-
     const options: Intl.DateTimeFormatOptions = {
         day: 'numeric',
     };
     return date.toLocaleString(undefined, options);
+}
+
+function dayNumberFromParsedDate(dateString: Date | string) {
+    const options: Intl.DateTimeFormatOptions = {
+        day: 'numeric',
+    };
+    return dateString.toLocaleString(undefined, options);
+}
+
+function getMonthNumberFromDate(dateString: Date | string){
+    const date = parseDate(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+        month: 'numeric',
+    };
+    return date.toLocaleString(undefined, options);
+}
+function getMonthNumberFromParsedDate(dateString: Date | string){
+    const options: Intl.DateTimeFormatOptions = {
+        month: 'numeric',
+    };
+    return dateString.toLocaleString(undefined, options);
 }
 
 // const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -61,6 +81,12 @@ export function startOfWeek(date: Date) {
     const currentDate = parseDate(date);
     const currentDayIndex = currentDate.getDay();
 
+    const sundayDate = new Date(currentDate);
+    sundayDate.setDate(currentDate.getDate() - currentDayIndex);
+    return sundayDate;
+}
+export function startOfWeekFromParsedDate(currentDate: Date) {
+    const currentDayIndex = currentDate.getDay();
     const sundayDate = new Date(currentDate);
     sundayDate.setDate(currentDate.getDate() - currentDayIndex);
     return sundayDate;
@@ -89,10 +115,9 @@ export function endOfWeek(date: Date) {
 
 export function getDaysInMonth(year: number, month: number) {
     if (month < 0 || month > 11) {
-        throw new Error('Invalid month provided.');
+        throw new Error(`Invalid month provided: ${month}`);
     }
-    const nextMonth = new Date(year, month + 1, 0);
-    return nextMonth.getDate();
+    return new Date(year, month + 1, 0).getDate();
 }
 
 /**
@@ -126,6 +151,24 @@ export function getNumberOfDays(start: Date, end: Date): number {
 
     return Math.abs(Math.round((endUtc - startUtc) / oneDay)) + 1;
 }
+
+function getNumberOfDaysFromParsedDates(startDate: Date, endDate: Date): number {
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    const startUtc = Date.UTC(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate()
+    );
+    const endUtc = Date.UTC(
+        endDate.getFullYear(),
+        endDate.getMonth(),
+        endDate.getDate()
+    );
+
+    return Math.abs(Math.round((endUtc - startUtc) / oneDay)) + 1;
+}
+
 export function incrementDayByOne(date: Date): Date {
     const nextDate = parseDate(date);
     nextDate.setDate(nextDate.getDate() + 1);
@@ -148,6 +191,70 @@ export function getMonthName(date: Date) {
     } catch (err) {
         return 'month name not found';
     }
+}
+
+export function getMonthNameByNumber(monthNum: number) {
+    try {
+        if (monthNum > 11 || monthNum < 0) {
+            throw new Error();
+        }
+        const monthNames = [
+            'January','February','March','April','May', 'June', 
+            'July', 'August', 'September', 'October', 'November', 'December'
+          ];
+          
+        return monthNames[monthNum];
+    } catch (err) {
+        return `month name not found by given number ${monthNum}`;
+    }
+}
+
+type visibleDayType = {
+    number: string;
+    inMonth: boolean;
+    date: Date;
+}
+function getVisibleDayNumbersInArray(date: Date){
+    const calendarMonth: visibleDayType[][] = [];
+    const currentDate = parseDate(date);
+    const firstDayOfMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        1
+    );
+    let startDate = startOfWeekFromParsedDate(firstDayOfMonth);
+
+    let newYear = currentDate.getFullYear();
+    let newMonth = currentDate.getMonth() + 1;
+
+    if (newMonth > 11){
+        newMonth = 1;
+        newYear = currentDate.getFullYear() + 1;
+    }
+
+    const lastDayOfMonth = new Date(newYear,newMonth, 0);
+    const endDate = endOfWeek(lastDayOfMonth);
+
+    const totalDays = getNumberOfDaysFromParsedDates(startDate, endDate);
+    const numberOfWeeks = Math.ceil(totalDays / 7);
+
+    for (let week = 0; week < numberOfWeeks; week++) {
+        const calendarWeek: visibleDayType[] = [];
+
+        for (let day = 0; day < 7; day++) {
+            const calendarDay = {
+                number: dayNumberFromParsedDate(startDate),
+                inMonth: startDate.getMonth() === currentDate.getMonth(),
+                date: startDate,
+            };
+            calendarWeek.push(calendarDay);
+
+            startDate = incrementDayByOne(startDate);
+        }
+
+        calendarMonth.push(calendarWeek);
+    }
+    return calendarMonth;
 }
 
 /**
@@ -223,7 +330,7 @@ export function calculateFutureDate(date: Date, dayNumber: number) {
 
 export function calculatePastDate(date: Date, dayNumber: number) {
     const clonedDate = parseDate(date);
-    console.log('calculatePastDate 1');
+
     let newDay = clonedDate.getDate();
     let newMonth = clonedDate.getMonth();
     let newYear = clonedDate.getFullYear();
@@ -231,6 +338,10 @@ export function calculatePastDate(date: Date, dayNumber: number) {
     if (newDay >= dayNumber) {
         newDay -= dayNumber;
     } else {
+        if (newMonth - 1 < 0) {
+            newMonth = 11;
+            newYear = newYear - 1;    
+        }
         let daysInPreviousMonth = getDaysInMonth(newYear, newMonth - 1);
 
         while (newDay < dayNumber) {
@@ -257,12 +368,16 @@ export default {
     dayNumberFromDate,
     endOfWeek,
     formatDate,
-    getDaysInMonth,
-    getNumberOfDays,
-    getDayName,
-    getMonthName,
     getDateRange,
+    getDayName,
+    getDaysInMonth,
+    getMonthName,
+    getNumberOfDays,
+    getMonthNumberFromDate,
+    getMonthNameByNumber,
+    getVisibleDayNumbersInArray,
     incrementDayByOne,
     parseDate,
     startOfWeek,
 };
+

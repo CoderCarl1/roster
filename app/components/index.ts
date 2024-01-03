@@ -5,6 +5,7 @@ import Appointments, {
 } from './appointments';
 import Customers, { Customer_Card, useCustomers } from './customers';
 import Form, { Input } from './form';
+import DateTimePicker from './form/datepicker';
 import { Button, Card } from './general';
 import LoadingComponent from './general/LoadingComponent';
 
@@ -23,4 +24,5 @@ export {
     Input,
     Card,
     Button,
+    DateTimePicker,
 };

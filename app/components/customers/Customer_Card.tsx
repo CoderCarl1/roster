@@ -32,7 +32,7 @@ function Customer_card({ customer, clearCustomer, ...rest }: props) {
                 onSubmit={handleSubmit}
                 toggleEditable={toggleEditable}
                 editable={editable}
-                closeFunc={() => clearCustomer()}
+                closeFunc={clearCustomer}
             >
                 <Input
                     editable={editable}

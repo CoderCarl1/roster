@@ -138,13 +138,13 @@ describe('DATE FUNCTIONS', () => {
         });
         test('should throw an error for an invalid month (less than 0)', () => {
             expect(() => getDaysInMonth(2021, -1)).toThrow(
-                'Invalid month provided.'
+                'Invalid month provided: -1'
             );
         });
 
         test('should throw an error for an invalid month (greater than 11)', () => {
             expect(() => getDaysInMonth(2021, 12)).toThrow(
-                'Invalid month provided.'
+                'Invalid month provided: 12'
             );
         });
     });

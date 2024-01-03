@@ -3,7 +3,7 @@ import Button from './button';
 
 type cardProps = {
     toggleEditable: (event: React.SyntheticEvent | React.MouseEvent) => boolean;
-    editable: boolean | Event;
+    editable: boolean;
     closeFunc: () => void;
     children?: React.ReactNode;
 } & React.HTMLProps<HTMLFormElement>;

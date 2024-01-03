@@ -1,0 +1,19 @@
+@use '../abstracts/' as *;
+
+.weekday_initials {
+  @include grid($columns: 7);
+
+  .initial {
+    --initials-font-size: inherit;
+    --initials-font-weight: 400;
+    --initials-font-color: #{clr(neutral, 400)};
+    --initials-background-color: #{clr(neutral, 100)};
+
+    font-size: var(--initials-font-size);
+    width: 100%;
+    text-align: center;
+    font-weight: var(--initials-font-weight);
+    color: var(--initials-font-color);
+    background-color: var(--initials-background-color);
+  }
+}

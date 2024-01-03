@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 /**
  * @param newState default is FALSE, accepts new boolean
@@ -19,14 +19,13 @@ export default function useToggle(newState: boolean | Event = false) {
         value: boolean | React.SyntheticEvent | React.MouseEvent
     ) => {
         let retval;
-
         if (typeof value === 'boolean') {
             setToggle(value);
             retval = value;
         } else {
             value.preventDefault();
             retval = Boolean(!toggle);
-            setToggle((prev) => Boolean(!prev));
+            setToggle((prev) =>!prev);
         }
 
         return retval;

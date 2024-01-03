@@ -73,8 +73,14 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         setDate(nextDayDate);
     }
     function prevMonth() {
+        let month = currentDate.month - 1;
+        let year = currentDate.year;
+        if (currentDate.month - 1 < 0) {
+            month = 11;
+            year = year - 1;    
+        }
         const daysToMinus =
-            dates.getDaysInMonth(currentDate.year, currentDate.month - 1) +
+            dates.getDaysInMonth(year, month) +
             currentDate.day;
 
         const prevMonthDate = dates.calculatePastDate(

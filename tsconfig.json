@@ -17,6 +17,9 @@
       "@components": ["./app/components"],
       "@contexts": ["./app/contexts"],
       "@functions": ["./app/functions"],
+      "@address": ["./app/models/address.server"],
+      "@customer": ["./app/models/customer.server"],
+      "@appointment": ["./app/models/appointment.server"],
       "@types": ["types.d.ts"],
       "@errors": ["./app/functions/errors.ts"]
     },

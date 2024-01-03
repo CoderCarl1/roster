@@ -34,7 +34,7 @@ function Address_card({ address, clearAddress, ...rest }: props) {
                 onSubmit={handleSubmit}
                 toggleEditable={toggleEditable}
                 editable={editable}
-                closeFunc={() => clearAddress()}
+                closeFunc={clearAddress}
             >
                 <Input
                     editable={editable}

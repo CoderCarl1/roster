@@ -2,16 +2,13 @@
 
 .single {
   position: relative;
-  background-color: clr(primary, 100);
   height: 100dvh;
 }
 .card {
   position: absolute;
   inset: 0;
-  background-color: clr(neutral, 200);
   
   fieldset {
-    background-color: inherit;
     border: 1px solid clr(neutral, 100);
   }
 

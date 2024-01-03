@@ -1,0 +1,84 @@
+@use '../abstracts/' as *;
+
+.dateTimePicker--wrapper {
+  --button-padding: 0;
+  --button-size: 32px;
+  position: relative;
+  width: 200px;
+  background: white;
+  border: 1px solid blue;
+}
+
+.date-picker {
+  position: absolute;
+  left: var(--button-size);
+  width: 200px;
+  top: calc(var(--button-size) / 2);
+  background-color: clr(neutral, 100);
+  border: 1px solid clr(primary, 300);
+  @include slide-fade-in();
+}
+
+.picker__calendar {
+  font-size: fs(200);
+
+  .weekday_initials {
+    gap: 0;
+  }
+
+  &--week {
+    @include grid($columns: 7, $gap: 0);
+  }
+
+  &--day {
+    --button-color: #{clr(neutral, 400)};
+    --button-bg-color: initial;
+
+    &:hover {
+      --button-bg-color: #{clr(primary,100)} !important;
+    }
+
+    color: var(--button-color);
+    text-align: center;
+    background-color: var(--button-bg-color);
+
+    &.notInMonth {
+      --button-color: #{clr(neutral, 200)};
+    }
+
+    &.selected {
+      --button-bg-color: #{clr(primary,300)};
+      --button-color: #{clr(neutral, 100)};
+
+      &:hover {
+        --button-bg-color: #{clr(primary,200)};
+      }
+
+      &:active {
+        --button-bg-color: #{clr(neutral,100)};
+        --button-border-color: #{clr(primary,200)};
+        --button-color: #{clr(primary, 400)};
+      }
+    }
+
+    &.button {
+      width: 100%;
+      aspect-ratio: 1;
+    }
+
+
+  }
+}
+
+// .picker__time {
+
+// }
+
+.select__date {
+  width: 200px;
+  @include grid($columns: 3, $gap: size(4));
+
+  // .input {
+
+  // }
+}

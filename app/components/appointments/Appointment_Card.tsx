@@ -33,7 +33,7 @@ function Appointment_card({ appointment, clearAppointment,   className = "", ...
                 onSubmit={handleSubmit}
                 toggleEditable={toggleEditable}
                 editable={editable}
-                closeFunc={() => clearAppointment()}
+                closeFunc={clearAppointment}
             >
                 <Input
                     editable={editable}

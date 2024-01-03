@@ -7,15 +7,15 @@ layout
 .calendar {
   flex: 1 1 80%;
 
-&__controls {
-  .date__information {
-    display: inline-block;
-    width: 35ch;
-    text-align: center;
-    padding: 0 1em;
-    outline: 1px solid purple;
+  &__controls {
+    .date__information {
+      display: inline-block;
+      width: 35ch;
+      text-align: center;
+      padding: 0 1em;
+      outline: 1px solid purple;
+    }
   }
-}
 
   &__month {
     @include grid($gap: size(4));
@@ -41,6 +41,20 @@ layout
       position: relative;
       z-index: 1;
       height: calc((var(--slot-height) * var(--grid-rows)));
+    }
+  }
+
+  &__appointment--single {
+    // position: fixed;
+    inset: 0;
+    z-index: 1;
+    background-color: clr(primary, 100);
+
+    fieldset {
+      width: min(100% - 2rem, 40rem);
+      margin-inline: auto;
+      background-color: clr(neutral, 100);
+      padding: size(16);
     }
   }
 }
@@ -119,7 +133,7 @@ Presentation
         font-size: fs(500);
       }
 
-      // underline at half hours
+      // underline at 15 (short) & 30 (long) min
       &::after {
         content: '';
         position: absolute;
@@ -135,15 +149,13 @@ Presentation
   }
 
   .weekday_initials {
-    @include grid($columns: 7, $gap: size(4));
+    gap: size(4);
 
     .initial {
-      width: 100%;
-      text-align: center;
-      font-size: fs(600);
-      font-weight: 700;
-      color: clr(neutral, 100);
-      background-color: clr(neutral, 400);
+      --initials-font-size: #{fs(600)};
+      --initials-font-weight: 700;
+      --initials-font-color: #{clr(neutral, 100)};
+      --initials-background-color: #{clr(neutral, 400)};
     }
   }
 }

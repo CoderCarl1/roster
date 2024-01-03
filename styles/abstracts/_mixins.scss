@@ -38,4 +38,62 @@
   display: grid;
   grid-template-columns: repeat($columns, 1fr);
   gap: $gap;
+  @content;
+}
+
+@mixin no-pointer-events() {
+  pointer-events: none;
+  @content;
+}
+
+@mixin float-label-container {
+  display: block;
+  position: relative;
+}
+
+@mixin float-label {
+  label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    cursor: text;
+    font-size: 75%;
+    opacity: 1;
+    transition: all 0.2s;
+    @content;
+  }
+}
+
+@mixin float-label-input {
+  &::placeholder {
+    opacity: 1;
+    // transition: all 0.2s;
+  }
+  &:placeholder-shown:not(:focus)::placeholder {
+    opacity: 0;
+  }
+}
+
+@mixin float-label-scaled {
+  &:placeholder-shown:not(:focus) + * {
+    font-size: 125%;
+    opacity: 0.5;
+    @content;
+  }
+}
+@mixin transform($transformBase, $transformAdditions) {
+  transform: $transformBase $transformAdditions;
+}
+
+@mixin fade-in($duration: 250ms){
+  animation-name: fade-in;
+  animation-fill-mode: forwards;
+  animation-duration: $duration;
+}
+
+@mixin slide-fade-in($duration: 0ms){
+  transform-origin: top right;
+  animation-name: fade-in, slide-down;
+  animation-fill-mode: forwards;
+  animation-duration: $duration;
 }
