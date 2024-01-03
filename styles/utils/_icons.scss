@@ -1,0 +1,12 @@
+@use '../abstracts/' as *;
+
+.icon {
+  fill: var(--fill, #{clr(neutral,400)});
+}
+
+.calendar {
+  --fill: #{clr(primary, 300)};
+  &:hover {
+    --fill: #{clr(primary, 200)};
+  }
+}
