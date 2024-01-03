@@ -6,19 +6,17 @@ import { TAppointmentWithCustomerName } from '@types';
 type props = {
     appointment: TAppointmentWithCustomerName;
     clearAppointment: () => void;
-} & React.HTMLProps<HTMLDivElement>;
+} & React.HTMLProps<HTMLFormElement>;
 
-function Appointment_card({ appointment, clearAppointment, ...props }: props) {
-    const [formData, setFormData] =
+function Appointment_card({ appointment, clearAppointment,   className = "", ...props }: props) {
+    const [ formData, setFormData ] =
         useState<Partial<TAppointmentWithCustomerName | null>>(appointment);
-
-    const { className = '', ...rest } = props;
 
     const { toggle: editable, setToggleStatus: toggleEditable } = useToggle();
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData({ ...formData, [ name ]: value });
     };
 
     // TODO: add a submit that calls update customer
@@ -29,8 +27,9 @@ function Appointment_card({ appointment, clearAppointment, ...props }: props) {
 
     // TODO: add basic styling
     return (
-        <div className={'appointment single ' + className && className} {...rest}>
             <Card
+                className={'appointment single ' + className}
+                {...props}
                 onSubmit={handleSubmit}
                 toggleEditable={toggleEditable}
                 editable={editable}
@@ -82,7 +81,6 @@ function Appointment_card({ appointment, clearAppointment, ...props }: props) {
                 />
                 {/* Make a note field */}
             </Card>
-        </div>
     );
 }
 

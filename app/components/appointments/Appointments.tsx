@@ -139,10 +139,10 @@ type appointmentProps = {
     children?: React.ReactNode;
 } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
-function Appointments({ children, ...props }: appointmentProps) {
+function Appointments({ children,   className = "", ...props }: appointmentProps) {
     const { appointmentsData, setAppointment } = useAppointments();
     return (
-        <section {...props} className={'section-wrapper' + props.className}>
+        <section {...props} className={'section-wrapper ' + className}>
             {children}
 
             <Table>
