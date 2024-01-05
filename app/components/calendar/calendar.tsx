@@ -198,7 +198,7 @@ function DayCalendar({ dayData, weekView = false }: dayProps) {
                     slot.appointment &&
                     appointmentSlotLength[slot.appointment.id].initial ===
                         appointmentSlotLength[slot.appointment.id].available--;
-                const { hue, saturation, lightness } = randomHSLValues();
+                const { hue, saturation, lightness } = useMemo(() => randomHSLValues(),[]);
                 const slotStyles: Record<string, any> = {
                     '--decoration-width': `${decorationWidth}`,
                 };

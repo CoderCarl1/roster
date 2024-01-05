@@ -4,7 +4,7 @@
   --button-padding: 0;
   --button-size: 32px;
   position: relative;
-  width: 200px;
+  // width: 200px;
   background: white;
   border: 1px solid blue;
 }
@@ -17,8 +17,39 @@
   background-color: clr(neutral, 100);
   border: 1px solid clr(primary, 300);
   @include slide-fade-in();
+  z-index: 1;
 }
+.calendar--wrapper {
+  position: relative;
+}
+.calendar__selection--month {
+  position: absolute;
+  inset: 0;
+  @include grid($columns: 3, $gap: size(4));
+  background-color: clr(neutral, 100);
+  @include fade-in();
 
+  .month {
+    --button-border-radius: 50%;
+    --button-padding: size(8);
+    &.current {
+      --button-bg-color: #{clr(primary,200)};
+      --button-color: #{clr(neutral, 100)};
+      &:hover {
+        --button-bg-color: #{clr(primary,200)};
+        --button-color: #{clr(neutral, 100)};
+        --button-border-color: #{clr(primary,300)};
+        // --button-color: #{clr(neutral, 100)};
+      }
+    }
+    &:hover {
+      --button-bg-color: #{clr(primary,100)};
+    }
+  }
+}
+.calendar__selection--day {
+
+}
 .picker__calendar {
   font-size: fs(200);
 
@@ -74,11 +105,13 @@
 
 // }
 
-.select__date {
+.input__date {
   width: 200px;
   @include grid($columns: 3, $gap: size(4));
+  --input-padding-left: 4px;
+  --input-padding-right: 4px;
+}
 
-  // .input {
-
-  // }
+.month__select {
+  
 }

@@ -46,41 +46,40 @@
   @content;
 }
 
-@mixin float-label-container {
-  display: block;
-  position: relative;
-}
+// @mixin float-label-container {
+//   display: block;
+//   position: relative;
+// }
 
-@mixin float-label {
-  label {
-    position: absolute;
-    left: 0;
-    top: 0;
-    cursor: text;
-    font-size: 75%;
-    opacity: 1;
-    transition: all 0.2s;
-    @content;
-  }
-}
+// @mixin float-label {
+//   label {
+//     position: absolute;
+//     left: 0;
+//     top: 0;
+//     cursor: text;
+//     font-size: 75%;
+//     opacity: 1;
+//     transition: all 0.2s;
+//     @content;
+//   }
+// }
 
-@mixin float-label-input {
-  &::placeholder {
-    opacity: 1;
-    // transition: all 0.2s;
-  }
-  &:placeholder-shown:not(:focus)::placeholder {
-    opacity: 0;
-  }
-}
+// @mixin float-label-input {
+//   &::placeholder {
+//     opacity: 1;
+//   }
+//   &:placeholder-shown:not(:focus)::placeholder {
+//     opacity: 0;
+//   }
+// }
 
-@mixin float-label-scaled {
-  &:placeholder-shown:not(:focus) + * {
-    font-size: 125%;
-    opacity: 0.5;
-    @content;
-  }
-}
+// @mixin float-label-scaled {
+//   &:placeholder-shown:not(:focus) + * {
+//     font-size: 125%;
+//     opacity: 0.5;
+//     @content;
+//   }
+// }
 @mixin transform($transformBase, $transformAdditions) {
   transform: $transformBase $transformAdditions;
 }

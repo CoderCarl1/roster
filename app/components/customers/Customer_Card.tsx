@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { log, useToggle } from '@functions';
+import { log, useError, useToggle } from '@functions';
 import { TCustomer } from '@types';
-import { Input, Card } from '~/components';
+import { Text, Card, Checkbox } from '~/components';
 
 type props = {
     customer: TCustomer;
@@ -13,7 +13,7 @@ function Customer_card({ customer, clearCustomer, ...rest }: props) {
         useState<Partial<TCustomer | null>>(customer);
 
     const { toggle: editable, setToggleStatus: toggleEditable } = useToggle();
-
+    const { showError, handleError } = useError({ firstName: false, lastName: false, contact: false, suspended: false});
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
         setFormData({ ...formData, [name]: value });
@@ -34,33 +34,40 @@ function Customer_card({ customer, clearCustomer, ...rest }: props) {
                 editable={editable}
                 closeFunc={clearCustomer}
             >
-                <Input
-                    editable={editable}
+                <Text
                     label="First Name"
+                    value={formData?.firstName ?? ''}
                     formKey={'firstName'}
-                    value={formData?.firstName ?? 'First Name'}
+                    editable={editable}
+                    showError={showError.fullName}
+                    errorMessage=''
                     onChangeFunc={handleChange}
                 />
-                <Input
-                    editable={editable}
+                <Text
                     label="Last Name"
-                    formKey={'lastName'}
                     value={formData?.lastName ?? 'Last Name'}
+                    formKey={'lastName'}
+                    editable={editable}
+                    showError={showError.lastName}
+                    errorMessage=''
                     onChangeFunc={handleChange}
                 />
-                <Input
-                    editable={editable}
+                <Text
                     label="contact"
-                    formKey={'contact'}
                     value={formData?.contact ?? 'contact'}
+                    formKey={'contact'}
+                    editable={editable}
+                    showError={showError.contact}
+                    errorMessage=''
                     onChangeFunc={handleChange}
                 />
-                <Input
-                    type="checkbox"
-                    editable={editable}
+                <Checkbox
                     label="suspended"
+                    checked={formData?.suspended || false}
                     formKey={'suspended'}
-                    value={String(formData?.suspended)}
+                    editable={editable}
+                    showError={showError.suspended}
+                    errorMessage=''
                     onChangeFunc={handleChange}
                 />
                 {/* Make a note field */}

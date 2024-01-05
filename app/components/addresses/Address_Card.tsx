@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Input, Card } from '@components';
-import { log, useToggle } from '@functions';
+import { Text, Card, Checkbox, NumberInput } from '@components';
+import { log, useToggle, useError } from '@functions';
 import { TAddressWithCustomerNameAndFullAddress } from '@types';
 
 type props = {
@@ -9,16 +9,17 @@ type props = {
 } & React.HTMLProps<HTMLDivElement>;
 
 function Address_card({ address, clearAddress, ...rest }: props) {
-    const [formData, setFormData] =
-        useState<Partial<TAddressWithCustomerNameAndFullAddress | null>>(
+    const [ formData, setFormData ] =
+        useState<Partial<TAddressWithCustomerNameAndFullAddress>>(
             address
         );
 
     const { toggle: editable, setToggleStatus: toggleEditable } = useToggle();
+    const { showError, handleError } = useError({ fullName: false, number: false, line1: false, line2: false, suburb: false, archived: false });
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData({ ...formData, [ name ]: value });
     };
 
     // TODO: add a submit that calls update address
@@ -36,54 +37,58 @@ function Address_card({ address, clearAddress, ...rest }: props) {
                 editable={editable}
                 closeFunc={clearAddress}
             >
-                <Input
+                <Text
                     editable={editable}
                     label="full Name"
                     formKey={'fullName'}
-                    value={formData?.fullName ?? 'full Name'}
+                    value={formData.fullName ?? ''}
                     onChangeFunc={handleChange}
+                    showError={showError.fullName}
+                    errorMessage=''
                 />
-                <Input
-                    editable={editable}
+                <NumberInput
                     label="number"
+                    value={formData?.number ?? ''}
+                    editable={editable}
                     formKey={'number'}
-                    value={formData?.number ?? 'number'}
+                    showError={showError.number}
+                    errorMessage=''
                     onChangeFunc={handleChange}
                 />
-                <Input
+                <Text
                     editable={editable}
                     label="line 1"
                     formKey={'line1'}
-                    value={formData?.line1 ?? 'line 1'}
+                    value={formData?.line1 ?? ''}
                     onChangeFunc={handleChange}
+                    showError={showError.line1}
+                    errorMessage=''
                 />
-                <Input
+                <Text
                     editable={editable}
                     label="line 2"
                     formKey={'line2'}
-                    value={formData?.line2 ?? 'line 2'}
+                    value={formData?.line2 ?? ''}
                     onChangeFunc={handleChange}
+                    showError={showError.line2}
+                    errorMessage=''
                 />
-                <Input
+                <Text
                     editable={editable}
                     label="suburb"
                     formKey={'suburb'}
-                    value={formData?.suburb ?? 'suburb'}
+                    value={formData?.suburb ?? ''}
                     onChangeFunc={handleChange}
+                    showError={showError.suburb}
+                    errorMessage=''
                 />
-                <Input
-                    editable={editable}
-                    label="suburb"
-                    formKey={'suburb'}
-                    value={formData?.suburb ?? 'suburb'}
-                    onChangeFunc={handleChange}
-                />
-                <Input
-                    type="checkbox"
-                    editable={editable}
+                <Checkbox
                     label="archived"
+                    checked={formData?.archived || false}
+                    editable={editable}
                     formKey={'archived'}
-                    value={String(formData?.archived)}
+                    showError={showError.archived}
+                    errorMessage=''
                     onChangeFunc={handleChange}
                 />
                 {/* Make a note field */}

@@ -177,6 +177,8 @@ export function isDataErrorType(value: {
 }
 
 export function isNumber(value: unknown): value is number{
+    console.log("is number typecvheck value", value)
+    console.log("return bool value is ",       !isNaN(value as number) && isFinite(value as number))
     return Boolean(
         !isNaN(value as number) && isFinite(value as number)
     )

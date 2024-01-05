@@ -4,25 +4,33 @@ import Appointments, {
     useAppointments,
 } from './appointments';
 import Customers, { Customer_Card, useCustomers } from './customers';
-import Form, { Input } from './form';
+import Form, { Text, NumberInput, Checkbox } from './form';
 import DateTimePicker from './form/datepicker';
 import { Button, Card } from './general';
 import LoadingComponent from './general/LoadingComponent';
 
+
 export {
-    LoadingComponent,
+    // Appointment
     Appointments,
     Appointment_Card,
     useAppointments,
-    Customers,
-    Customer_Card,
-    useCustomers,
+    // Address
     Addresses,
     Address_Card,
     useAddresses,
+    // Customer
+    Customers,
+    Customer_Card,
+    useCustomers,
+    // inputs
+    Text,
+    NumberInput,
+    Checkbox,
+    // Generic
     Form,
-    Input,
     Card,
     Button,
     DateTimePicker,
+    LoadingComponent,
 };

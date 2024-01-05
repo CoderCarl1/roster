@@ -7,6 +7,7 @@ import { randomNumber } from './helpers/numbers';
 import { removePropertiesFromObject } from './helpers/objects';
 import { isAddress, isAppointment, isCustomer } from './helpers/typechecks';
 import useClickOutside from './helpers/useClickOutside';
+import useError from './helpers/useError';
 import useToggle from './helpers/useToggle';
 
 export {
@@ -19,7 +20,8 @@ export {
     randomNumber,
     randomHSLValues,
     removePropertiesFromObject,
-    useToggle,
     useClickOutside,
+    useError,
+    useToggle,
     dates,
 };

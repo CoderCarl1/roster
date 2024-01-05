@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { Input, Card } from '@components';
-import { log, useToggle } from '@functions';
-import { TAppointmentWithCustomerName } from '@types';
+import { Text, Card, Checkbox, NumberInput } from '@components';
+import { log, useToggle, useError } from '@functions';
+import { TAppointmentWithCustomerNameAndFullAddress } from '@types';
 
 type props = {
-    appointment: TAppointmentWithCustomerName;
+    appointment: TAppointmentWithCustomerNameAndFullAddress;
     clearAppointment: () => void;
 } & React.HTMLProps<HTMLFormElement>;
 
-function Appointment_card({ appointment, clearAppointment,   className = "", ...props }: props) {
+function Appointment_card({ appointment, clearAppointment, className = "", ...props }: props) {
     const [ formData, setFormData ] =
-        useState<Partial<TAppointmentWithCustomerName | null>>(appointment);
+        useState<Partial<TAppointmentWithCustomerNameAndFullAddress | null>>(appointment);
 
     const { toggle: editable, setToggleStatus: toggleEditable } = useToggle();
+    const { showError, handleError } = useError({ fullName: false, start: false, end: false, recurring: false, frequency: false, completed: false });
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -27,60 +28,95 @@ function Appointment_card({ appointment, clearAppointment,   className = "", ...
 
     // TODO: add basic styling
     return (
-            <Card
-                className={'appointment single ' + className}
-                {...props}
-                onSubmit={handleSubmit}
-                toggleEditable={toggleEditable}
+        <Card
+            className={'appointment single ' + className}
+            {...props}
+            onSubmit={handleSubmit}
+            toggleEditable={toggleEditable}
+            editable={editable}
+            closeFunc={clearAppointment}
+        >
+            {/* 
+            Make this error out when no customer name is available  
+            / not selected before submit
+             - maybe make into a dropdown searchable field of customers
+            */}
+            <Text
+                label="full Name"
+                value={formData?.fullName ?? 'No Customer Name'}
+                formKey={'fullName'}
                 editable={editable}
-                closeFunc={clearAppointment}
-            >
-                <Input
-                    editable={editable}
-                    label="full Name"
-                    formKey={'fullName'}
-                    value={formData?.fullName ?? 'full Name'}
-                    onChangeFunc={handleChange}
-                />
-                <Input
-                    editable={editable}
-                    label="start"
-                    formKey={'start'}
-                    value={formData?.start ?? 'start'}
-                    onChangeFunc={handleChange}
-                />
-                <Input
-                    editable={editable}
-                    label="end"
-                    formKey={'end'}
-                    value={formData?.end ?? 'end'}
-                    onChangeFunc={handleChange}
-                />
-                <Input
-                    type="checkbox"
-                    editable={editable}
-                    label="recurring"
-                    formKey={'recurring'}
-                    value={String(formData?.recurring)}
-                    onChangeFunc={handleChange}
-                />
-                <Input
-                    editable={editable}
+                showError={showError.fullName}
+                errorMessage=''
+                onChangeFunc={handleChange}
+            />
+            {/* 
+            Make this error out when no address is available 
+            / not selected before submit
+             - maybe make into a dropdown searchable field of customers*/}
+            <Text
+                label="address"
+                value={formData?.fullAddress ?? 'No Address Provided'}
+                formKey={'address'}
+                editable={editable}
+                showError={showError.fullName}
+                errorMessage=''
+                onChangeFunc={handleChange}
+            />
+            {/* TODO: make this use the Date Time picker */}
+            <Text
+                editable={editable}
+                label="start"
+                formKey={'start'}
+                value={formData?.start ?? ''}
+                onChangeFunc={handleChange}
+                showError={showError.start}
+                errorMessage=''
+            />
+            {/* TODO: make this use the Date Time picker */}
+            <Text
+                editable={editable}
+                label="end"
+                formKey={'end'}
+                value={formData?.end ?? ''}
+                onChangeFunc={handleChange}
+                showError={showError.end}
+                errorMessage=''
+            />
+            <Checkbox
+                label="recurring"
+                checked={formData?.recurring || false}
+                editable={editable}
+                formKey={'recurring'}
+                showError={showError.recurring}
+                errorMessage=''
+                onChangeFunc={handleChange}
+            />
+            {/* should this just be disabled if recurring is false? */}
+            {formData?.recurring &&
+                <NumberInput
                     label="frequency"
-                    formKey={'frequency'}
-                    value={String(formData?.frequency) ?? '0'}
-                    onChangeFunc={handleChange}
-                />
-                <Input
-                    type="checkbox"
+                    value={String(formData?.frequency) ?? ''}
+                    maxLength={2}
+                    min={1}
                     editable={editable}
-                    label="completed"
-                    formKey={'completed'}
-                    value={String(formData?.completed)}
+                    formKey={'frequency'}
+                    showError={showError.frequency}
+                    errorMessage=''
                     onChangeFunc={handleChange}
                 />
-                {/* Make a note field */}
-            </Card>
+            }
+            <Checkbox
+                label="completed"
+                checked={formData?.completed || false}
+                formKey={'completed'}
+                editable={editable}
+                showError={showError.fullName}
+                errorMessage=''
+                onChangeFunc={handleChange}
+            />
+            {/* Make a note field */}
+        </Card>
     );
 }
 

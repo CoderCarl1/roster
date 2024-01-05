@@ -114,6 +114,7 @@ export function endOfWeek(date: Date) {
 }
 
 export function getDaysInMonth(year: number, month: number) {
+    console.log("received month", month)
     if (month < 0 || month > 11) {
         throw new Error(`Invalid month provided: ${month}`);
     }

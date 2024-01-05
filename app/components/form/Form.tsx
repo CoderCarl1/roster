@@ -4,6 +4,7 @@ type formProps = {
 } & React.HTMLProps<HTMLFormElement>;
 
 function Form({ handleSubmit, children, ...props }: formProps) {
+    
     function innerHandleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (!handleSubmit) return;
