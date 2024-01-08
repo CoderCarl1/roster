@@ -8,7 +8,14 @@ import Form, { Text, NumberInput, Checkbox } from './form';
 import DateTimePicker from './form/datepicker';
 import { Button, Card } from './general';
 import LoadingComponent from './general/LoadingComponent';
-
+import Table, {
+    Caption,
+    Row,
+    TD,
+    TH,
+    TableBody,
+    TableHead,
+} from './table/table';
 
 export {
     // Appointment
@@ -24,6 +31,13 @@ export {
     Customer_Card,
     useCustomers,
     // inputs
+    Table,
+    Caption,
+    TableHead,
+    TH,
+    TableBody,
+    Row,
+    TD,
     Text,
     NumberInput,
     Checkbox,

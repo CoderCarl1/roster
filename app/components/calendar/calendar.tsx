@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, LoadingComponent } from '@components';
+import { Button, DateTimePicker, LoadingComponent } from '@components';
 import { useCalendarContext } from '~/contexts';
 import { dates, randomHSLValues } from '~/functions';
 import { useAppointments } from '../appointments';
@@ -47,6 +47,7 @@ export default function Main({
         prevDay,
         prevWeek,
         prevMonth,
+        setDate,
     } = useCalendarContext();
     const [dateRange, setDateRange] = useState<{ from: string; to: string }>({
         from: '',
@@ -55,7 +56,10 @@ export default function Main({
     const { from, to } = dateRange;
 
     useEffect(() => {
-        const { from, to } = dates.getDateRange(currentDate.date, 7);
+        const { from, to } = dates.getDateRange(
+            dates.startOfWeek(currentDate.date),
+            6
+        );
         setDateRange({ from, to });
     }, [currentDate.date]);
 
@@ -118,16 +122,64 @@ export default function Main({
         }
     }, [displayType, prevDay, prevWeek, prevMonth]);
 
+    const dateDisplay = () => {
+        function handleDateDisplayChange(date: Date) {
+            console.log('handleDateDisplayChange');
+            date = dates.parseDate(date);
+            if (displayType === 'week') {
+                date = dates.startOfWeek(date);
+            }
+            if (displayType === 'month') {
+                date.setDate(1);
+            }
+            setDate(date);
+        }
+        if (displayType === 'day') {
+            return (
+                <>
+                    <p>
+                        {currentDate.dayName.slice(0, 3)} {currentDate.day}
+                    </p>
+                    <DateTimePicker
+                        cb={handleDateDisplayChange}
+                        calendarType="day"
+                        data-selection="day"
+                    />
+                </>
+            );
+        }
+        if (displayType === 'week') {
+            return (
+                <>
+                    <p>
+                        {from} - {to}
+                    </p>
+                    <DateTimePicker
+                        cb={handleDateDisplayChange}
+                        calendarType="week"
+                        data-selection="week"
+                    />
+                </>
+            );
+        }
+        if (displayType === 'month') {
+            return (
+                <>
+                    <p>{currentDate.monthName}</p>
+                    <DateTimePicker
+                        cb={handleDateDisplayChange}
+                        calendarType="month"
+                        data-selection="month"
+                    />
+                </>
+            );
+        }
+    };
+
     return (
         <section {...props}>
             <div className="calendar__controls">
-                <span className="date__information">
-                    {displayType === 'day'
-                        ? `${currentDate.dayName.slice(0, 3)} ${from}`
-                        : displayType === 'week'
-                          ? `${from} - ${to}`
-                          : `${currentDate.monthName}`}
-                </span>
+                <span className="date__information">{dateDisplay()}</span>
                 <Button onClick={handlePrev}>prev</Button>
                 <Button onClick={handleNext}>next</Button>
             </div>
@@ -198,7 +250,10 @@ function DayCalendar({ dayData, weekView = false }: dayProps) {
                     slot.appointment &&
                     appointmentSlotLength[slot.appointment.id].initial ===
                         appointmentSlotLength[slot.appointment.id].available--;
-                const { hue, saturation, lightness } = useMemo(() => randomHSLValues(),[]);
+                const { hue, saturation, lightness } = useMemo(
+                    () => randomHSLValues(),
+                    []
+                );
                 const slotStyles: Record<string, any> = {
                     '--decoration-width': `${decorationWidth}`,
                 };

@@ -176,10 +176,8 @@ export function isDataErrorType(value: {
     return true;
 }
 
-export function isNumber(value: unknown): value is number{
-    return Boolean(
-        !isNaN(value as number) && isFinite(value as number)
-    )
+export function isNumber(value: unknown): value is number {
+    return Boolean(!isNaN(value as number) && isFinite(value as number));
 }
 
 function isNull(value: unknown, message = 'value is not null') {

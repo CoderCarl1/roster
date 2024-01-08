@@ -17,7 +17,11 @@ export default function Card({
 }: cardProps) {
     // TODO: update to use icons
     return (
-        <Form {...props} className={"card " + props?.className} autoComplete="on" >
+        <Form
+            {...props}
+            className={'card ' + props?.className}
+            autoComplete="on"
+        >
             <div className="card__controls">
                 {!editable ? (
                     <Button

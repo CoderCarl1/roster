@@ -5,21 +5,26 @@ import {
 } from '@remix-run/node';
 import { Await, useLoaderData } from '@remix-run/react';
 import { Suspense } from 'react';
-import { Appointments, Customers, LoadingComponent, DateTimePicker } from '@components';
+import { address_find_all } from '@address';
+import { appointment_find_many } from '@appointment';
+import {
+    Appointments,
+    Customers,
+    LoadingComponent,
+    DateTimePicker,
+} from '@components';
 import {
     CustomerProvider,
     AppointmentProvider,
     AddressProvider,
     CalendarProvider,
 } from '@contexts';
+import { customer_find_many } from '@customer';
 import {
     AddressOperationError,
     AppointmentOperationError,
     CustomerOperationError,
 } from '@errors';
-import { address_find_all } from '@address';
-import { appointment_find_many } from '@appointment';
-import { customer_find_many } from '@customer';
 
 export const meta: MetaFunction = () => {
     return [
@@ -86,19 +91,17 @@ export default function Index() {
     const { customersLoaderData, addressesLoaderData, appointmentsLoaderData } =
         useLoaderData<loaderType>();
 
-// return (
-//     <main>
-//         <div className="dashboard">
-//                 <DateTimePicker />
-//         </div>
-//     </main>
-// )
+    // return (
+    //     <main>
+    //         <div className="dashboard">
+    //                 <DateTimePicker />
+    //         </div>
+    //     </main>
+    // )
 
     return (
         <main>
             <div className="dashboard">
-            <DateTimePicker />
-
                 <CustomerProvider>
                     <AppointmentProvider>
                         <AddressProvider>

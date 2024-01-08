@@ -8,16 +8,30 @@ type props = {
     clearAppointment: () => void;
 } & React.HTMLProps<HTMLFormElement>;
 
-function Appointment_card({ appointment, clearAppointment, className = "", ...props }: props) {
-    const [ formData, setFormData ] =
-        useState<Partial<TAppointmentWithCustomerNameAndFullAddress | null>>(appointment);
+function Appointment_card({
+    appointment,
+    clearAppointment,
+    className = '',
+    ...props
+}: props) {
+    const [formData, setFormData] =
+        useState<Partial<TAppointmentWithCustomerNameAndFullAddress | null>>(
+            appointment
+        );
 
     const { toggle: editable, setToggleStatus: toggleEditable } = useToggle();
-    const { showError, handleError } = useError({ fullName: false, start: false, end: false, recurring: false, frequency: false, completed: false });
+    const { showError, handleError } = useError({
+        fullName: false,
+        start: false,
+        end: false,
+        recurring: false,
+        frequency: false,
+        completed: false,
+    });
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setFormData({ ...formData, [ name ]: value });
+        setFormData({ ...formData, [name]: value });
     };
 
     // TODO: add a submit that calls update customer
@@ -47,7 +61,7 @@ function Appointment_card({ appointment, clearAppointment, className = "", ...pr
                 formKey={'fullName'}
                 editable={editable}
                 showError={showError.fullName}
-                errorMessage=''
+                errorMessage=""
                 onChangeFunc={handleChange}
             />
             {/* 
@@ -60,7 +74,7 @@ function Appointment_card({ appointment, clearAppointment, className = "", ...pr
                 formKey={'address'}
                 editable={editable}
                 showError={showError.fullName}
-                errorMessage=''
+                errorMessage=""
                 onChangeFunc={handleChange}
             />
             {/* TODO: make this use the Date Time picker */}
@@ -71,7 +85,7 @@ function Appointment_card({ appointment, clearAppointment, className = "", ...pr
                 value={formData?.start ?? ''}
                 onChangeFunc={handleChange}
                 showError={showError.start}
-                errorMessage=''
+                errorMessage=""
             />
             {/* TODO: make this use the Date Time picker */}
             <Text
@@ -81,7 +95,7 @@ function Appointment_card({ appointment, clearAppointment, className = "", ...pr
                 value={formData?.end ?? ''}
                 onChangeFunc={handleChange}
                 showError={showError.end}
-                errorMessage=''
+                errorMessage=""
             />
             <Checkbox
                 label="recurring"
@@ -89,11 +103,11 @@ function Appointment_card({ appointment, clearAppointment, className = "", ...pr
                 editable={editable}
                 formKey={'recurring'}
                 showError={showError.recurring}
-                errorMessage=''
+                errorMessage=""
                 onChangeFunc={handleChange}
             />
             {/* should this just be disabled if recurring is false? */}
-            {formData?.recurring &&
+            {formData?.recurring ? (
                 <NumberInput
                     label="frequency"
                     value={String(formData?.frequency) ?? ''}
@@ -102,17 +116,17 @@ function Appointment_card({ appointment, clearAppointment, className = "", ...pr
                     editable={editable}
                     formKey={'frequency'}
                     showError={showError.frequency}
-                    errorMessage=''
+                    errorMessage=""
                     onChangeFunc={handleChange}
                 />
-            }
+            ) : null}
             <Checkbox
                 label="completed"
                 checked={formData?.completed || false}
                 formKey={'completed'}
                 editable={editable}
                 showError={showError.fullName}
-                errorMessage=''
+                errorMessage=""
                 onChangeFunc={handleChange}
             />
             {/* Make a note field */}

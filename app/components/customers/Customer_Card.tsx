@@ -13,7 +13,12 @@ function Customer_card({ customer, clearCustomer, ...rest }: props) {
         useState<Partial<TCustomer | null>>(customer);
 
     const { toggle: editable, setToggleStatus: toggleEditable } = useToggle();
-    const { showError, handleError } = useError({ firstName: false, lastName: false, contact: false, suspended: false});
+    const { showError, handleError } = useError({
+        firstName: false,
+        lastName: false,
+        contact: false,
+        suspended: false,
+    });
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
         setFormData({ ...formData, [name]: value });
@@ -40,7 +45,7 @@ function Customer_card({ customer, clearCustomer, ...rest }: props) {
                     formKey={'firstName'}
                     editable={editable}
                     showError={showError.fullName}
-                    errorMessage=''
+                    errorMessage=""
                     onChangeFunc={handleChange}
                 />
                 <Text
@@ -49,7 +54,7 @@ function Customer_card({ customer, clearCustomer, ...rest }: props) {
                     formKey={'lastName'}
                     editable={editable}
                     showError={showError.lastName}
-                    errorMessage=''
+                    errorMessage=""
                     onChangeFunc={handleChange}
                 />
                 <Text
@@ -58,7 +63,7 @@ function Customer_card({ customer, clearCustomer, ...rest }: props) {
                     formKey={'contact'}
                     editable={editable}
                     showError={showError.contact}
-                    errorMessage=''
+                    errorMessage=""
                     onChangeFunc={handleChange}
                 />
                 <Checkbox
@@ -67,7 +72,7 @@ function Customer_card({ customer, clearCustomer, ...rest }: props) {
                     formKey={'suspended'}
                     editable={editable}
                     showError={showError.suspended}
-                    errorMessage=''
+                    errorMessage=""
                     onChangeFunc={handleChange}
                 />
                 {/* Make a note field */}

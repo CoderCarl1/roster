@@ -85,6 +85,16 @@ function Table({ variant = 'default', children, ...props }: TableProps) {
         return null;
     });
 
+    // TODO: make this a possibility
+    // const tableColgroup = () => {
+
+    //     return (
+    //         <colgroup>
+    //         {}
+    //         </colgroup>
+    //     )
+    // }
+    // TODO: make this handle a TableHead or header element properly
     const tableHeadElement = () => {
         const { head, headProps } = tableData;
         rowLength = head.length;
@@ -138,6 +148,7 @@ function Table({ variant = 'default', children, ...props }: TableProps) {
 
     return (
         <table className={'[ table ]' + `[ variant-${variant} ]`} {...props}>
+            {unfilteredChildren}
             {tableData.caption}
             {tableHeadElement()}
             {TableBodyElement()}

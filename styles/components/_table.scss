@@ -1,6 +1,17 @@
 @use '../abstracts/'as *;
 
 .table {
+  th {
+    vertical-align: bottom;
+  }
+  td {
+    vertical-align: text-top;
+  }
+  th,
+  td {
+    text-align: left;
+  }
+
   tr {
     &:hover {
       background-color: clr(secondary, 100);

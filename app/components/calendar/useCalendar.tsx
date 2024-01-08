@@ -118,17 +118,13 @@ function useCalendar() {
         let startDate = dates.startOfWeek(firstDayOfMonth);
         let newYear = currentDate.getFullYear();
         let newMonth = currentDate.getMonth() + 1;
-    
-        if (newMonth > 11){
+
+        if (newMonth > 11) {
             newMonth = 1;
             newYear = currentDate.getFullYear() + 1;
         }
-    
-        const lastDayOfMonth = new Date(
-            newYear,
-            newMonth,
-            0
-        );
+
+        const lastDayOfMonth = new Date(newYear, newMonth, 0);
         const endDate = dates.endOfWeek(lastDayOfMonth);
 
         const totalDays = dates.getNumberOfDays(startDate, endDate);

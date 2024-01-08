@@ -25,7 +25,7 @@ export default function useToggle(newState: boolean | Event = false) {
         } else {
             value.preventDefault();
             retval = Boolean(!toggle);
-            setToggle((prev) =>!prev);
+            setToggle((prev) => !prev);
         }
 
         return retval;

@@ -12,7 +12,7 @@
     "db:seed": "npx tsx prisma/script.ts --seeding true",
     "css": "sass styles/:app/styles/",
     "dev": "run-p \"dev:*\"",
-    "dev:seed": "npx tsx prisma/script.ts --seeding true",
+    "2d2ev:seed": "npx tsx prisma/script.ts --seeding true",
     "dev:css": "npm run css -- --watch",
     "dev:remix": "remix dev",
     "start": "remix-serve ./build/index.js",

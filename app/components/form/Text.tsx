@@ -15,22 +15,25 @@ export default function Text({
     formKey,
     editable = false,
     onChangeFunc,
-    className = "",
+    className = '',
     maxLength,
     showError = false,
     errorMessage = '',
     ...props
 }: GenericFormInputProps) {
-
     function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
         if (onChangeFunc) {
-          onChangeFunc(event);
+            onChangeFunc(event);
         }
     }
 
     return (
-        <div {...props} className={"input-wrapper floating " + className}>
-             {showError && errorMessage && <span className="warning" aria-live="assertive" role="alert">{errorMessage}</span>}
+        <div {...props} className={'input-wrapper floating ' + className}>
+            {showError && errorMessage ? (
+                <span className="warning" aria-live="assertive" role="alert">
+                    {errorMessage}
+                </span>
+            ) : null}
             {editable ? (
                 <>
                     <input
@@ -47,7 +50,6 @@ export default function Text({
             ) : (
                 <p>{value}</p>
             )}
-
         </div>
     );
 }

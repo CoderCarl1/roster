@@ -86,3 +86,39 @@ select {
     scroll-behavior: auto !important;
   }
 }
+
+@media print {
+  body {
+    font-size: 6pt;
+    color: #000;
+    background-color: #fff;
+    background-image: none;
+    margin: 0;
+    padding: 0;
+  }
+  table {
+    page-break-inside: avoid;
+  }
+  th {
+    color: #000;
+    background-color: #fff;
+    border-bottom: 1pt solid #000;
+  }
+  tr {
+    border-top: 1pt solid #000;
+  }
+}
+
+@media print and (max-width: 5in) {
+  table {
+    page-break-inside: auto;
+  }
+  caption {
+    color: #000;
+    background-color: #fff;
+    border-bottom: 1pt solid #000;
+  }
+  tr {
+    page-break-inside: avoid;
+  }
+}

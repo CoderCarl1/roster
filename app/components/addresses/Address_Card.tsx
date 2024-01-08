@@ -9,17 +9,22 @@ type props = {
 } & React.HTMLProps<HTMLDivElement>;
 
 function Address_card({ address, clearAddress, ...rest }: props) {
-    const [ formData, setFormData ] =
-        useState<Partial<TAddressWithCustomerNameAndFullAddress>>(
-            address
-        );
+    const [formData, setFormData] =
+        useState<Partial<TAddressWithCustomerNameAndFullAddress>>(address);
 
     const { toggle: editable, setToggleStatus: toggleEditable } = useToggle();
-    const { showError, handleError } = useError({ fullName: false, number: false, line1: false, line2: false, suburb: false, archived: false });
+    const { showError, handleError } = useError({
+        fullName: false,
+        number: false,
+        line1: false,
+        line2: false,
+        suburb: false,
+        archived: false,
+    });
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setFormData({ ...formData, [ name ]: value });
+        setFormData({ ...formData, [name]: value });
     };
 
     // TODO: add a submit that calls update address
@@ -44,7 +49,7 @@ function Address_card({ address, clearAddress, ...rest }: props) {
                     value={formData.fullName ?? ''}
                     onChangeFunc={handleChange}
                     showError={showError.fullName}
-                    errorMessage=''
+                    errorMessage=""
                 />
                 <NumberInput
                     label="number"
@@ -52,7 +57,7 @@ function Address_card({ address, clearAddress, ...rest }: props) {
                     editable={editable}
                     formKey={'number'}
                     showError={showError.number}
-                    errorMessage=''
+                    errorMessage=""
                     onChangeFunc={handleChange}
                 />
                 <Text
@@ -62,7 +67,7 @@ function Address_card({ address, clearAddress, ...rest }: props) {
                     value={formData?.line1 ?? ''}
                     onChangeFunc={handleChange}
                     showError={showError.line1}
-                    errorMessage=''
+                    errorMessage=""
                 />
                 <Text
                     editable={editable}
@@ -71,7 +76,7 @@ function Address_card({ address, clearAddress, ...rest }: props) {
                     value={formData?.line2 ?? ''}
                     onChangeFunc={handleChange}
                     showError={showError.line2}
-                    errorMessage=''
+                    errorMessage=""
                 />
                 <Text
                     editable={editable}
@@ -80,7 +85,7 @@ function Address_card({ address, clearAddress, ...rest }: props) {
                     value={formData?.suburb ?? ''}
                     onChangeFunc={handleChange}
                     showError={showError.suburb}
-                    errorMessage=''
+                    errorMessage=""
                 />
                 <Checkbox
                     label="archived"
@@ -88,7 +93,7 @@ function Address_card({ address, clearAddress, ...rest }: props) {
                     editable={editable}
                     formKey={'archived'}
                     showError={showError.archived}
-                    errorMessage=''
+                    errorMessage=""
                     onChangeFunc={handleChange}
                 />
                 {/* Make a note field */}

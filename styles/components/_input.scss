@@ -33,7 +33,7 @@
     color: clr(primary, 200);
   }
   input:focus-within {
-    color: transparent;
+    color: clr(neutral, 300);
   }
   
   // select,

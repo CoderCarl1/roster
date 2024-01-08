@@ -51,28 +51,28 @@ export function dayNumberFromDate(dateString: Date | string) {
     const options: Intl.DateTimeFormatOptions = {
         day: 'numeric',
     };
-    return date.toLocaleString(undefined, options);
+    return +date.toLocaleString(undefined, options);
 }
 
 function dayNumberFromParsedDate(dateString: Date | string) {
     const options: Intl.DateTimeFormatOptions = {
         day: 'numeric',
     };
-    return dateString.toLocaleString(undefined, options);
+    return +dateString.toLocaleString(undefined, options);
 }
 
-function getMonthNumberFromDate(dateString: Date | string){
+function getMonthNumberFromDate(dateString: Date | string) {
     const date = parseDate(dateString);
     const options: Intl.DateTimeFormatOptions = {
         month: 'numeric',
     };
-    return date.toLocaleString(undefined, options);
+    return +date.toLocaleString(undefined, options);
 }
-function getMonthNumberFromParsedDate(dateString: Date | string){
+function getMonthNumberFromParsedDate(dateString: Date | string) {
     const options: Intl.DateTimeFormatOptions = {
         month: 'numeric',
     };
-    return dateString.toLocaleString(undefined, options);
+    return +dateString.toLocaleString(undefined, options);
 }
 
 // const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -114,7 +114,6 @@ export function endOfWeek(date: Date) {
 }
 
 export function getDaysInMonth(year: number, month: number) {
-    console.log("received month", month)
     if (month < 0 || month > 11) {
         throw new Error(`Invalid month provided: ${month}`);
     }
@@ -153,7 +152,10 @@ export function getNumberOfDays(start: Date, end: Date): number {
     return Math.abs(Math.round((endUtc - startUtc) / oneDay)) + 1;
 }
 
-function getNumberOfDaysFromParsedDates(startDate: Date, endDate: Date): number {
+function getNumberOfDaysFromParsedDates(
+    startDate: Date,
+    endDate: Date
+): number {
     const oneDay = 24 * 60 * 60 * 1000;
 
     const startUtc = Date.UTC(
@@ -200,10 +202,20 @@ export function getMonthNameByNumber(monthNum: number) {
             throw new Error();
         }
         const monthNames = [
-            'January','February','March','April','May', 'June', 
-            'July', 'August', 'September', 'October', 'November', 'December'
-          ];
-          
+            'January',
+            'February',
+            'March',
+            'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December',
+        ];
+
         return monthNames[monthNum];
     } catch (err) {
         return `month name not found by given number ${monthNum}`;
@@ -211,11 +223,11 @@ export function getMonthNameByNumber(monthNum: number) {
 }
 
 type visibleDayType = {
-    number: string;
+    number: number;
     inMonth: boolean;
     date: Date;
-}
-function getVisibleDayNumbersInArray(date: Date){
+};
+function getVisibleDayNumbersInArray(date: Date): visibleDayType[][] {
     const calendarMonth: visibleDayType[][] = [];
     const currentDate = parseDate(date);
     const firstDayOfMonth = new Date(
@@ -228,12 +240,12 @@ function getVisibleDayNumbersInArray(date: Date){
     let newYear = currentDate.getFullYear();
     let newMonth = currentDate.getMonth() + 1;
 
-    if (newMonth > 11){
+    if (newMonth > 11) {
         newMonth = 1;
         newYear = currentDate.getFullYear() + 1;
     }
 
-    const lastDayOfMonth = new Date(newYear,newMonth, 0);
+    const lastDayOfMonth = new Date(newYear, newMonth, 0);
     const endDate = endOfWeek(lastDayOfMonth);
 
     const totalDays = getNumberOfDaysFromParsedDates(startDate, endDate);
@@ -341,7 +353,7 @@ export function calculatePastDate(date: Date, dayNumber: number) {
     } else {
         if (newMonth - 1 < 0) {
             newMonth = 11;
-            newYear = newYear - 1;    
+            newYear = newYear - 1;
         }
         let daysInPreviousMonth = getDaysInMonth(newYear, newMonth - 1);
 
@@ -381,4 +393,3 @@ export default {
     parseDate,
     startOfWeek,
 };
-

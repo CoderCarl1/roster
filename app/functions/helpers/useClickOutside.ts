@@ -1,10 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 type clickOutsideProps<T> = {
-  cb: (value?: MouseEvent) => unknown;
-  initialRef?: React.RefObject<T>;
-  checkBeforeRunningCB?: Boolean[];
-}
+    cb: (value?: MouseEvent) => unknown;
+    initialRef?: React.RefObject<T>;
+    checkBeforeRunningCB?: boolean[];
+};
 /**
  * Monitors clicks outside of a specified DOM element and triggers the passed in callback when a click occurs outside of it.
  *
@@ -13,33 +13,38 @@ type clickOutsideProps<T> = {
  *
  * @returns A reference to the same DOM element.
  */
-export function UseClickOutside<T extends HTMLElement>(
-  { cb, initialRef, checkBeforeRunningCB }: clickOutsideProps<T>
-): React.MutableRefObject<T | null> {
-  const domRef = useRef(initialRef ? initialRef.current : null);
+export function UseClickOutside<T extends HTMLElement>({
+    cb,
+    initialRef,
+    checkBeforeRunningCB,
+}: clickOutsideProps<T>): React.MutableRefObject<T | null> {
+    const domRef = useRef(initialRef ? initialRef.current : null);
 
-  useEffect(() => {
-    function outsideClickHandler(event: MouseEvent) {
-      if (checkBeforeRunningCB && !checkBeforeRunningCB.every(Boolean)) {
-        return;
-      }
-      const target = event.target as HTMLElement;
+    useEffect(() => {
+        function outsideClickHandler(event: MouseEvent) {
+            if (checkBeforeRunningCB && !checkBeforeRunningCB.every(Boolean)) {
+                return;
+            }
+            const target = event.target as HTMLElement;
 
-      if (domRef.current && !domRef.current?.contains(target)) {
-        cb();
-        return;
-      }
-    }
+            if (domRef.current && !domRef.current?.contains(target)) {
+                cb();
+                return;
+            }
+        }
 
-    document.addEventListener("mousedown", outsideClickHandler, true);
+        document.addEventListener('mousedown', outsideClickHandler, true);
 
-    return () => {
-      document.removeEventListener("mousedown", outsideClickHandler, true);
-    };
-  }, [ domRef, cb ]);
+        return () => {
+            document.removeEventListener(
+                'mousedown',
+                outsideClickHandler,
+                true
+            );
+        };
+    }, [domRef, cb]);
 
-
-  return domRef;
+    return domRef;
 }
 
 export default UseClickOutside;
