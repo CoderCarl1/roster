@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 type clickOutsideProps<T> = {
-    cb: (value?: MouseEvent) => unknown;
+    cb: (value?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => unknown;
     initialRef?: React.RefObject<T>;
     checkBeforeRunningCB?: boolean[];
 };
@@ -25,9 +25,11 @@ export function UseClickOutside<T extends HTMLElement>({
             if (checkBeforeRunningCB && !checkBeforeRunningCB.every(Boolean)) {
                 return;
             }
+
             const target = event.target as HTMLElement;
 
-            if (domRef.current && !domRef.current?.contains(target)) {
+            if (event.button === 0 && domRef.current && !domRef.current?.contains(target)) {
+                event.preventDefault();
                 cb();
                 return;
             }
