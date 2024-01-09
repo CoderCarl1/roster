@@ -11,6 +11,7 @@ import {
     CalendarWeekType,
 } from './useCalendar';
 import { useCalendar } from '.';
+import { shortWeekDay } from '~/functions/helpers/dates';
 
 type calendarDisplayTypes = 'day' | 'week' | 'month';
 type mainProps = {
@@ -142,8 +143,7 @@ export default function Main({
                     </p>
                     <DateTimePicker
                         cb={handleDateDisplayChange}
-                        calendarType="day"
-                        data-selection="day"
+                        calendartype="day"
                     />
                 </>
             );
@@ -156,8 +156,7 @@ export default function Main({
                     </p>
                     <DateTimePicker
                         cb={handleDateDisplayChange}
-                        calendarType="week"
-                        data-selection="week"
+                        calendartype="week"
                     />
                 </>
             );
@@ -168,8 +167,7 @@ export default function Main({
                     <p>{currentDate.monthName}</p>
                     <DateTimePicker
                         cb={handleDateDisplayChange}
-                        calendarType="month"
-                        data-selection="month"
+                        calendartype="month"
                     />
                 </>
             );
@@ -300,7 +298,7 @@ function WeekCalendar({ weekData }: weekProps) {
     return (
         <div className="calendar__week">
             <div className="weekday_initials">
-                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((initial, idx) => (
+                {shortWeekDay.map((initial, idx) => (
                     <span className="initial" key={initial + idx}>
                         {initial}
                     </span>
