@@ -37,7 +37,6 @@ const useError = (
      * @param inputName - The name of the input associated with the error.
      */
     const handleError = (inputName: string): void => {
-        console.log('handleErro=r', autoClearTimeouts);
         if (
             autoClearTimeouts &&
             errorTimeouts.current &&
