@@ -3,31 +3,45 @@
 .dateTimePicker--wrapper {
   --button-padding: 0;
   --button-size: 32px;
+
   position: relative;
-  // width: 200px;
-  background: white;
-  border: 1px solid clr(primary, 300);
+  background: clr(neutral, 100);
 
-  &[data-selection="week"] {
-    --row-button-color: red;
 
-    // .picker__calendar--day.selected:
-    .picker__calendar--day.selected .button {
-      --button-bg-color: initial;
-      --button-color: #{clr(neutral, 400)};
-    }
-    .picker__calendar--week:hover {
-      .button {
-        --button-bg-color: var(--row-button-color) !important;
-        &:active {
-          transition: all 0s;
-        }
-      }
-    }
+
+//common layouts
+.calendar__selection--month,
+.calendar__selection--weeks.month {
+  height: calc(2lh * 4);
+  width: 100%;
+
+}
+
+//common styles 
+table {
+  border-collapse: collapse;
+}
+.weekday_initials {
+  background-color: clr(neutral, 400);
+  gap: 0;
+  .initial {
+    --initials-font-size: #{fs(200)};
+    color: clr(neutral, 100);
   }
 }
 
+.calendar__selection--month,
+.calendar__selection--weeks.month {
+  background-color: clr(neutral, 100);
+  @include border($color: primary, $shade: 100);
+
+}
+
+
+}
+
 .date-picker {
+  
   position: absolute;
   left: var(--button-size);
   width: 200px;
@@ -36,23 +50,26 @@
   border: 1px solid clr(primary, 300);
   @include slide-fade-in();
   z-index: 1;
+  padding: size(4);
 }
 .calendar--wrapper {
   position: relative;
 }
+
+
+
 .calendar__selection--month {
   position: absolute;
   inset: 0;
-  @include grid($columns: 3, $gap: size(4));
-  background-color: clr(neutral, 100);
+  // @include grid($columns: 3, $gap: size(4));
   @include fade-in();
-  height: calc(2lh * 4);
-  @include border($color: primary, $shade: 100);
   padding: size(4);
-
+  &.fadeout {
+    @include fade-out();
+  }
   .month {
     --button-border-radius: 50%;
-    --button-padding: size(8);
+    --button-padding: #{size(8)};
     &.current {
       --button-bg-color: #{clr(primary,200)};
       --button-color: #{clr(neutral, 100)};
@@ -70,41 +87,27 @@
 }
 
 .calendar__selection--weeks {
-  // &.month,
-  // &.week {
-  //   width: 100%;
-  // }
-  .weekday_initials {
-    gap: 0 !important;
-  }
-  .initial {
-    --initials-font-size: #{fs(300)} !important;
-  }
+
   &.week{
     @include grid($columns: 7);
     width: 100%;
     &:hover {
-      --button-bg-color: #{clr(primary,100)};
+      --button-bg-color: #{clr(primary,100)} !important;
+      // --button-color:#{clr(neutral, 100)};
+    }
+    &.selected {
+      --button-bg-color: #{clr(neutral, 200)};
     }
   }
-  .week-btn {
+  // .week-btn {
 
-  }
+  // }
 }
 
 .calendar__selection--days {
-  border-collapse: collapse;
+  
   font-size: fs(200);
 
-  thead tr{
-    background-color: clr(neutral, 400);
-    .initial {
-      color: clr(neutral, 100);
-    }
-  }
-  .weekday_initials {
-    gap: 0;
-  }
   &.month,
   &.week {
     width: 100%;

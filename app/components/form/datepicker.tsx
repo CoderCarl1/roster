@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
     Button,
     NumberInput,
@@ -6,57 +6,62 @@ import {
     TD,
     TH,
     Table,
-    TableHead,
 } from '@components';
-import { dates, useClickOutside, useToggle } from '@functions';
+import { dates, useCaptureFocus, useClickOutside, useToggle } from '@functions';
 import { isNumber } from '~/functions/helpers/typechecks';
 import useError from '~/functions/helpers/useError';
 import CalendarSVG from '~/icons/calendar';
+import { monthNames, shortMonthNames, shortWeekDay, weekDays } from '~/functions/helpers/dates';
 
 type props = {
     startingDate?: Date;
     cb: (arg: any) => unknown | void;
-    calendarType?: 'day' | 'week' | 'month';
-    className: string;
-} & React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLDivElement>,
-    HTMLDivElement
->;
+    calendartype?: 'day' | 'week' | 'month';
+    className?: string;
+} & React.JSX.IntrinsicElements[ "div" ];
+
+// React.DetailedHTMLProps<
+//     React.HTMLAttributes<HTMLDivElement>,
+//     HTMLDivElement
+// >;
 
 export default function DateTimePicker({
     startingDate,
     cb,
-    calendarType = 'day',
+    calendartype = 'day',
     className = '',
     ...props
 }: props) {
     // Date Stuff
-    const [datePickerShown, setDatePickerShown] = useState(false);
+    const [ datePickerShown, setDatePickerShown ] = useState(false);
 
     const today = new Date();
-    const [selectedDate, setSelectedDate] = useState(
+    const [ selectedDate, setSelectedDate ] = useState(
         startingDate ? new Date(startingDate) : today
     );
-    const [currentDate, setCurrentDate] = useState({
+    const [ currentDate, setCurrentDate ] = useState({
         day: selectedDate.getDay(),
         month: selectedDate.getMonth() + 1,
         year: selectedDate.getFullYear(),
     });
-    const [showMonths, setshowMonths] = useState(false);
+    const [ showMonths, setshowMonths ] = useState(false);
     const calendarRef = useClickOutside({
         cb: showDatePicker,
-        checkBeforeRunningCB: [datePickerShown],
+        checkBeforeRunningCB: [ datePickerShown ],
     }) as React.RefObject<HTMLDivElement>;
     // Time Stuff
     // const [ time, setTime ] = useState(monthDate ? new Date(monthDate) : today);
 
-    function handleCalendarSelect(date?: Date) {
+    function handleCalendarSelect(date?: Date, closePicker = true) {
         if (date) {
             const parsedDate = dates.parseDate(date);
             setSelectedDate(parsedDate);
             setDateStatesFromDate(parsedDate);
         }
-        showDatePicker();
+        if (closePicker) {
+            console.log("handleCalendarSelect")
+            showDatePicker();
+        }
     }
     // ChangeEventHandler<HTMLInputElement>
     function handleDateChange(e?: React.ChangeEvent<HTMLInputElement>) {
@@ -67,19 +72,21 @@ export default function DateTimePicker({
             year: currentDate.year,
         };
         console.log('dateParts old ', dateParts);
-        dateParts[e.currentTarget.name] = parseInt(e?.currentTarget.value, 10);
+        dateParts[ e.currentTarget.name ] = parseInt(e?.currentTarget.value, 10);
         console.log('dateParts new ', dateParts);
         setDateStatesFromDate(
             new Date(dateParts.year, dateParts.month, dateParts.day)
         );
     }
+
     function handleMonthGridView() {
         setshowMonths((prev) => !prev);
     }
-    // function handleMonthSelect(monthNumber: number) {
-    //   handleMonthGridView();
-    //   setDateStatesFromDate(new Date(currentDate.year, monthNumber, currentDate.day))
-    // }
+    function handleMonthSelect(date: Date) {
+        const closePicker = calendartype === 'month';
+        handleMonthGridView();
+        handleCalendarSelect(date, closePicker)
+    }
 
     function setDateStatesFromDate(date: Date) {
         console.log('setDateStatesFromDate', date);
@@ -95,37 +102,50 @@ export default function DateTimePicker({
         setDatePickerShown((prev) => !prev);
     }
 
-    // function handleTimeSelect() {}
-    // function handleDayChange(newDay: string) {}
     return (
         <div className={`dateTimePicker--wrapper ` + className} {...props}>
-            <Button className="no-border" onClick={showDatePicker}>
+            <Button className={datePickerShown ? "no-pointer-events" : ""} onClick={showDatePicker} aria-controls='datePicker' aria-expanded={`${datePickerShown}`}>
                 <CalendarSVG />
             </Button>
-            {datePickerShown ? (
-                <div className="date-picker" ref={calendarRef}>
+            <div className="modal-wrapper">
+                <div className={`date-picker${datePickerShown ? "" : " visually-hidden"}`}
+                    id="datePicker"
+                    ref={calendarRef}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label='Choose Date'
+                >
                     <InputDate
                         cb={setDateStatesFromDate}
                         day={selectedDate.getDate()}
                         month={selectedDate.getMonth() + 1}
                         year={selectedDate.getFullYear()}
                         showMonthGrid={handleMonthGridView}
+                        calendartype={calendartype}
                     />
                     <div className="calendar--wrapper">
                         <PickerCalendar
                             date={selectedDate}
                             cb={handleCalendarSelect}
-                            calendarType={calendarType}
+                            handleMonthGridView={handleMonthGridView}
+                            calendartype={calendartype}
                         />
                         {showMonths ? (
                             <MonthSelect
                                 date={selectedDate}
-                                cb={handleCalendarSelect}
+                                cb={handleMonthSelect}
+                                handleMonthGridView={handleMonthGridView}
                             />
                         ) : null}
                     </div>
+                    <div className="dialog-ok-cancel-group">
+                        <Button className="dialog-button" onClick={showDatePicker}>Cancel</Button>
+                        <Button className="dialog-button">OK</Button>
+                    </div>
+                    <div className="dialog-message" aria-live="polite">Cursor keys can navigate dates</div>
                 </div>
-            ) : null}
+            </div>
+
         </div>
     );
 }
@@ -145,7 +165,8 @@ function PickerTime() {
 type pickerCalendarProps = {
     date: Date;
     cb: (date?: Date) => unknown | void;
-    calendarType: 'day' | 'week' | 'month';
+    handleMonthGridView: () => void;
+    calendartype: 'day' | 'week' | 'month';
 } & React.DetailedHTMLProps<
     React.TableHTMLAttributes<HTMLTableElement>,
     HTMLTableElement
@@ -154,22 +175,20 @@ type pickerCalendarProps = {
 function PickerCalendar({
     date,
     cb,
-    calendarType,
+    handleMonthGridView,
+    calendartype,
     ...props
 }: pickerCalendarProps) {
-    if (calendarType === 'day') {
-        console.log('day picker');
+    if (calendartype === 'day') {
         return <DaySelect date={date} cb={cb} {...props} />;
     }
 
-    if (calendarType === 'week') {
-        console.log('week picker');
-        return <WeekSelect date={date} cb={cb} {...props} />;
+    if (calendartype === 'week') {
+        return <WeekSelect date={date} cb={cb}  {...props} />;
     }
 
-    if (calendarType === 'month') {
-        console.log('month picker');
-        return <MonthSelect date={date} cb={cb} {...props} />;
+    if (calendartype === 'month') {
+        return <MonthSelect date={date} cb={cb} handleMonthGridView={handleMonthGridView} {...props} />;
     }
     return null;
 }
@@ -180,16 +199,17 @@ type inputDateProps = {
     year: number;
     cb: (date: Date) => unknown;
     showMonthGrid: () => void;
-};
+    calendartype: 'day' | 'week' | 'month',
+} & React.JSX.IntrinsicElements[ "div" ];
 
-function InputDate({ day, month, year, cb, showMonthGrid }: inputDateProps) {
+function InputDate({ day, month, year, cb, showMonthGrid, ...props }: inputDateProps) {
     const daysInMonth = useMemo(() => {
         return dates.getDaysInMonth(year, month - 1);
-    }, [year, month]);
+    }, [ year, month ]);
 
     const monthName = useMemo(() => {
         return dates.getMonthNameByNumber(month - 1);
-    }, [month]);
+    }, [ month ]);
     const { showError, handleError } = useError({
         day: false,
         month: false,
@@ -206,7 +226,7 @@ function InputDate({ day, month, year, cb, showMonthGrid }: inputDateProps) {
         const inputName = event.currentTarget.name;
 
         // remove error message when user changes input
-        if (showError[inputName]) {
+        if (showError[ inputName ]) {
             handleError(inputName);
         }
         if (maxLength && length > maxLength) {
@@ -245,12 +265,12 @@ function InputDate({ day, month, year, cb, showMonthGrid }: inputDateProps) {
             year: year,
         };
 
-        dateParts[inputName] = parseInt(event?.currentTarget.value, 10);
+        dateParts[ inputName ] = parseInt(event?.currentTarget.value, 10);
         cb(new Date(dateParts.year, dateParts.month - 1, dateParts.day));
     }
 
     return (
-        <div className="input__date">
+        <div className="input__date" {...props}>
             {/* TODO: make the day input disabled when month view */}
             <NumberInput
                 label="day"
@@ -283,7 +303,7 @@ function InputDate({ day, month, year, cb, showMonthGrid }: inputDateProps) {
 type daySelectProps = {
     date: Date;
     cb: (selectedDate: Date) => unknown;
-    className: string;
+    className?: string;
 } & React.DetailedHTMLProps<
     React.TableHTMLAttributes<HTMLTableElement>,
     HTMLTableElement
@@ -291,60 +311,68 @@ type daySelectProps = {
 
 function DaySelect({ date, cb, className = '', ...props }: daySelectProps) {
     const month = date && dates.getVisibleDayNumbersInArray(date);
-    const weekDayInitials = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
     return (
-        <Table className="calendar__selection--days month" {...props}>
-            {weekDayInitials.map((initial, idx) => (
-                <TH className="initial" key={initial + idx + 'date-picker'}>
-                    {initial}
-                </TH>
-            ))}
-            {month.length
-                ? month.map((week, weekIndex) => {
-                      return (
-                          <Row
-                              key={weekIndex + 'date-picker'}
-                              className="calendar__selection--days week"
-                          >
-                              {week.map((day, dayIndex) => {
-                                  let dayClasses = '';
+        <table className="calendar__selection--days month" aria-labelledby='days_selector--caption' tabIndex={0} {...props}>
+            <caption className='visually-hidden' id="days_selector--caption">days within {dates.getMonthName(date)}</caption>
+            <thead>
+                <tr className="weekday_initials">
+                    {shortWeekDay.map((initial, idx) => (
+                        <th
+                            className="initial"
+                            abbr={weekDays[ idx ]}
+                            key={initial + idx + 'date-picker'}
+                        >
+                            {initial}
+                        </th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
+                {month.length && month.map((week, weekIndex) => {
+                    return (
+                        <tr
+                            key={weekIndex + 'date-picker'}
+                            className="calendar__selection--days week"
+                        >
+                            {week.map((day, dayIndex) => {
+                                let dayClasses = '';
 
-                                  if (!day.inMonth) {
-                                      dayClasses += ' notInMonth';
-                                  }
-                                  if (date.toString() === day.date.toString()) {
-                                      dayClasses += ' selected';
-                                  }
+                                if (!day.inMonth) {
+                                    dayClasses += ' notInMonth';
+                                }
+                                if (date.toString() === day.date.toString()) {
+                                    dayClasses += ' selected';
+                                }
 
-                                  return (
-                                      <TD
-                                          key={
-                                              day.number + weekIndex + dayIndex
-                                          }
-                                          className={
-                                              'calendar__selection--days day' +
-                                              dayClasses
-                                          }
-                                      >
-                                          <Button onClick={() => cb(day.date)}>
-                                              {day.number}
-                                          </Button>
-                                      </TD>
-                                  );
-                              })}
-                          </Row>
-                      );
-                  })
-                : null}
-        </Table>
+                                return (
+                                    <td
+                                        key={
+                                            day.number + weekIndex + dayIndex
+                                        }
+                                        className={
+                                            'calendar__selection--days day' +
+                                            dayClasses
+                                        }
+                                    >
+                                        <Button onClick={() => cb(day.date)}>
+                                            {day.number}
+                                        </Button>
+                                    </td>
+                                );
+                            })}
+                        </tr>
+                    );
+                })}
+            </tbody>
+        </table>
     );
 }
 
 type weekSelectProps = {
     date: Date;
     cb: (selectedDate: Date) => unknown;
-    className: string;
+    className?: string;
 } & React.DetailedHTMLProps<
     React.TableHTMLAttributes<HTMLTableElement>,
     HTMLTableElement
@@ -354,127 +382,153 @@ function WeekSelect({ date, cb, className = '', ...props }: weekSelectProps) {
     const month = date && dates.getVisibleDayNumbersInArray(date);
     const startOfWeek = dates.startOfWeek(date);
     const endOfWeek = dates.endOfWeek(date);
-    console.log('startOfWeek', startOfWeek);
-    console.log('endOfWeek', endOfWeek);
-    console.log('date', date);
-    const weekDayInitials = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
     function handleWeekSelect(date: Date) {
         cb(date);
     }
 
     return (
-        <div className="calendar__selection--weeks month" {...props}>
-            <div className="weekday_initials">
-                {weekDayInitials.map((initial, idx) => (
-                    <span
-                        className="initial"
-                        key={initial + idx + 'date-picker'}
-                    >
-                        {initial}
-                    </span>
-                ))}
-            </div>
-            {month.length
-                ? month.map((week, weekIndex) => {
-                      const comparisonDate = week[0].date;
-                      let weekClasses = '';
+        <table className="calendar__selection--weeks month" aria-labelledby='week_selector--caption' tabIndex={0} {...props} >
+            <caption className='visually-hidden' id="week_selector--caption">Weeks within {dates.getMonthName(date)}</caption>
+            <thead>
+                <tr className="weekday_initials">
+                    {shortWeekDay.map((initial, idx) => (
+                        <th
+                            className="initial"
+                            key={initial + idx + 'date-picker'}
+                            abbr={weekDays[ idx ]}
+                        >
+                            {initial}
+                        </th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
+                {month.length && month.map((week, weekIndex) => {
+                        const comparisonDate = week[ 0 ].date;
+                        let weekClasses = '';
 
-                      if (
-                          comparisonDate === startOfWeek ||
-                          comparisonDate === endOfWeek ||
-                          (comparisonDate < endOfWeek &&
-                              comparisonDate > startOfWeek)
-                      ) {
-                          weekClasses += ' selected';
-                      }
-                      return (
-                          <Button
-                              key={weekIndex + 'date-picker'}
-                              className={
-                                  'calendar__selection--weeks week week-btn' +
-                                  weekClasses
-                              }
-                              onClick={() => handleWeekSelect(week[0].date)}
-                          >
-                              {week.map((day, dayIndex) => {
-                                  // TODO: get class to say day is not in month
-                                  return (
-                                      <span
-                                          key={
-                                              day.number + weekIndex + dayIndex
-                                          }
-                                          className="calendar__selection--weeks day"
-                                      >
-                                          {day.number}
-                                      </span>
-                                  );
-                              })}
-                          </Button>
-                      );
-                  })
-                : null}
-        </div>
+                        if (
+                            comparisonDate.toLocaleDateString() === startOfWeek.toLocaleDateString() ||
+                            comparisonDate.toLocaleDateString() === endOfWeek.toLocaleDateString() ||
+                            (comparisonDate < endOfWeek &&
+                                comparisonDate > startOfWeek)
+                        ) {
+                            weekClasses += ' selected';
+                        }
+                        return (
+                            <tr key={weekIndex + 'date-picker'}>
+                                <td>
+                                    <Button
+
+                                        className={
+                                            'calendar__selection--weeks week week-btn' +
+                                            weekClasses
+                                        }
+
+                                        onClick={() => handleWeekSelect(week[ 0 ].date)}
+                                    >
+                                        <p className='visually-hidden'>from {dates.humanReadable(week[ 0 ].date)} to {dates.humanReadable(week[ 6 ].date)}</p>
+                                        {week.map((day, dayIndex) => {
+                                            let dayClasses = '';
+                                            if (!day.inMonth) {
+                                                dayClasses += ' notInMonth';
+                                            }
+
+                                            return (
+                                                <span
+                                                    key={
+                                                        day.number + weekIndex + dayIndex
+                                                    }
+                                                    aria-hidden="true"
+                                                    className={"calendar__selection--weeks day" + 
+                                                                dayClasses}
+                                                >
+                                                    {day.number}
+                                                </span>
+                                            );
+                                        })}
+                                    </Button>
+                                </td>
+                            </tr>
+                        );
+                    })}
+            </tbody>
+        </table>
     );
 }
 
 type monthSelectProps = {
     date: Date;
     cb: (selectedDate: Date) => unknown;
-    className: string;
+    handleMonthGridView: () => void;
+    className?: string;
 } & React.DetailedHTMLProps<
     React.TableHTMLAttributes<HTMLTableElement>,
     HTMLTableElement
 >;
 
-function MonthSelect({ date, cb, className = '', ...props }: monthSelectProps) {
-    const monthNames = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
-    ];
+function MonthSelect({ date, cb, handleMonthGridView, className = '', ...props }: monthSelectProps) {
+
+    const [ selectedDate, setSelectedDate ] = useState(date ? date : new Date());
+
+    const monthRef = useCaptureFocus<HTMLTableElement>({ cb: handleMonthGridView });
+    const timeoutRef = useRef<NodeJS.Timeout>()
     const currentMonthName = useMemo(() => {
-        return monthNames[date.getMonth()];
-    }, [date]);
+        return monthNames[ date.getMonth() ];
+    }, [ date ]);
 
     function handleMonthSelect(monthNumber: number) {
         const updatedDate = new Date(date.getFullYear(), monthNumber, 1);
-        cb(updatedDate);
+        setSelectedDate(updatedDate);
+        if (monthRef.current !== null) {
+            console.log("toggling class")
+            monthRef.current.classList.toggle('fadeout')
+        }
+        timeoutRef.current = setTimeout(() => {
+            cb(selectedDate);
+        }, 250)
     }
 
+    useEffect(() => {
+        if (monthRef.current) {
+            monthRef.current.focus();
+        }
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [])
+
     return (
-        <div className={'calendar__selection--month' + className} {...props}>
-            {monthNames.map((month, idx) => {
-                if (month === currentMonthName) {
+        <table ref={monthRef} className={'calendar__selection--month' + className} role="region" aria-labelledby="months--selector_caption" tabIndex={0} {...props}>
+            <caption className="visually-hidden" id="months--selector_caption">Months</caption>
+            <tbody>
+                {monthNames.map((month, idx) => {
+                    if (month === currentMonthName) {
+                        return (
+                            <Button
+                                key={'month-grid' + idx}
+                                className="month current"
+                                onClick={() => handleMonthSelect(idx)}
+                                aria-label={month}
+                            >
+                                {shortMonthNames[idx]}
+                            </Button>
+                        );
+                    }
                     return (
                         <Button
                             key={'month-grid' + idx}
-                            className="month current"
+                            className="month"
                             onClick={() => handleMonthSelect(idx)}
                         >
-                            {month}
+                            {shortMonthNames[idx]}
                         </Button>
                     );
-                }
-                return (
-                    <Button
-                        key={'month-grid' + idx}
-                        className="month"
-                        onClick={() => handleMonthSelect(idx)}
-                    >
-                        {month}
-                    </Button>
-                );
-            })}
-        </div>
+                })}
+            </tbody>
+        </table>
     );
 }
