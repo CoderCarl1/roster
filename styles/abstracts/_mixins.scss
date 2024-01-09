@@ -94,6 +94,11 @@
   animation-fill-mode: forwards;
   animation-duration: $duration;
 }
+@mixin fade-out($duration: 250ms){
+  animation-name: fade-out;
+  animation-fill-mode: forwards;
+  animation-duration: $duration;
+}
 
 @mixin slide-fade-in($duration: 0ms){
   transform-origin: top right;
