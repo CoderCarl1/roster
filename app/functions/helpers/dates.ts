@@ -1,5 +1,10 @@
 import log from './log';
 
+export const shortWeekDay = [ 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa' ];
+export const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+export const shortMonthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+export const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
 /**
  * Parses a date or date string and returns a valid Date object.
  *
@@ -29,8 +34,24 @@ export function parseDate(possibleDate: unknown): Date {
     return dateObj;
 }
 
-export function formatDate(dateString: Date | string): string {
-    const date = parseDate(dateString);
+export function humanReadable(date: Date | string): string{
+    date = parseDate(date);
+
+    const options: Intl.DateTimeFormatOptions = {
+        // year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        // hour: 'numeric',
+        // minute: 'numeric',
+        // second: 'numeric',
+        // hour12: false,
+        // timeZoneName: 'short',
+    };
+
+    return date.toLocaleString(undefined, options);
+}
+export function formatDate(date: Date | string): string{
+    date = parseDate(date);
 
     const options: Intl.DateTimeFormatOptions = {
         // year: 'numeric',
@@ -201,20 +222,6 @@ export function getMonthNameByNumber(monthNum: number) {
         if (monthNum > 11 || monthNum < 0) {
             throw new Error();
         }
-        const monthNames = [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-            'August',
-            'September',
-            'October',
-            'November',
-            'December',
-        ];
 
         return monthNames[monthNum];
     } catch (err) {
@@ -389,6 +396,7 @@ export default {
     getMonthNumberFromDate,
     getMonthNameByNumber,
     getVisibleDayNumbersInArray,
+    humanReadable,
     incrementDayByOne,
     parseDate,
     startOfWeek,
