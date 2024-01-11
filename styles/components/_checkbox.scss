@@ -1,0 +1,103 @@
+@use '../abstracts/' as *;
+.checkbox__wrapper {
+  position: relative;
+  display: flex;
+  gap: size(8);
+}
+
+.icon.checkmark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  cursor: pointer; 
+
+  #checkbox-border,
+  #checkbox-mark {
+    stroke-dasharray: 11;
+  }
+  #checkbox-border {
+    stroke: clr(neutral, 400);
+    stroke-dashoffset: 0;
+  }
+  #checkbox-mark {
+    stroke-dashoffset: 11;
+  }
+}
+
+
+.input.checkbox {
+  opacity: 0.5;
+  height: 32px;   
+  flex: 1 0 32px;
+  &:disabled ~ .checkmark {
+    #checkbox-border,
+    #checkbox-mark {
+      animation-duration: 0ms;
+    }
+  }
+  &:disabled ~ .checkmark,
+  &:disabled:checked ~ .checkmark {
+    #checkbox-border {
+      stroke-width: 2;
+      stroke-dashoffset: 0;
+      stroke: clr(primary, 100);
+    }
+  }
+  &:disabled:checked ~ .checkmark {
+    #checkbox-mark {
+      stroke-width: 2;
+      stroke-dashoffset: 0;
+      stroke: clr(primary, 100);
+      fill:  clr(primary, 100);
+    }
+  }
+
+  &:where(:focus-visible, :hover):not(:disabled) ~ .checkmark {
+    box-shadow: 0px 2px 5px 1px clr(primary, 100);
+  }
+  &:not(:checked, :disabled):where(:focus-visible, :hover) ~ .checkmark {
+    #checkbox-border {
+      stroke-width: 2;
+      stroke: clr(primary, 100);
+      animation: checkmark-hover 250ms ease-in forwards;
+    }
+  }
+  &:is(:checked) {
+    & ~ .checkmark  {
+      background-color: clr(neutral, 100);
+      #checkbox-border {
+        stroke: clr(primary, 200);
+        stroke-width: 2;
+        animation: checkmark-hover 250ms ease-out forwards;
+      }
+      #checkbox-mark {
+        stroke: clr(primary, 200);
+        fill: clr(neutral, 100);
+        stroke-width: 2;
+        animation: checkbox-checked-mark 250ms ease-out forwards;
+      }
+    }
+  }
+}
+
+@keyframes checkmark-hover {
+  from {
+    stroke-opacity: 0;
+    stroke-dashoffset: 10;
+  }
+  to {
+    stroke-opacity: 1;
+    stroke-dashoffset: 0;
+  }  
+}
+@keyframes checkbox-checked-mark {
+  from {
+    stroke-opacity: 0;
+    stroke-dashoffset: 10;
+  }
+  to {
+    stroke-opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
