@@ -1,19 +1,17 @@
 type props = React.SVGProps<SVGElement>;
-// SVGProps<SVGSVGElement>
 
-export default function CalendarSVG({ className = '', ...props }: props) {
+export function CalendarSVG({ fill = "currentColor", height = "32px", width = "32px", className = '', ...props }: props) {
     return (
         <svg
-            fill="#000000"
             className={'calendar icon ' + className}
-            version="1.1"
-            id="Capa_1"
+            fill={fill}
+            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
-            xmlnsXlink="http://www.w3.org/1999/xlink"
-            width="32px"
-            height="32px"
-            viewBox="0 0 610.398 610.398"
-            xmlSpace="preserve"
+            width={width}
+            height={height}
+            focusable="false"
+            // viewBox="0 0 610.398 610.398"
+            viewBox={`0 0 ${height} ${width}`}
         >
             <g>
                 <g>
@@ -69,3 +67,5 @@ export default function CalendarSVG({ className = '', ...props }: props) {
         </svg>
     );
 }
+
+export default CalendarSVG;

@@ -1,12 +1,26 @@
 @use '../abstracts/' as *;
 
 .icon {
-  fill: var(--fill, #{clr(neutral,400)});
-}
+  fill: var(--fill);
+  stroke: var(--stroke-color);
 
-.calendar {
-  --fill: #{clr(primary, 300)};
-  &:hover {
-    --fill: #{clr(primary, 200)};
+  path {
+    fill: var(--path-fill);
+  }
+
+  &.transparent {
+    --fill: transparent;
+
+    path {
+      --path-fill: transparent;
+    }
+  }
+
+  &:not(.transparent) {
+    --fill: #{clr(primary, 300)};
+
+    &:hover {
+      --fill: #{clr(primary, 200)};
+    }
   }
 }
