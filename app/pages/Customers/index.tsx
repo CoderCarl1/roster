@@ -2,9 +2,8 @@ import { useLoaderData } from '@remix-run/react';
 import { useEffect } from 'react';
 import { Customer_Card, useCustomers } from '@components';
 import { addFullName, log } from '@functions';
-import { TCustomer } from '@types';
-import { loaderType } from '~/routes/_index';
-import Table, { Caption, Row, TD, TH } from '../table/table';
+import {homeLoaderDataType, TCustomer } from '@types';
+import Table, { Caption, Row, TD, TH } from '../../components/table/table';
 
 function Main(
     props?: React.DetailedHTMLProps<
@@ -12,7 +11,7 @@ function Main(
         HTMLElement
     >
 ) {
-    const data = useLoaderData<loaderType>();
+    const data = useLoaderData<homeLoaderDataType>();
     const customersLoaderData =
         data.customersLoaderData as unknown as TCustomer[];
     customersLoaderData.length = 1;

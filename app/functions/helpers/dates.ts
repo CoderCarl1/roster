@@ -1,3 +1,4 @@
+import { visibleDayType } from '@types';
 import log from './log';
 
 export const shortWeekDay = [ 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa' ];
@@ -228,12 +229,26 @@ export function getMonthNameByNumber(monthNum: number) {
         return `month name not found by given number ${monthNum}`;
     }
 }
+export function getMonthNumberByName(monthName: string) {
+    try {
+        const monthNumber = monthNames.indexOf(monthName);
+        if (!monthNumber) throw new Error();
+        return monthNumber;
+    } catch (err) {
+        return `month number not found by given name ${monthName}`;
+    }
+}
 
-type visibleDayType = {
-    number: number;
-    inMonth: boolean;
-    date: Date;
-};
+export function dateParts(date: Date){
+    date = parseDate(date);
+    let year = date.getFullYear();
+    let month = date.getMonth();
+    let day = date.getDate()
+
+    return {year, month, day};
+}
+
+// TODO: This needs to not return 2 months when someone clicks the last days or the first days
 function getVisibleDayNumbersInArray(date: Date): visibleDayType[][] {
     const calendarMonth: visibleDayType[][] = [];
     const currentDate = parseDate(date);
@@ -385,6 +400,7 @@ export function calculatePastDate(date: Date, dayNumber: number) {
 export default {
     calculateFutureDate,
     calculatePastDate,
+    dateParts,
     dayNumberFromDate,
     endOfWeek,
     formatDate,
@@ -392,6 +408,7 @@ export default {
     getDayName,
     getDaysInMonth,
     getMonthName,
+    getMonthNumberByName,
     getNumberOfDays,
     getMonthNumberFromDate,
     getMonthNameByNumber,

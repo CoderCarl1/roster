@@ -9,10 +9,11 @@ import {
     log,
     useToggle,
 } from '@functions';
-import { TAppointmentWithCustomerNameAndFullAddress } from '@types';
-import { loaderType } from '~/routes/_index';
-import Calendar from '../calendar/calendar';
-import Table, { Caption, Row, TD, TH } from '../table/table';
+import { homeLoaderDataType, TAppointmentWithCustomerNameAndFullAddress } from '@types';
+
+// import Calendar from '../../components/calendar/calendar';
+import Calendar from '../../components/form/date/calendar'
+import Table, { Caption, Row, TD, TH } from '../../components/table/table';
 
 export type displayTypeEnum = 'day' | 'week' | 'month' | 'appointments';
 
@@ -22,7 +23,7 @@ function Main(
         HTMLElement
     >
 ) {
-    const data = useLoaderData<loaderType>();
+    const data = useLoaderData<homeLoaderDataType>();
     const appointmentsLoaderData =
         data.appointmentsLoaderData as unknown as TAppointmentWithCustomerNameAndFullAddress[];
     const { toggle: loading, setToggleStatus: setLoading } = useToggle(true);
@@ -103,24 +104,27 @@ function Main(
         );
     };
 
+
     if (appointmentsData && appointmentsData.length) {
         return displayType !== 'appointments' ? (
-            <Calendar
-                displayType={displayType}
-                setLoading={setLoading}
-                loading={loading}
-                {...props}
-                className="calendar"
-            >
-                {appointmentsControls()}
-                {currentAppointment ? (
-                    <Appointment_Card
-                        clearAppointment={setAppointment}
-                        appointment={currentAppointment}
-                        className="calendar__appointment--single"
-                    />
-                ) : null}
-            </Calendar>
+            
+            <Calendar className="carl"/>
+            // <Calendar
+            //     displayType={displayType}
+            //     setLoading={setLoading}
+            //     loading={loading}
+            //     {...props}
+            //     className="calendar"
+            // >
+            //     {appointmentsControls()}
+            //     {currentAppointment ? (
+            //         <Appointment_Card
+            //             clearAppointment={setAppointment}
+            //             appointment={currentAppointment}
+            //             className="calendar__appointment--single"
+            //         />
+            //     ) : null}
+            // </Calendar>
         ) : (
             <Appointments className={currentAppointment ? 'disabled' : ''}>
                 {appointmentsControls()}

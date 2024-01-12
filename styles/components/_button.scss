@@ -19,10 +19,12 @@
   border-radius: var(--_button-border-radius);
   text-transform: capitalize;
 }
-.no-border {
+.button.no-border {
   --button-border-color: transparent;
 }
-
+.button.icon{
+  --button-padding: 0;
+}
 .button:hover:not([disabled]) {
   --button-bg-color: #fff;
 

@@ -7,6 +7,7 @@ import {
     Outlet,
     Scripts,
     ScrollRestoration,
+    useRouteError,
 } from '@remix-run/react';
 import appStyles from './styles/styles.css';
 

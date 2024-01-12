@@ -10,8 +10,8 @@ export function CalendarSVG({ fill = "currentColor", height = "32px", width = "3
             width={width}
             height={height}
             focusable="false"
-            // viewBox="0 0 610.398 610.398"
-            viewBox={`0 0 ${height} ${width}`}
+            viewBox="0 0 610.398 610.398"
+            // viewBox={`0 0 ${height} ${width}`}
         >
             <g>
                 <g>

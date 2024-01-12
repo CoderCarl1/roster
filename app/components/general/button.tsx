@@ -1,3 +1,5 @@
+import { joinClasses } from "~/functions";
+
 type ButtonProps = {
     children?: React.ReactNode;
     variant?: 'primary' | 'secondary' | 'danger' | 'default';
@@ -6,11 +8,11 @@ type ButtonProps = {
 export default function Button({
     children,
     variant = 'default',
+    className = '',
     ...props
 }: ButtonProps) {
-    const { className = '', ...attributes } = props;
     return (
-        <button className={`button ${variant} ${className}`} {...attributes}>
+        <button className={joinClasses('button', variant, className)} {...props}>
             {children}
         </button>
     );

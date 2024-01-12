@@ -4,10 +4,11 @@ import {
 } from "@remix-run/react";
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { monthNames, shortMonthNames, shortWeekDay, weekDays } from "~/functions/helpers/dates";
-import { dates, joinClasses } from "@functions";
-import { Button, ErrorCard } from "@components";
+import { isNumber } from "~/functions/helpers/typechecks";
+import { dates, joinClasses, log, useError } from "@functions";
+import { Button, Checkbox, ErrorCard, NumberInput } from "@components";
 import { visibleDayType } from "@types";
-import { Arrow } from "~/icons";
+import { Arrow, CalendarSVG } from "@icons";
 
 type calendarDataType = {
   currentDate: Date;
@@ -21,7 +22,6 @@ type calendarDisplayTypes = 'day' | 'week' | 'month';
 function useCalendar() {
   function getCalendarDateParts(date: Date | String) {
     date = dates.parseDate(date);
-
     return {
       currentDate: date,
       monthName: monthNames[ date.getMonth() ],
@@ -80,6 +80,7 @@ export default function Calendar({ calendarType, date, cb, className = '', ...pr
     startOfWeek: dates.startOfWeek(today),
     endOfWeek: dates.endOfWeek(today),
   });
+  const [ showCalendar, setShowCalendar ] = useState(false);
 
   function handleDateChange(date: Date | String) {
     const data = getCalendarDateParts(date);
@@ -87,6 +88,10 @@ export default function Calendar({ calendarType, date, cb, className = '', ...pr
   }
   function handleCalendarTypeChange(newType: string) {
     setInternalCalendarType(newType)
+  }
+
+  function handleShowCalendar() {
+    setShowCalendar(prev => !prev);
   }
 
   useEffect(() => {
@@ -100,25 +105,268 @@ export default function Calendar({ calendarType, date, cb, className = '', ...pr
   }, [ calendarType ])
 
   return (
-    <div key={internalCalendarType}
-      className={joinClasses('calendar__wrapper', className)}
-      {...props}>
-        {calendarData.currentDate.toLocaleDateString()}
-      <CalendarControls
-        handleCalendarTypeChange={handleCalendarTypeChange}
-        handleDateChange={handleDateChange}
-        currentDate={calendarData.currentDate}
-      />
-      <div className="calendar__content">
-        <CalendarComponent
-          internalCalendarType={internalCalendarType}
+    <div className={joinClasses('calendar__wrapper', className)} {...props}>
+      <div className="calendar__inputs__icon">
+        <CalendarInputs
           handleDateChange={handleDateChange}
           currentDate={calendarData.currentDate}
         />
+        <Button className="icon" onClick={handleShowCalendar}><CalendarSVG /></Button>
       </div>
+
+      {showCalendar && (
+        <>
+          <CalendarControls
+            handleCalendarTypeChange={handleCalendarTypeChange}
+            handleDateChange={handleDateChange}
+            currentDate={calendarData.currentDate}
+          />
+          <div className="calendar__content">
+            <CalendarComponent
+              internalCalendarType={internalCalendarType}
+              handleDateChange={handleDateChange}
+              currentDate={calendarData.currentDate}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
+
+
+type CalendarInputsProps = {
+  handleDateChange: (date: Date | String) => void;
+  currentDate: Date;
+  children?: React.ReactNode;
+}
+
+function CalendarInputs({ handleDateChange, currentDate, children }: CalendarInputsProps) {
+
+  const { getCalendarDateParts } = useCalendar();
+  const { daysInMonth, monthName } = getCalendarDateParts(currentDate)
+  const { showError, handleError } = useError({
+    day: false,
+    month: false,
+    year: false,
+  });
+  const ref = useRef<HTMLDivElement>(null);
+
+  function handleInputValuechange() {
+    console.log("handleInputValuechange func ran")
+    if (!ref.current) return;
+
+    const dateValues: Record<string, number> = {
+      day: currentDate.getDate(),
+      month: currentDate.getMonth(),
+      year: currentDate.getFullYear()
+    };
+
+    [ 'day', 'month', 'year' ].forEach((name) => {
+      const input = ref.current!.querySelector(`input[name="${name}"]`) as HTMLInputElement | null;
+
+      if (input) {
+        _validateValue(input, name);
+      }
+    });
+
+    function _validateValue(element: HTMLInputElement, name: string) {
+      const { max, min, value } = element;
+      const parsedValue = parseInt(value, 10);
+      const parsedMax = parseInt(max, 10);
+      const parsedMin = parseInt(min, 10);
+      let daysInMonth2 = 31
+
+      if (isNumber(parsedMax) && parsedValue > parsedMax) {
+        return _handleMax(name);
+      }
+
+      if (isNumber(parsedMin) && parsedValue < parsedMin) {
+        return _handleMin(name);
+      }
+
+      dateValues[ name ] = parsedValue;
+      if (name === 'month') {
+        dateValues.month--;
+      }
+
+      function _handleMin(name: string) {
+        if (name === 'day') {
+          dateValues.month--
+          if (dateValues.month < 0) {
+            dateValues.month = 11;
+            dateValues.year--;
+          }
+        }
+        if (name === 'month') {
+          dateValues.year--
+        }
+        dateValues.day = daysInMonth2;
+      }
+
+      function _handleMax(name: string) {
+        if (name === 'day') {
+          dateValues.month++
+          if (dateValues.month > 11) {
+            dateValues.month = 0;
+            dateValues.year++;
+          }
+        }
+        if (name === 'month') {
+          dateValues.year++
+        }
+        dateValues.day = 1;
+      }
+    }
+    const updatedDate = new Date(dateValues.year, dateValues.month, dateValues.day);
+    handleDateChange(updatedDate);
+  }
+
+  function handleFocus(event: React.KeyboardEvent<HTMLInputElement>) {
+    console.log("handleFocus func ran")
+
+    const inputName = event.currentTarget.name;
+    const currentEl = ref.current!.querySelector(`input[name="${inputName}"]`) as HTMLInputElement | null;
+    if (!currentEl) return;
+
+    switch (event.key) {
+      case 'Tab':
+        event.shiftKey ? _moveFocus(inputName, false) : _moveFocus(inputName);
+        break;
+      case 'Backspace':
+        if (currentEl.value.length === 1) {
+          console.log("happened")
+          event.preventDefault(); // Prevent the default backspace behavior
+          currentEl.value = '1';
+          currentEl.dispatchEvent(new Event('change', { bubbles: true }));
+          _moveFocus(inputName, false);
+        }
+        break;
+      case 'ArrowLeft':
+        if(currentEl.selectionStart === 0){
+          _moveFocus(inputName, false);
+        }
+        break;
+      case 'ArrowRight':
+        if(currentEl.selectionStart === currentEl.value.length - 1){
+          _moveFocus(inputName);
+        }
+        break;
+      default:
+        break;
+    }
+
+
+    function _moveFocus(currentFieldName: string, forwards: boolean = true) {
+      const {prev, next} = getFieldsToFocus(currentFieldName);
+      if (forwards && next){
+        event.preventDefault();
+        next.focus();
+        next.setSelectionRange(0, 0)
+      }
+      if (!forwards && prev){
+        event.preventDefault();
+        prev.focus();
+        prev.setSelectionRange(prev.value.length, prev.value.length)
+      }
+    }
+
+    function getFieldsToFocus(currentFieldName: string) {
+      const fieldOrder = ['day', 'month', 'year'];
+      const select = (name: string) => ref.current!.querySelector(`input[name="${name}"]`) as HTMLInputElement | null;
+      const currentIndex = fieldOrder.indexOf(currentFieldName);
+      let prevFocusable, nextFocusable;
+      if (currentIndex === 1) {
+        prevFocusable = select('day');
+        nextFocusable = select('year');
+      }
+      if (currentIndex === 0) {
+        prevFocusable = null;
+        nextFocusable = select('month');
+      }
+      if (currentIndex === 2) {
+        prevFocusable = select('month');
+        nextFocusable = null;
+      }
+
+      return {
+        prev: prevFocusable,
+        next: nextFocusable
+      }
+    }
+
+  }
+  function changeType(event: React.FocusEvent<HTMLInputElement> ){
+    const currentEl = event.currentTarget
+    const newType = currentEl.type === 'number' ? 'text' : 'number';
+    currentEl.type = newType;
+  }
+
+
+  return (
+    <div className="calendar__inputs" ref={ref}>
+      <NumberInput
+        aria-placeholder="dd"
+        placeholder="dd"
+        aria-label="day"
+        aria-valuemin={1}
+        aria-valuemax={daysInMonth}
+        min={1}
+        max={daysInMonth}
+        maxLength={2}
+        value={currentDate.getDate()}
+        onChange={handleInputValuechange}
+        onKeyDown={handleFocus}
+        onBlur={changeType}
+        onFocus={changeType}
+        editable={true}
+        formKey={"day"}
+        showError={false}
+        errorMessage={`Date can be between 1 and ${daysInMonth} (${monthName}).`}
+      />
+      <NumberInput
+        aria-placeholder="MM"
+        placeholder="MM"
+        aria-label="month"
+        aria-valuemin={1}
+        aria-valuemax={12}
+        maxLength={2}
+        min={1}
+        max={12}
+        value={currentDate.getMonth() + 1}
+        onChange={handleInputValuechange}
+        onKeyDown={handleFocus}
+        onBlur={changeType}
+        onFocus={changeType}
+        editable={true}
+        formKey={"month"}
+        showError={false}
+        errorMessage={`Months can be between 1 and 12.`}
+      />
+      <NumberInput
+        aria-placeholder="YYYY"
+        placeholder="YYYY"
+        aria-label="year"
+        aria-valuemin={currentDate.getFullYear() - 10}
+        aria-valuemax={currentDate.getFullYear() + 10}
+        min={currentDate.getFullYear() - 10}
+        max={currentDate.getFullYear() + 10}
+        maxLength={4}
+        value={currentDate.getFullYear()}
+        onChange={handleInputValuechange}
+        onKeyDown={handleFocus}
+        onBlur={changeType}
+        onFocus={changeType}
+        editable={true}
+        formKey={"year"}
+        showError={false}
+        errorMessage={`Please choose betwen ${currentDate.getFullYear() - 10} & ${currentDate.getFullYear() + 10}`}
+      />
+      {children}
+    </div>
+  )
+}
+
 
 type calendarControlProps = {
   handleCalendarTypeChange: (type: string) => void;
@@ -337,9 +585,9 @@ function WeekView({ handleDateChange, currentDate }: viewProps) {
 
 function MonthView({ handleDateChange, currentDate }: viewProps) {
   const { getCalendarDateParts } = useCalendar();
-  const {monthName} = getCalendarDateParts(currentDate);
-  const actualMonth = monthNames[new Date().getMonth()];
-  function handleMonthSelect(monthNumber: number){
+  const { monthName } = getCalendarDateParts(currentDate);
+  const actualMonth = monthNames[ new Date().getMonth() ];
+  function handleMonthSelect(monthNumber: number) {
     const date = new Date(currentDate.getFullYear(), monthNumber, 1);
     handleDateChange(date);
   }

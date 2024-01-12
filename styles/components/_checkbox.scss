@@ -27,7 +27,7 @@
 
 
 .input.checkbox {
-  opacity: 0.5;
+  opacity: 0;
   height: 32px;   
   flex: 1 0 32px;
   &:disabled ~ .checkmark {

@@ -2,12 +2,11 @@ import { useLoaderData } from '@remix-run/react';
 import { useEffect } from 'react';
 import { useAddresses, Address_Card } from '@components';
 import { addFullAddress, addFullName, log } from '@functions';
-import { TAddress, TAddressWithCustomerNameAndFullAddress } from '@types';
-import { loaderType } from '~/routes/_index';
-import Table, { Caption, Row, TD, TH } from '../table/table';
+import { homeLoaderDataType, TAddress, TAddressWithCustomerNameAndFullAddress } from '@types';
+import Table, { Caption, Row, TD, TH } from '../../components/table/table';
 
 function Main() {
-    const data = useLoaderData<loaderType>();
+    const data = useLoaderData<homeLoaderDataType>();
     const addressesData = data.addressesLoaderData as unknown as TAddress[];
 
     const { setAddress, currentAddress, setAddresses, addresses } =

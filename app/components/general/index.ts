@@ -1,5 +1,6 @@
 import { LoadingComponent } from '..';
 import Button from './button';
 import Card from './card';
+import ErrorCard from './errorCard';
 
-export { Card, Button, LoadingComponent };
+export { Card, ErrorCard, Button, LoadingComponent };

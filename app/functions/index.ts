@@ -5,6 +5,7 @@ import dates from './helpers/dates';
 import log from './helpers/log';
 import { randomNumber } from './helpers/numbers';
 import { removePropertiesFromObject } from './helpers/objects';
+import { joinClasses } from './helpers/strings';
 import { isAddress, isAppointment, isCustomer } from './helpers/typechecks';
 import useCaptureFocus from './helpers/useCaptureFocus';
 import useClickOutside from './helpers/useClickOutside';
@@ -14,6 +15,8 @@ import useToggle from './helpers/useToggle';
 export {
     addFullName,
     addFullAddress,
+    dates,
+    joinClasses,
     isCustomer,
     isAddress,
     isAppointment,
@@ -25,5 +28,4 @@ export {
     useClickOutside,
     useError,
     useToggle,
-    dates,
 };

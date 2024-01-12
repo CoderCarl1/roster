@@ -8,6 +8,7 @@ import Form, { Text, NumberInput, Checkbox } from './form';
 import DateTimePicker from './form/datepicker';
 import { Button, Card } from './general';
 import LoadingComponent from './general/LoadingComponent';
+import ErrorCard from './general/errorCard';
 import Table, {
     Caption,
     Row,
@@ -44,6 +45,7 @@ export {
     // Generic
     Form,
     Card,
+    ErrorCard,
     Button,
     DateTimePicker,
     LoadingComponent,

@@ -15,6 +15,9 @@ import {
     PrismaClientValidationError,
 } from '@prisma/client/runtime/library';
 
+
+export {homeLoaderDataType} from '~/pages/Home/loader'
+
 type optionalFullName = {
     fullName?: string | undefined | null;
 };
@@ -136,8 +139,15 @@ type TmockNote = Pick<
 
 type TmockUser = Pick<User, 'username'>;
 
-// Errors
+// Dates
+export type visibleDayType = {
+    number: number;
+    inMonth: boolean;
+    date: Date;
+};
 
+// Errors
+export type ErrorBoundaryProps = { error: Error };
 /**
  * Prisma Errors
  */

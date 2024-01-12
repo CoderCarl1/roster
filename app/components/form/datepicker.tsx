@@ -271,7 +271,6 @@ function InputDate({ day, month, year, cb, showMonthGrid, ...props }: inputDateP
 
     return (
         <div className="input__date" {...props}>
-            {/* TODO: make the day input disabled when month view */}
             <NumberInput
                 label="day"
                 value={day}
@@ -489,6 +488,7 @@ function MonthSelect({ date, cb, handleMonthGridView, className = '', ...props }
             cb(selectedDate);
         }, 250)
     }
+
 
     useEffect(() => {
         if (monthRef.current) {

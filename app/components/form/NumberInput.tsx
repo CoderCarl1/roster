@@ -1,5 +1,5 @@
 type numberInputProps = {
-    label: string;
+    label?: string;
     value: string | number;
     maxLength?: number;
     min?: number;
@@ -11,10 +11,10 @@ type numberInputProps = {
     onChangeFunc?: (
         event: React.ChangeEvent<HTMLInputElement>
     ) => void | Promise<void> | any;
-} & React.HTMLProps<HTMLDivElement>;
+} & React.HTMLProps<HTMLInputElement>;
 
 export default function NumberInput({
-    label = '',
+    label,
     value,
     maxLength,
     editable = false,
@@ -32,7 +32,7 @@ export default function NumberInput({
     }
 
     return (
-        <div {...props} className={'input-wrapper floating ' + className}>
+        <div className={'input-wrapper floating ' + className}>
             {editable ? (
                 <>
                     {showError && errorMessage ? (
@@ -48,12 +48,13 @@ export default function NumberInput({
                         type="number"
                         name={formKey}
                         value={value}
-                        placeholder={label}
+                        placeholder={label && label}
                         onChange={handleOnChange}
                         maxLength={maxLength}
-                        className="input"
+                        className="input number"
+                        {...props} 
                     />
-                    <label>{label}</label>
+                    {label && <label>{label}</label>}
                 </>
             ) : (
                 <span>{value}</span>
