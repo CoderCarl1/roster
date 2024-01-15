@@ -173,82 +173,104 @@
 
 
 .calendar__wrapper {
-
-  .calendar__dropdown {
+  .date__inputs {
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr 1.5fr;
+    font-size: 1rem;
+    width: 14ch;
+    border: 1px solid clr(neutral, 300);
+    // padding-inline: 0.5em;
+    margin-inline-end: 0.25rem;
+    &:focus-within {
+    border: 1px solid clr(primary, 300);
+  
+    }
+    // add / between number inputs
+    .input-wrapper{
+      padding-inline: 4px;
+      &:not(:last-of-type) {
+  
+        &:after {
+          content: "/";
+          font-size: calc(1rem + 4px);
+          position: absolute;
+          right: 0.125em;
+          bottom: -2px;
+          color: clr(neutral, 200);
+        }
+      }
+  
+    }
+    .input.number {
+      --input-padding-top: 0;
+      border: 0;
+      outline: 0;
+     
+      // &:not(:focus-within) {
+  
+      // }
+      &:focus-within {
+        color: clr(primary, 300);
+        background: #FFF;
+      }
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      // &:not(:last-of-type){
+        
+      // }
+    }
+  
+  }
+  .calendar__content--wrapper {
+    width: calc(30ch + (3 * 0.25rem));
     
     // width: min(100%, calc(30ch + (3 * 0.25rem)));
-    width: calc(30ch + (3 * 0.25rem));
+    .calendar__view {
 
+      .weekday_initials {
+        display: table-row;
+      }
+
+      .calendar__selection--days {
+        width: 100%;
+        .button {
+          width: 100%;
+        }
+      }
+    }
   
   }
 
 .calendar__controls {
-  // display: grid;
-  // grid-template-columns: 2fr 1fr 1fr 1fr;
-  // place-items: center;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
   gap: size(4);
-  line-height: 2lh;
-  &--monthName {
-    background: clr(neutral, 400);
-    color: clr(neutral,100);
-    text-align: center;
-    font-weight: 600;
-    flex: 0 1 10.5ch;
+  line-height: 1.25lh;
+  &--row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
   }
-  &--nextPrev{
-    flex: 1 0 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .calendar__control {
+    &--month-change {
+      border: 0;
+    }
+    &--month-name {
+      background: clr(neutral, 400);
+      color: clr(neutral,100);
+      text-align: center;
+      font-weight: 600;
+    }
   }
+
   .button {
     --button-padding: 0;
-    flex: 0 0 6.5ch;
+    --button-border-radius: 0;
   }
 }
-.calendar__inputs {
-  display: inline-grid;
-  grid-template-columns: repeat(3, 1fr);
-  font-size: 1rem;
-  width: 16ch;
-  border: 1px solid clr(neutral, 300);
-  padding-inline: 0.5em;
-  margin-inline-end: 0.25rem;
-  &:focus-within {
-  border: 1px solid clr(primary, 300);
 
-  }
-
-  .input-wrapper{
-    &:not(:last-of-type):after {
-      content: "/";
-      position: absolute;
-      right: 0.25rem;
-      bottom: 0.125rem;
-      color: clr(neutral, 200);
-    }
-  }
-  .input.number {
-    --input-padding-top: 0;
-    border: 0;
-    outline: 0;
-
-    &:focus-within {
-      color: clr(primary, 300);
-      background: #FFF;
-    }
-    &::-webkit-outer-spin-button,
-    &::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    // &:not(:last-of-type){
-      
-    // }
-  }
-
-}
 
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useCalendar } from "../calendar.hooks";
 import { dates, joinClasses } from "@functions";
 import { NumberInput } from "../..";
@@ -15,11 +15,11 @@ export default function DateInputs({ children, className = "", ...props }: DateI
 
   return (
     <div className={joinClasses(className, "calendar__wrapper")} {...props}>
-      <div className="calendar__inputs__icon">
+      <div className="date__inputs--wrapper">
         <Inputs />
         <Button_CalendarIcon onClick={handleShowCalendar} />
       </div>
-      <div className="calendar__dropdown">
+      <div className="calendar__content--wrapper">
         {showCalendar && children}
       </div>
     </div>
@@ -208,7 +208,14 @@ function Inputs() {
     const newType = currentEl.type === 'number' ? 'text' : 'number';
     currentEl.type = newType;
   }
-
+  function leadingZeros(value: string | number) {
+    let number = typeof value === 'string' ? parseInt(value) : value;
+    const length = `${value}`.length;
+    if(!isNaN(number) && length === 1) {
+      value = `0${value}`;
+    }
+    return value;
+  }
   const commonInputProps = {
     onChange: handleInputValuechange,
     onKeyDown: handleFocus,
@@ -218,7 +225,7 @@ function Inputs() {
   };
 
   return (
-    <div className="calendar__inputs" ref={ref}>
+    <div className="date__inputs" ref={ref}>
       <NumberInput
         aria-placeholder="dd"
         placeholder="dd"
@@ -228,7 +235,7 @@ function Inputs() {
         min={1}
         max={daysInMonth}
         maxLength={2}
-        value={currentCalendarDate.getDate()}
+        value={leadingZeros(currentCalendarDate.getDate())}
         formKey={"day"}
         {...commonInputProps}
       />
@@ -241,7 +248,7 @@ function Inputs() {
         maxLength={2}
         min={1}
         max={12}
-        value={currentCalendarDate.getMonth() + 1}
+        value={leadingZeros(currentCalendarDate.getMonth() + 1)}
         formKey={"month"}
         {...commonInputProps}
       />
