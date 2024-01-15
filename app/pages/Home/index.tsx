@@ -1,16 +1,10 @@
 import { Await, useLoaderData } from '@remix-run/react';
 import React, { Suspense, useState } from 'react';
 
-import type { homeLoaderDataType } from './loader'
-
-import {
-    Appointments,
-    Customers,
-    LoadingComponent,
-} from '@components';
+import { Appointments, Customers, LoadingComponent } from '@components';
 
 import Providers from '@contexts';
-
+import type { homeLoaderDataType } from './loader';
 
 export default function Home() {
     const { customersLoaderData, addressesLoaderData, appointmentsLoaderData } =
@@ -30,16 +24,15 @@ export default function Home() {
                         <Await resolve={appointmentsLoaderData}>
                             <Appointments className="dashboard__section appointments" />
                         </Await>
-                    </Suspense> 
+                    </Suspense>
 
-                     {/* <Suspense fallback={<LoadingComponent />}>
+                    {/* <Suspense fallback={<LoadingComponent />}>
                                     <Await resolve={addressesLoaderData}>
                                         <Addresses />
                                     </Await>
                                 </Suspense>  */}
-                 </Providers> 
+                </Providers>
             </div>
         </main>
     );
 }
-

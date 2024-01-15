@@ -1,10 +1,44 @@
 import { visibleDayType } from '@types';
 import log from './log';
 
-export const shortWeekDay = [ 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa' ];
-export const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-export const shortMonthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-export const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+export const shortWeekDay = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+export const weekDays = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+];
+export const shortMonthNames = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+];
+export const monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+];
 
 /**
  * Parses a date or date string and returns a valid Date object.
@@ -35,7 +69,7 @@ export function parseDate(possibleDate: unknown): Date {
     return dateObj;
 }
 
-export function humanReadable(date: Date | string): string{
+export function humanReadable(date: Date | string): string {
     date = parseDate(date);
 
     const options: Intl.DateTimeFormatOptions = {
@@ -51,7 +85,7 @@ export function humanReadable(date: Date | string): string{
 
     return date.toLocaleString(undefined, options);
 }
-export function formatDate(date: Date | string): string{
+export function formatDate(date: Date | string): string {
     date = parseDate(date);
 
     const options: Intl.DateTimeFormatOptions = {
@@ -249,9 +283,9 @@ export const dateParts = (date: Date) => {
         startOfWeek: startOfWeek(date),
         endOfWeek: endOfWeek(date),
         monthName: date.toLocaleString(undefined, { month: 'long' }),
-        daysInMonth: getDaysInMonth(date.getFullYear(), date.getMonth())
-    }
-}
+        daysInMonth: getDaysInMonth(date.getFullYear(), date.getMonth()),
+    };
+};
 
 // TODO: This needs to not return 2 months when someone clicks the last days or the first days
 function getVisibleDayNumbersInArray(date: Date): visibleDayType[][] {

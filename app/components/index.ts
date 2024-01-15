@@ -7,8 +7,8 @@ import Customers, { Customer_Card, useCustomers } from './customers';
 import Form, { Text, NumberInput, Checkbox } from './form';
 import DateTimePicker from './form/datepicker';
 import { Button, Card } from './general';
-import LoadingComponent from './general/LoadingComponent';
 import ErrorCard from './general/errorCard';
+import LoadingComponent from './general/LoadingComponent';
 import Table, {
     Caption,
     Row,

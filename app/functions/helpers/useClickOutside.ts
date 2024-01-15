@@ -28,7 +28,11 @@ export function UseClickOutside<T extends HTMLElement>({
 
             const target = event.target as HTMLElement;
 
-            if (event.button === 0 && domRef.current && !domRef.current?.contains(target)) {
+            if (
+                event.button === 0 &&
+                domRef.current &&
+                !domRef.current?.contains(target)
+            ) {
                 event.preventDefault();
                 cb();
                 return;

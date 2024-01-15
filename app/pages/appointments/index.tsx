@@ -9,7 +9,10 @@ import {
     log,
     useToggle,
 } from '@functions';
-import { homeLoaderDataType, TAppointmentWithCustomerNameAndFullAddress } from '@types';
+import {
+    homeLoaderDataType,
+    TAppointmentWithCustomerNameAndFullAddress,
+} from '@types';
 
 // import Calendar from '../../components/calendar/calendar';
 import DatePicker from '../../components/calendar/DatePicker';
@@ -104,11 +107,10 @@ function Main(
         );
     };
 
-
     if (appointmentsData && appointmentsData.length) {
         return displayType !== 'appointments' ? (
-            
-            <DatePicker className="carl"/>
+            <DatePicker className="carl" />
+        ) : (
             // <Calendar
             //     displayType={displayType}
             //     setLoading={setLoading}
@@ -125,7 +127,6 @@ function Main(
             //         />
             //     ) : null}
             // </Calendar>
-        ) : (
             <Appointments className={currentAppointment ? 'disabled' : ''}>
                 {appointmentsControls()}
                 {currentAppointment ? (

@@ -1,32 +1,39 @@
-import { ErrorCard } from '@components';
 import { redirect } from '@remix-run/node';
 import { isRouteErrorResponse, useRouteError } from '@remix-run/react';
-
+import { ErrorCard } from '@components';
 
 export function ErrorBoundary() {
-  const error = useRouteError();
+    const error = useRouteError();
 
-  let errorHeading: string, errorMessage: string, errorStack: string | undefined;
+    let errorHeading: string,
+        errorMessage: string,
+        errorStack: string | undefined;
 
-  function handleRetry(){
-    return redirect("/");
-  }
+    function handleRetry() {
+        return redirect('/');
+    }
 
-  if (isRouteErrorResponse(error)) {
-    errorHeading = `${error.status} ${error.statusText}`;
-    errorMessage = `${error.data}`;
-  } else if (error instanceof Error) {
-    errorStack = JSON.stringify(error.stack, null, 2);
-    errorHeading = 'Error';
-    errorMessage = error.message;
-  } else {
-    errorHeading = 'Unknown Error';
-    errorMessage = 'An unknown error occurred.';
-  }
+    if (isRouteErrorResponse(error)) {
+        errorHeading = `${error.status} ${error.statusText}`;
+        errorMessage = `${error.data}`;
+    } else if (error instanceof Error) {
+        errorStack = JSON.stringify(error.stack, null, 2);
+        errorHeading = 'Error';
+        errorMessage = error.message;
+    } else {
+        errorHeading = 'Unknown Error';
+        errorMessage = 'An unknown error occurred.';
+    }
 
-  return (
-  <div className='dashboard__error'>
-    <ErrorCard errorHeading={errorHeading} errorMessage={errorMessage} errorStack={errorStack} cb={handleRetry} buttonMessage="reload application"/>
-  </div>
-  )
+    return (
+        <div className="dashboard__error">
+            <ErrorCard
+                errorHeading={errorHeading}
+                errorMessage={errorMessage}
+                errorStack={errorStack}
+                cb={handleRetry}
+                buttonMessage="reload application"
+            />
+        </div>
+    );
 }

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Text, Card, Checkbox, NumberInput } from '@components';
-import { log, useToggle, useError } from '@functions';
+import { log, useToggle, useError, joinClasses } from '@functions';
 import { TAppointmentWithCustomerNameAndFullAddress } from '@types';
 
 type props = {
     appointment: TAppointmentWithCustomerNameAndFullAddress;
     clearAppointment: () => void;
+    className?: string;
 } & React.HTMLProps<HTMLFormElement>;
 
 function Appointment_card({
@@ -43,7 +44,7 @@ function Appointment_card({
     // TODO: add basic styling
     return (
         <Card
-            className={'appointment single ' + className}
+            className={joinClasses('appointment single', className)}
             {...props}
             onSubmit={handleSubmit}
             toggleEditable={toggleEditable}

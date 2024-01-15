@@ -13,7 +13,6 @@
 // // import { useCalendar } from '.';
 // import { shortWeekDay } from '~/functions/helpers/dates';
 
-
 // // appointment calendar.
 
 // type calendarDisplayTypes = 'day' | 'week' | 'month';

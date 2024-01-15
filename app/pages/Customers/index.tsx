@@ -2,7 +2,7 @@ import { useLoaderData } from '@remix-run/react';
 import { useEffect } from 'react';
 import { Customer_Card, useCustomers } from '@components';
 import { addFullName, log } from '@functions';
-import {homeLoaderDataType, TCustomer } from '@types';
+import { homeLoaderDataType, TCustomer } from '@types';
 import Table, { Caption, Row, TD, TH } from '../../components/table/table';
 
 function Main(

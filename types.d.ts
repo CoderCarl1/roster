@@ -15,8 +15,7 @@ import {
     PrismaClientValidationError,
 } from '@prisma/client/runtime/library';
 
-
-export {homeLoaderDataType} from '~/pages/Home/loader'
+export { homeLoaderDataType } from '~/pages/Home/loader';
 
 type optionalFullName = {
     fullName?: string | undefined | null;

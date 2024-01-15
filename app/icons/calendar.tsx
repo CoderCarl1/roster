@@ -1,6 +1,12 @@
 type props = React.SVGProps<SVGElement>;
 
-export function CalendarSVG({ fill = "currentColor", height = "32px", width = "32px", className = '', ...props }: props) {
+export function CalendarSVG({
+    fill = 'currentColor',
+    height = '32px',
+    width = '32px',
+    className = '',
+    ...props
+}: props) {
     return (
         <svg
             className={'calendar icon ' + className}

@@ -2,7 +2,11 @@ import { useLoaderData } from '@remix-run/react';
 import { useEffect } from 'react';
 import { useAddresses, Address_Card } from '@components';
 import { addFullAddress, addFullName, log } from '@functions';
-import { homeLoaderDataType, TAddress, TAddressWithCustomerNameAndFullAddress } from '@types';
+import {
+    homeLoaderDataType,
+    TAddress,
+    TAddressWithCustomerNameAndFullAddress,
+} from '@types';
 import Table, { Caption, Row, TD, TH } from '../../components/table/table';
 
 function Main() {

@@ -1,7 +1,6 @@
-import { visibleDayType } from '@types';
 import { createContext, useState, useContext, useMemo, useEffect } from 'react';
+import { visibleDayType } from '@types';
 import { dates, log } from '~/functions';
-
 
 type CalendarContextType = {
     currentCalendarDate: Date;
@@ -16,32 +15,32 @@ type CalendarContextType = {
     visibleDates: visibleDayType[][] | undefined;
     // setVisibleDates: (date: Date) => void;
 };
-type visibleDatesStateType = {data: visibleDayType[][], date: Date};
+type visibleDatesStateType = { data: visibleDayType[][]; date: Date };
 const CalendarContext = createContext<CalendarContextType | null>(null);
 
 export function CalendarProvider({ children }: { children: React.ReactNode }) {
     const today = new Date();
     const [currentCalendarDate, setCurrentCalendarDate] = useState<Date>(today);
-    const [currentVisibleDates, setCurrentVisibleDates] = useState<visibleDatesStateType>();
+    const [currentVisibleDates, setCurrentVisibleDates] =
+        useState<visibleDatesStateType>();
 
     useEffect(() => {
-        setVisibleDates()
-    }, [])
+        setVisibleDates();
+    }, []);
 
     function setCalendarDate(date: Date | string) {
         date = dates.parseDate(date);
         setCurrentCalendarDate(date);
     }
 
-    function setVisibleDates(date: Date = new Date()){
+    function setVisibleDates(date: Date = new Date()) {
         const data = dates.getVisibleDayNumbersInArray(date);
-        setCurrentVisibleDates({data, date});
+        setCurrentVisibleDates({ data, date });
     }
 
     const monthName = useMemo(() => {
-        return dates.getMonthName(currentVisibleDates?.date || new Date()) 
-    },  [ currentVisibleDates?.date ])
-
+        return dates.getMonthName(currentVisibleDates?.date || new Date());
+    }, [currentVisibleDates?.date]);
 
     // function nextDay() {
     //     const nextDayDate = dates.calculateFutureDate(currentCalendarDate, 1);
@@ -53,21 +52,21 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     // }
 
     function nextMonth() {
-        if (!currentVisibleDates){
+        if (!currentVisibleDates) {
             setVisibleDates();
             return;
         }
-        let {year, month} = dates.dateParts(currentVisibleDates.date);
+        let { year, month } = dates.dateParts(currentVisibleDates.date);
         if (month === 11) {
             month = 0;
             year = year + 1;
-          } else {
-            month = month + 1
-          }
-        const nextMonthDate =  new Date(year, month, 1);
+        } else {
+            month = month + 1;
+        }
+        const nextMonthDate = new Date(year, month, 1);
         setVisibleDates(nextMonthDate);
     }
-    
+
     // function prevDay() {
     //     const prevDayDate = dates.calculatePastDate(currentCalendarDate, 1);
     //     setCalendarDate(prevDayDate);
@@ -77,17 +76,17 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     //     setCalendarDate(prevWeekDate);
     // }
     function prevMonth() {
-        if (!currentVisibleDates){
+        if (!currentVisibleDates) {
             setVisibleDates();
             return;
         }
-        let {year, month} = dates.dateParts(currentVisibleDates.date);
+        let { year, month } = dates.dateParts(currentVisibleDates.date);
 
         if (month === 0) {
             month = 11;
             year = year - 1;
         } else {
-            month = month - 1
+            month = month - 1;
         }
 
         const prevMonthDate = new Date(year, month, 1);

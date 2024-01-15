@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import CheckMark from "~/icons/checkmark";
+import { useEffect, useState } from 'react';
+import CheckMark from '~/icons/checkmark';
 
 type CheckboxProps = {
     label: string;
@@ -24,21 +24,24 @@ export default function Checkbox({
     className = '',
     ...props
 }: CheckboxProps) {
-    const [ isChecked, setIsChecked ] = useState(checked);
+    const [isChecked, setIsChecked] = useState(checked);
 
     const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setIsChecked(prev => !prev);
+        setIsChecked((prev) => !prev);
         if (onChangeFunc) {
             onChangeFunc(event);
         }
     };
     useEffect(() => {
         setIsChecked(checked);
-    }, [ checked ])
+    }, [checked]);
 
     if (editable) {
         return (
-            <div className={`checkbox__wrapper ${className ? className : ''}`} {...props}>
+            <div
+                className={`checkbox__wrapper ${className ? className : ''}`}
+                {...props}
+            >
                 {showError && errorMessage ? (
                     <span
                         className="warning"
@@ -57,15 +60,18 @@ export default function Checkbox({
                     id={formKey}
                 />
                 <CheckMark className="transparent" />
-                <label htmlFor={formKey} className='checkbox__label'>
+                <label htmlFor={formKey} className="checkbox__label">
                     {label}
                 </label>
             </div>
-        )
+        );
     }
 
     return (
-        <div className={`checkbox__wrapper ${className ? className : ''}`} {...props}>
+        <div
+            className={`checkbox__wrapper ${className ? className : ''}`}
+            {...props}
+        >
             <input
                 type="checkbox"
                 className="input checkbox"
@@ -75,7 +81,7 @@ export default function Checkbox({
                 disabled
             />
             <CheckMark className="transparent" />
-            <label htmlFor={formKey} className='checkbox__label'>
+            <label htmlFor={formKey} className="checkbox__label">
                 {label}
             </label>
         </div>

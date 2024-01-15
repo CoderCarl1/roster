@@ -48,13 +48,13 @@ export default function NumberInput({
                         type="number"
                         name={formKey}
                         value={value}
-                        placeholder={label && label}
+                        placeholder={label ? label : null}
                         onChange={handleOnChange}
                         maxLength={maxLength}
                         className="input number"
-                        {...props} 
+                        {...props}
                     />
-                    {label && <label>{label}</label>}
+                    {label ? <label>{label}</label> : null}
                 </>
             ) : (
                 <span>{value}</span>

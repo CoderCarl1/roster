@@ -1,4 +1,4 @@
-import { joinClasses } from "~/functions";
+import { joinClasses } from '~/functions';
 
 type ButtonProps = {
     children?: React.ReactNode;
@@ -11,7 +11,6 @@ export default function Button({
     className = '',
     ...props
 }: ButtonProps) {
-
     const classNames = joinClasses('button', variant, className);
 
     if (variant === 'icon') {
@@ -19,36 +18,40 @@ export default function Button({
             <IconButton className={classNames} {...props}>
                 {children}
             </IconButton>
-        )
+        );
     }
 
     return (
         <DefaultButton className={classNames} {...props}>
             {children}
         </DefaultButton>
-    )
+    );
 }
 
 type commonButtonProps = {
     children?: React.ReactNode;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
-function DefaultButton({ children, className = '', ...props }: commonButtonProps) {
-
+function DefaultButton({
+    children,
+    className = '',
+    ...props
+}: commonButtonProps) {
     return (
         <button className={joinClasses('button', className)} {...props}>
             {children}
         </button>
-    )
+    );
 }
 
-type IconButtonProps = {
-
-} & commonButtonProps;
-export function IconButton({ children, className = '', ...props }: IconButtonProps) {
+export function IconButton({
+    children,
+    className = '',
+    ...props
+}: commonButtonProps) {
     return (
         <DefaultButton className={joinClasses('icon', className)} {...props}>
             {children}
         </DefaultButton>
-    )
+    );
 }
