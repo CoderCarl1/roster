@@ -6,7 +6,7 @@
   "scripts": {
     "build": "run-s \"build:*\"",
     "build:css": "npm run css -- --style=compressed",
-    "build:remix": "remix build",
+    "build:remix": "prisma generate && remix build",
     "db:script": "npx tsx prisma/script.ts",
     "db:setup": "prisma generate && prisma migrate deploy && npm run db:seed",
     "db:seed": "npx tsx prisma/script.ts --seeding true",
@@ -19,7 +19,8 @@
     "clean": "npm run clean:format && npm run clean:lint -- --fix",
     "clean:format": "prettier --write \"app/**/*.{js,ts,jsx,tsx}\" \"tests/**/*.{js,ts,jsx,tsx}\" \"types.d.ts\"",
     "clean:lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
-    "test": "jest --watch "
+    "test": "jest --watch ",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@paralleldrive/cuid2": "^2.2.2",
