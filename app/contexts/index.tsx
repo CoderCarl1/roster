@@ -3,7 +3,7 @@ import {
   AppointmentProvider,
   useAppointmentContext,
 } from './appointmentContext';
-import { CalendarProvider, useCalendarContext } from './calendarContext';
+// import { CalendarProvider, useCalendarContext } from './calendarContext';
 import { CustomerProvider, useCustomerContext } from './customerContext';
 
 export {
@@ -13,8 +13,8 @@ export {
   useCustomerContext,
   AddressProvider,
   useAddressContext,
-  useCalendarContext,
-  CalendarProvider,
+  // useCalendarContext,
+  // CalendarProvider,
 };
 
 type providerProps = {
@@ -26,9 +26,9 @@ export default function Providers({ children }: providerProps) {
     <CustomerProvider>
       <AppointmentProvider>
         <AddressProvider>
-          <CalendarProvider>
+          {/* <CalendarProvider> */}
             {children}
-          </CalendarProvider>
+          {/* </CalendarProvider> */}
         </AddressProvider>
       </AppointmentProvider>
     </CustomerProvider>

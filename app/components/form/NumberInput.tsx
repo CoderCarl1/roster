@@ -6,7 +6,7 @@ type numberInputProps = {
     max?: number;
     editable: boolean;
     formKey: string;
-    showError: boolean;
+    showError?: boolean;
     errorMessage?: string;
     onChangeFunc?: (
         event: React.ChangeEvent<HTMLInputElement>

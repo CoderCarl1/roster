@@ -66,7 +66,7 @@ function useCalendar() {
         }
 
         return {
-            dayNumber: dates.dayNumberFromDate(selectedDate),
+            dayNumber: `${dates.dayNumberFromDate(selectedDate)}`,
             date: timeStringToCompare.toLocaleString(),
             dayName: dates.getDayName(selectedDate),
             data: calendarData,

@@ -25,8 +25,8 @@ export function ErrorBoundary() {
   }
 
   return (
-  <div className=''>
-  <ErrorCard errorHeading={errorHeading} errorMessage={errorMessage} errorStack={errorStack} cb={handleRetry} buttonMessage="reload application"/>
+  <div className='dashboard__error'>
+    <ErrorCard errorHeading={errorHeading} errorMessage={errorMessage} errorStack={errorStack} cb={handleRetry} buttonMessage="reload application"/>
   </div>
   )
 }

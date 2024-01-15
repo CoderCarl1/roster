@@ -12,7 +12,7 @@ import {
 import { homeLoaderDataType, TAppointmentWithCustomerNameAndFullAddress } from '@types';
 
 // import Calendar from '../../components/calendar/calendar';
-import Calendar from '../../components/form/date/calendar'
+import DatePicker from '../../components/calendar/DatePicker';
 import Table, { Caption, Row, TD, TH } from '../../components/table/table';
 
 export type displayTypeEnum = 'day' | 'week' | 'month' | 'appointments';
@@ -108,7 +108,7 @@ function Main(
     if (appointmentsData && appointmentsData.length) {
         return displayType !== 'appointments' ? (
             
-            <Calendar className="carl"/>
+            <DatePicker className="carl"/>
             // <Calendar
             //     displayType={displayType}
             //     setLoading={setLoading}

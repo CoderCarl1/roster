@@ -174,7 +174,40 @@
 
 .calendar__wrapper {
 
+  .calendar__dropdown {
+    
+    // width: min(100%, calc(30ch + (3 * 0.25rem)));
+    width: calc(30ch + (3 * 0.25rem));
 
+  
+  }
+
+.calendar__controls {
+  // display: grid;
+  // grid-template-columns: 2fr 1fr 1fr 1fr;
+  // place-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: size(4);
+  line-height: 2lh;
+  &--monthName {
+    background: clr(neutral, 400);
+    color: clr(neutral,100);
+    text-align: center;
+    font-weight: 600;
+    flex: 0 1 10.5ch;
+  }
+  &--nextPrev{
+    flex: 1 0 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .button {
+    --button-padding: 0;
+    flex: 0 0 6.5ch;
+  }
+}
 .calendar__inputs {
   display: inline-grid;
   grid-template-columns: repeat(3, 1fr);

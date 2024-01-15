@@ -1,0 +1,42 @@
+@use '../abstracts/' as *;
+
+.dashboard__error {
+  height: 100dvh;
+  background-color: clr(neutral, 400);
+  padding-top: size(16);
+  .errorBoundary {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1em;
+    width: min(100% - 2rem, bp(small));
+    background-color: clr(neutral,100);
+    margin-inline: auto;
+    outline: 1px solid clr(neutral, 400);
+    outline-offset: -1px;
+    padding: size(16);
+    .error-heading {
+      text-transform: uppercase;
+      text-align: center;
+      &::after {
+        content: '';
+        display: block;
+        width: 100%;
+        height: 2px;
+        background-color: clr(accent, 200);
+
+      }
+    }
+    .error-message {
+
+    }
+    .error-stackTrack {
+      text-wrap: wrap;
+      font-size: fs(200);
+      max-height: 200px;
+      overflow-y: auto;
+      margin-block-start: size(16);
+      padding: size(8);
+    }
+  }
+}

@@ -239,13 +239,18 @@ export function getMonthNumberByName(monthName: string) {
     }
 }
 
-export function dateParts(date: Date){
+export const dateParts = (date: Date) => {
     date = parseDate(date);
-    let year = date.getFullYear();
-    let month = date.getMonth();
-    let day = date.getDate()
-
-    return {year, month, day};
+    return {
+        day: date.getDate(),
+        month: date.getMonth(),
+        year: date.getFullYear(),
+        dayName: getDayName(date),
+        startOfWeek: startOfWeek(date),
+        endOfWeek: endOfWeek(date),
+        monthName: date.toLocaleString(undefined, { month: 'long' }),
+        daysInMonth: getDaysInMonth(date.getFullYear(), date.getMonth())
+    }
 }
 
 // TODO: This needs to not return 2 months when someone clicks the last days or the first days
