@@ -41,15 +41,14 @@ function Appointment_card({
         log('fake submission of appointment card form', { data: formData });
     };
 
-    // TODO: add basic styling
     return (
         <Card
             className={joinClasses('appointment single', className)}
-            {...props}
             onSubmit={handleSubmit}
             toggleEditable={toggleEditable}
             editable={editable}
             closeFunc={clearAppointment}
+            {...props}
         >
             {/* 
             Make this error out when no customer name is available  
