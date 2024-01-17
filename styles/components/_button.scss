@@ -25,7 +25,7 @@
 .button.icon{
   --button-padding: 0;
 }
-.button:hover:not([disabled]) {
+:where(.button:hover:not([disabled])) {
   --button-bg-color: #fff;
 
   box-shadow:
