@@ -15,10 +15,10 @@ import {
 } from '@types';
 
 // import Calendar from '../../components/calendar/calendar';
+import { useAppointments } from '~/components/appointments/appointment.hooks';
+import { SearchBar } from '~/components/general';
 import DatePicker from '../../components/calendar/DatePicker';
 import Table, { Caption, Row, TD, TH } from '../../components/table/table';
-import { SearchBar } from '~/components/general';
-import { useAppointments } from '~/components/appointments/appointment.hooks';
 
 export type displayTypeEnum = 'day' | 'week' | 'month' | 'appointments';
 
@@ -29,30 +29,31 @@ function Main(
     >
 ) {
     const data = useLoaderData<homeLoaderDataType>();
-    
-        const {
-            setAppointment,
-            currentAppointment,
-            setAppointments,
-            appointmentsData,
-        } = useAppointments();
 
-        useEffect(() => {
-            const appointmentsLoaderData =
+    const {
+        setAppointment,
+        currentAppointment,
+        setAppointments,
+        appointmentsData,
+    } = useAppointments();
+
+    useEffect(() => {
+        const appointmentsLoaderData =
             data.appointmentsLoaderData as unknown as TAppointmentWithCustomerNameAndFullAddress[];
-            // console.log("data.appointmentsLoaderData initialk", appointmentsLoaderData)
-            // setLoading(true);
-            setAppointments(appointmentsLoaderData);
-            // setLoading(false);
-        }, []);
-        useEffect(() => {
-        }, [appointmentsData])
-        return (
-            <>
-            {currentAppointment && <p>current appointment is at {currentAppointment.fullAddress}</p>}
-                {appointmentsData && <SearchBar array={appointmentsData}/>}
-            </>
-        )
+        // console.log("data.appointmentsLoaderData initialk", appointmentsLoaderData)
+        // setLoading(true);
+        setAppointments(appointmentsLoaderData);
+        // setLoading(false);
+    }, []);
+    useEffect(() => {}, [appointmentsData]);
+    return (
+        <>
+            {currentAppointment ? <p>
+                    current appointment is at {currentAppointment.fullAddress}
+                </p> : null}
+            {appointmentsData ? <SearchBar array={appointmentsData} /> : null}
+        </>
+    );
 
     // const { toggle: loading, setToggleStatus: setLoading } = useToggle(true);
 
@@ -136,22 +137,22 @@ function Main(
     //     return displayType !== 'appointments' ? (
     //         <DatePicker className="carl" />
     //     ) : (
-            // <Calendar
-            //     displayType={displayType}
-            //     setLoading={setLoading}
-            //     loading={loading}
-            //     {...props}
-            //     className="calendar"
-            // >
-            //     {appointmentsControls()}
-            //     {currentAppointment ? (
-            //         <Appointment_Card
-            //             clearAppointment={setAppointment}
-            //             appointment={currentAppointment}
-            //             className="calendar__appointment--single"
-            //         />
-            //     ) : null}
-            // </Calendar>
+    // <Calendar
+    //     displayType={displayType}
+    //     setLoading={setLoading}
+    //     loading={loading}
+    //     {...props}
+    //     className="calendar"
+    // >
+    //     {appointmentsControls()}
+    //     {currentAppointment ? (
+    //         <Appointment_Card
+    //             clearAppointment={setAppointment}
+    //             appointment={currentAppointment}
+    //             className="calendar__appointment--single"
+    //         />
+    //     ) : null}
+    // </Calendar>
     //         <Appointments className={currentAppointment ? 'disabled' : ''}>
     //             {appointmentsControls()}
     //             {currentAppointment ? (

@@ -16,7 +16,11 @@ type debounceProps<T> = {
 
 type CancelFunction = () => void;
 
-export function debounce<T>({ func, delay, args }: debounceProps<T>): CancelFunction {
+export function debounce<T>({
+    func,
+    delay,
+    args,
+}: debounceProps<T>): CancelFunction {
     let debounceTimer: NodeJS.Timeout | null = null;
 
     function setTimer() {
@@ -30,8 +34,8 @@ export function debounce<T>({ func, delay, args }: debounceProps<T>): CancelFunc
 
     setTimer();
 
-     // Return a cancel function to be handled in useEffect on dismounts
-     const cancel: CancelFunction = () => {
+    // Return a cancel function to be handled in useEffect on dismounts
+    const cancel: CancelFunction = () => {
         if (debounceTimer) {
             clearTimeout(debounceTimer);
         }

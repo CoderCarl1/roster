@@ -20,11 +20,11 @@ export default function AppointmentView({
     type = 'day',
     ...props
 }: AppointmentViewProps) {
-    let ViewComponent = AppointmentCalendar[type];
+    const ViewComponent = AppointmentCalendar[type];
 
     return (
         <AppointmentProvider>
-            <ViewComponent {...props}/>
+            <ViewComponent {...props} />
         </AppointmentProvider>
     );
 }

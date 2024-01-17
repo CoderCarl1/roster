@@ -49,7 +49,7 @@ function DatePicker({ cb, dateToSet, ...props }: DatePickerProps) {
         day: DayView,
         week: WeekView,
         month: MonthView,
-    }
+    };
     const CalendarView = calendarViews[currentCalendarViewType];
 
     return (

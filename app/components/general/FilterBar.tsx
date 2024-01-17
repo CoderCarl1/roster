@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Text from '../form/Text';
-import React from 'react';
+
 
 type filterBarProps = {
-  cb: (text: string) => void;
-  className?: string;
-  onFocusFunc?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    cb: (text: string) => void;
+    className?: string;
+    onFocusFunc?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export default function FilterBar({ cb, onFocusFunc, className = ""}: filterBarProps) {
+export default function FilterBar({
+    cb,
+    onFocusFunc,
+    className = '',
+}: filterBarProps) {
     const [text, setText] = useState('');
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {

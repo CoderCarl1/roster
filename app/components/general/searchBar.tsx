@@ -1,19 +1,19 @@
 import { ElementRef, useEffect, useMemo, useRef, useState } from 'react';
-import FilterBar from './FilterBar';
 import { TAppointmentWithCustomerNameAndFullAddress } from '@types';
 import { debounce, joinClasses } from '~/functions';
+import UseClickOutside from '~/functions/helpers/useClickOutside';
 import {
     AppointmentProvider,
     useAppointments,
 } from '../appointments/appointment.hooks';
+import FilterBar from './FilterBar';
 import { Button } from '.';
-import UseClickOutside from '~/functions/helpers/useClickOutside';
 
 type searchBarProps = {
-  array: TAppointmentWithCustomerNameAndFullAddress[];
+    array: TAppointmentWithCustomerNameAndFullAddress[];
 } & React.HTMLProps<HTMLDivElement>;
 
-export default function Main({array, ...props}: searchBarProps) {
+export default function Main({ array, ...props }: searchBarProps) {
     return (
         <AppointmentProvider>
             <SearchBar array={array} {...props} />
@@ -21,43 +21,44 @@ export default function Main({array, ...props}: searchBarProps) {
     );
 }
 
-function SearchBar({array, ...props}: searchBarProps) {
+function SearchBar({ array, ...props }: searchBarProps) {
     const [results, setResults] = useState<
         TAppointmentWithCustomerNameAndFullAddress[]
     >([]);
-    const [searchTerm, setSearchTerm] = useState('')
+    const [searchTerm, setSearchTerm] = useState('');
     const [focusedIndex, setFocusedIndex] = useState<number | null>(null); // Track the focused result index;
-    const [searchIsCollapsed, setSearchIsCollapsed] = useState(true)
-    const searchBarRef = UseClickOutside<ElementRef<"div">>({cb: () => setSearchIsCollapsed(true) })
+    const [searchIsCollapsed, setSearchIsCollapsed] = useState(true);
+    const searchBarRef = UseClickOutside<ElementRef<'div'>>({
+        cb: () => setSearchIsCollapsed(true),
+    });
     const [invalidSearch, setInvalidSearch] = useState(false);
     const cancelDebouncedSearch = useMemo(() => {
         return debounce<string>({
             func: () => {
                 setInvalidSearch(false);
                 const lowerCaseSearchTerm = searchTerm.toLowerCase();
-                const filteredResultsMap = new Map<string, TAppointmentWithCustomerNameAndFullAddress>();
-                array.forEach(
-                    (appointment) => {
-                      const address = appointment.fullAddress?.toLowerCase();
-                      const fullName = appointment.fullName?.toLowerCase() || '';
-                      if( 
-                        address && (
-                          address.includes(lowerCaseSearchTerm)
-                        || fullName.includes(lowerCaseSearchTerm)
-                        )
-                      ){
+                const filteredResultsMap = new Map<
+                    string,
+                    TAppointmentWithCustomerNameAndFullAddress
+                >();
+                array.forEach((appointment) => {
+                    const address = appointment.fullAddress?.toLowerCase();
+                    const fullName = appointment.fullName?.toLowerCase() || '';
+                    if (
+                        address &&
+                        (address.includes(lowerCaseSearchTerm) ||
+                            fullName.includes(lowerCaseSearchTerm))
+                    ) {
                         filteredResultsMap.set(address, appointment);
-                      }
                     }
-                       
-                    );
-                    const filteredArray = Array.from(filteredResultsMap.values());
-                    if (filteredArray.length){
-                      setResults(filteredArray);
-                    } else {
-                      setInvalidSearch(true);
-                    }
-                    setFocusedIndex(null);
+                });
+                const filteredArray = Array.from(filteredResultsMap.values());
+                if (filteredArray.length) {
+                    setResults(filteredArray);
+                } else {
+                    setInvalidSearch(true);
+                }
+                setFocusedIndex(null);
             },
             delay: 300,
             args: '',
@@ -95,7 +96,7 @@ function SearchBar({array, ...props}: searchBarProps) {
     //         break;
     //     }
     //   };
-  
+
     //   document.addEventListener('keydown', handleKeyDown);
     //   return () => {
     //     document.removeEventListener('keydown', handleKeyDown);
@@ -103,52 +104,80 @@ function SearchBar({array, ...props}: searchBarProps) {
     // }, [focusedIndex, results]);
 
     function handleChange(text: string) {
-      setSearchTerm(text);
+        setSearchTerm(text);
     }
 
     useEffect(() => {
-      function handleClassNameAllocations(){
-        setSearchIsCollapsed(false);
-        searchBarRef.current?.classList.toggle('carl' , !searchIsCollapsed)
-      }
-      searchBarRef.current?.addEventListener('click', handleClassNameAllocations);
-      return () => {
-        searchBarRef.current?.removeEventListener('click', handleClassNameAllocations);
-      }
-      
-    }, [])
+        function handleClassNameAllocations() {
+            setSearchIsCollapsed(false);
+            searchBarRef.current?.classList.toggle('carl', !searchIsCollapsed);
+        }
+        searchBarRef.current?.addEventListener(
+            'click',
+            handleClassNameAllocations
+        );
+        return () => {
+            searchBarRef.current?.removeEventListener(
+                'click',
+                handleClassNameAllocations
+            );
+        };
+    }, []);
     return (
         <div ref={searchBarRef} className="search-bar__wrapper" {...props}>
-            <FilterBar className={joinClasses("search-bar", invalidSearch ? "invalid" : "")} cb={handleChange} />
-            <AppointmentResultsBar collapsed={searchIsCollapsed} focusedIndex={focusedIndex} results={results}/>
+            <FilterBar
+                className={joinClasses(
+                    'search-bar',
+                    invalidSearch ? 'invalid' : ''
+                )}
+                cb={handleChange}
+            />
+            <AppointmentResultsBar
+                collapsed={searchIsCollapsed}
+                focusedIndex={focusedIndex}
+                results={results}
+            />
         </div>
     );
 }
 
 type appointmentResultsBarProps = {
-  results: TAppointmentWithCustomerNameAndFullAddress[];
-  collapsed: boolean;
-  focusedIndex: number | null;
-}
-function AppointmentResultsBar({results, collapsed, focusedIndex}: appointmentResultsBarProps){
-  const {setAppointment} = useAppointments();
-  return (
-    <div  className={joinClasses("search-bar__results flow",
-    collapsed ? "collapse" : "")}>
-    {results.map((appointment, index) => {
-      return (
-        <Button 
-          key={appointment.id} 
-          className={joinClasses(
-            'search-bar__results--result',
-            focusedIndex === index ? "current" : ""
+    results: TAppointmentWithCustomerNameAndFullAddress[];
+    collapsed: boolean;
+    focusedIndex: number | null;
+};
+function AppointmentResultsBar({
+    results,
+    collapsed,
+    focusedIndex,
+}: appointmentResultsBarProps) {
+    const { setAppointment } = useAppointments();
+    return (
+        <div
+            className={joinClasses(
+                'search-bar__results flow',
+                collapsed ? 'collapse' : ''
             )}
-          onClick={() => setAppointment(appointment.id)}
-          >
-          <span className='result__name'>{appointment.fullName}</span><span className='result__address'>{appointment.fullAddress}</span>
-        </Button>
-      )
-    })}
-    </div>
-  )
+        >
+            {results.map((appointment, index) => {
+                return (
+                    <Button
+                        key={appointment.id}
+                        className={joinClasses(
+                            'search-bar__results--result',
+                            focusedIndex === index ? 'current' : ''
+                        )}
+                        onClick={() => setAppointment(appointment.id)}
+                    >
+                        <span className="result__name">
+                            {appointment.fullName}
+                        </span>
+                        <span className="result__address">
+                            {appointment.fullAddress}
+                        </span>
+                    </Button>
+                );
+            })}
+        </div>
+    );
 }

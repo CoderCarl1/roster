@@ -1,6 +1,5 @@
 import { joinClasses } from '~/functions';
 
-
 type commonButtonProps = {
     children?: React.ReactNode;
     ref?: React.MutableRefObject<HTMLButtonElement>;
@@ -33,7 +32,6 @@ export default function Button({
     );
 }
 
-
 function DefaultButton({
     children,
     className = '',
@@ -41,7 +39,11 @@ function DefaultButton({
     ...props
 }: commonButtonProps) {
     return (
-        <button ref={ref} className={joinClasses('button', className)} {...props}>
+        <button
+            ref={ref}
+            className={joinClasses('button', className)}
+            {...props}
+        >
             {children}
         </button>
     );

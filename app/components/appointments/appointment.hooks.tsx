@@ -1,6 +1,6 @@
-import { TAppointmentWithCustomerNameAndFullAddress } from '@types';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { addFullAddress, addFullName, dates, isAppointment } from '@functions';
+import { TAppointmentWithCustomerNameAndFullAddress } from '@types';
 
 export type CalendarAppointment = {
     time: string;
@@ -22,7 +22,9 @@ export type CalendarType =
 
 type AppointmentContextType = {
     currentAppointment: null | TAppointmentWithCustomerNameAndFullAddress;
-    setAppointments: (appointmentsArray: TAppointmentWithCustomerNameAndFullAddress[]) => void;
+    setAppointments: (
+        appointmentsArray: TAppointmentWithCustomerNameAndFullAddress[]
+    ) => void;
     setAppointment: (appointmentId?: string) => void;
     setAppointmentProviderDate: (date: Date) => void;
     appointmentsData: TAppointmentWithCustomerNameAndFullAddress[];
@@ -52,14 +54,30 @@ export function AppointmentProvider({
     const [appointmentsList, setAppointmentsList] = useState<
         TAppointmentWithCustomerNameAndFullAddress[]
     >([]);
-    const appointmentsForToday = useMemo(() => getVisibleAppointmentsForDay(currentDate),[currentDate]);
-    const appointmentsForWeek = useMemo(() => getVisibleAppointmentsForWeek(currentDate),[currentDate]);
-    const appointmentsForMonth = useMemo(() => getVisibleAppointmentsForMonth(currentDate),[currentDate]);
-    const timeSlotsForToday = useMemo(() => getDayTimeSlots(currentDate, appointmentsForToday), [currentDate, appointmentsForToday]);
-    const timeSlotsForWeek = useMemo(() => getWeekTimeSlots(currentDate, appointmentsForWeek),[currentDate, appointmentsForWeek]);
-    const timeSlotsForMonth = useMemo(() => getMonthTimeSlots(currentDate, appointmentsForMonth),[currentDate, appointmentsForMonth]);
-
-
+    const appointmentsForToday = useMemo(
+        () => getVisibleAppointmentsForDay(currentDate),
+        [currentDate]
+    );
+    const appointmentsForWeek = useMemo(
+        () => getVisibleAppointmentsForWeek(currentDate),
+        [currentDate]
+    );
+    const appointmentsForMonth = useMemo(
+        () => getVisibleAppointmentsForMonth(currentDate),
+        [currentDate]
+    );
+    const timeSlotsForToday = useMemo(
+        () => getDayTimeSlots(currentDate, appointmentsForToday),
+        [currentDate, appointmentsForToday]
+    );
+    const timeSlotsForWeek = useMemo(
+        () => getWeekTimeSlots(currentDate, appointmentsForWeek),
+        [currentDate, appointmentsForWeek]
+    );
+    const timeSlotsForMonth = useMemo(
+        () => getMonthTimeSlots(currentDate, appointmentsForMonth),
+        [currentDate, appointmentsForMonth]
+    );
 
     // TODO: USER OBJ NEEDS TO BE SET UP
     // useEffect(() => {
@@ -71,13 +89,14 @@ export function AppointmentProvider({
     //   setUserPreferences()
     // }, [userObj])
 
-
     function setAppointmentProviderDate(date: Date) {
         date = dates.parseDate(date);
         setCurrentDate(date);
     }
 
-    function setAppointments(appointmentsArray: TAppointmentWithCustomerNameAndFullAddress[]){
+    function setAppointments(
+        appointmentsArray: TAppointmentWithCustomerNameAndFullAddress[]
+    ) {
         setAppointmentsList(appointmentsArray);
     }
 
@@ -98,8 +117,7 @@ export function AppointmentProvider({
         }, []);
     }, [appointmentsList]);
 
-    useEffect(() => {
-    }, [appointmentsData])
+    useEffect(() => {}, [appointmentsData]);
 
     function setAppointment(appointmentId?: string) {
         let data = null;
@@ -306,7 +324,7 @@ export function AppointmentProvider({
         appointmentsForMonth,
         timeSlotsForToday,
         timeSlotsForWeek,
-        timeSlotsForMonth
+        timeSlotsForMonth,
     };
     return (
         <AppointmentContext.Provider value={value}>

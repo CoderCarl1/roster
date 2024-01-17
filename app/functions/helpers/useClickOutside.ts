@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 type clickOutsideProps<T> = {
-    cb: (value?: React.MouseEvent<T,  MouseEvent>) => unknown | void;
+    cb: (value?: React.MouseEvent<T, MouseEvent>) => unknown | void;
     initialRef?: React.RefObject<T>;
     checkBeforeRunningCB?: boolean[];
 };

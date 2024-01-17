@@ -2,7 +2,7 @@ import { addFullAddress } from './helpers/addresses';
 import { randomHSLValues } from './helpers/colours';
 import { addFullName } from './helpers/customers';
 import dates from './helpers/dates';
-import {debounce} from './helpers/debounce';
+import { debounce } from './helpers/debounce';
 import log from './helpers/log';
 import { randomNumber } from './helpers/numbers';
 import { removePropertiesFromObject } from './helpers/objects';

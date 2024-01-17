@@ -1,4 +1,4 @@
-import { joinClasses } from "~/functions";
+import { joinClasses } from '~/functions';
 
 type GenericFormInputProps = {
     label: string;
@@ -32,7 +32,10 @@ export default function Text({
     }
 
     return (
-        <div {...props} className={joinClasses('input-wrapper floating ', className)}>
+        <div
+            {...props}
+            className={joinClasses('input-wrapper floating ', className)}
+        >
             {showError && errorMessage ? (
                 <span className="warning" aria-live="assertive" role="alert">
                     {errorMessage}
