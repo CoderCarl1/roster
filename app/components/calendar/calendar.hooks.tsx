@@ -4,16 +4,11 @@ import { dates, log } from '~/functions';
 
 type CalendarContextType = {
     currentCalendarDate: Date;
-    // nextDay: () => void;
-    // nextWeek: () => void;
     nextMonth: () => void;
-    // prevDay: () => void;
-    // prevWeek: () => void;
     prevMonth: () => void;
     setCalendarDate: (date: Date | string) => void;
     monthName: string;
     visibleDates: visibleDayType[][] | undefined;
-    // setVisibleDates: (date: Date) => void;
 };
 type visibleDatesStateType = { data: visibleDayType[][]; date: Date };
 const CalendarContext = createContext<CalendarContextType | null>(null);
@@ -42,15 +37,6 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         return dates.getMonthName(currentVisibleDates?.date || new Date());
     }, [currentVisibleDates?.date]);
 
-    // function nextDay() {
-    //     const nextDayDate = dates.calculateFutureDate(currentCalendarDate, 1);
-    //     setCalendarDate(nextDayDate);
-    // }
-    // function nextWeek() {
-    //     const nextWeekDate = dates.calculateFutureDate(currentCalendarDate, 7);
-    //     setCalendarDate(nextWeekDate);
-    // }
-
     function nextMonth() {
         if (!currentVisibleDates) {
             setVisibleDates();
@@ -67,14 +53,6 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         setVisibleDates(nextMonthDate);
     }
 
-    // function prevDay() {
-    //     const prevDayDate = dates.calculatePastDate(currentCalendarDate, 1);
-    //     setCalendarDate(prevDayDate);
-    // }
-    // function prevWeek() {
-    //     const prevWeekDate = dates.calculatePastDate(currentCalendarDate, 7);
-    //     setCalendarDate(prevWeekDate);
-    // }
     function prevMonth() {
         if (!currentVisibleDates) {
             setVisibleDates();
@@ -97,11 +75,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         currentCalendarDate,
         setCalendarDate,
         monthName,
-        // nextDay,
-        // nextWeek,
         nextMonth,
-        // prevDay,
-        // prevWeek,
         prevMonth,
         visibleDates: currentVisibleDates && currentVisibleDates.data,
     };
