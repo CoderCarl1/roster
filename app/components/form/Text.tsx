@@ -1,11 +1,14 @@
+import { joinClasses } from "~/functions";
+
 type GenericFormInputProps = {
     label: string;
     value: string | number;
     formKey: string;
     editable: boolean;
     maxLength?: number;
-    showError: boolean;
+    showError?: boolean;
     errorMessage?: string;
+    onFocusFunc?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onChangeFunc?: (event: React.ChangeEvent<HTMLInputElement>) => unknown;
 } & React.HTMLProps<HTMLDivElement>;
 
@@ -19,6 +22,7 @@ export default function Text({
     maxLength,
     showError = false,
     errorMessage = '',
+    onFocusFunc,
     ...props
 }: GenericFormInputProps) {
     function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -28,7 +32,7 @@ export default function Text({
     }
 
     return (
-        <div {...props} className={'input-wrapper floating ' + className}>
+        <div {...props} className={joinClasses('input-wrapper floating ', className)}>
             {showError && errorMessage ? (
                 <span className="warning" aria-live="assertive" role="alert">
                     {errorMessage}
@@ -44,6 +48,7 @@ export default function Text({
                         onChange={handleOnChange}
                         maxLength={maxLength}
                         className="input"
+                        onFocus={onFocusFunc}
                     />
                     <label>{label}</label>
                 </>

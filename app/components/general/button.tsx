@@ -1,7 +1,12 @@
 import { joinClasses } from '~/functions';
 
-type ButtonProps = {
+
+type commonButtonProps = {
     children?: React.ReactNode;
+    ref?: React.MutableRefObject<HTMLButtonElement>;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
+
+type ButtonProps = commonButtonProps & {
     variant?: 'primary' | 'secondary' | 'danger' | 'default' | 'icon';
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
@@ -28,17 +33,15 @@ export default function Button({
     );
 }
 
-type commonButtonProps = {
-    children?: React.ReactNode;
-} & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 function DefaultButton({
     children,
     className = '',
+    ref,
     ...props
 }: commonButtonProps) {
     return (
-        <button className={joinClasses('button', className)} {...props}>
+        <button ref={ref} className={joinClasses('button', className)} {...props}>
             {children}
         </button>
     );

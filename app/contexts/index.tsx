@@ -1,14 +1,15 @@
+import { AppointmentProvider } from '~/components/appointments/appointment.hooks';
 import { AddressProvider, useAddressContext } from './addressContext';
-import {
-    AppointmentProvider,
-    useAppointmentContext,
-} from './appointmentContext';
+// import {
+    // AppointmentProvider,
+    // useAppointmentContext,
+// } from './appointmentContext';
 // import { CalendarProvider, useCalendarContext } from './calendarContext';
 import { CustomerProvider, useCustomerContext } from './customerContext';
 
 export {
     AppointmentProvider,
-    useAppointmentContext,
+    // useAppointmentContext,
     CustomerProvider,
     useCustomerContext,
     AddressProvider,
