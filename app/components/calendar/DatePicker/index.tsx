@@ -26,7 +26,7 @@ export default function Main(props: DatePickerProps) {
 function DatePicker({ cb, dateToSet, ...props }: DatePickerProps) {
     const { setCalendarDate, currentCalendarDate } = useCalendar();
     const [currentCalendarViewType, setCurrentCalendarViewType] =
-        useState('day');
+        useState<viewType>('day');
 
     useEffect(() => {
         if (dateToSet) {
@@ -41,9 +41,16 @@ function DatePicker({ cb, dateToSet, ...props }: DatePickerProps) {
     }, [currentCalendarDate]);
 
     function handleCalendarViewChange(viewType: viewType) {
-        if (!viewType || !['day', 'week', 'month'].includes(viewType)) return;
+        if (!['day', 'week', 'month'].includes(viewType)) return;
         setCurrentCalendarViewType(viewType);
     }
+
+    const calendarViews = {
+        day: DayView,
+        week: WeekView,
+        month: MonthView,
+    }
+    const CalendarView = calendarViews[currentCalendarViewType];
 
     return (
         <DateInputs {...props}>
@@ -52,9 +59,7 @@ function DatePicker({ cb, dateToSet, ...props }: DatePickerProps) {
                 currentCalendarViewType={currentCalendarViewType}
                 handleCalendarViewChange={handleCalendarViewChange}
             />
-            {currentCalendarViewType === 'day' ? <DayView /> : null}
-            {currentCalendarViewType === 'week' ? <WeekView /> : null}
-            {currentCalendarViewType === 'month' ? <MonthView /> : null}
+            <CalendarView />
         </DateInputs>
     );
 }
