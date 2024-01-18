@@ -1,7 +1,17 @@
 import { Appointment, Prisma } from '@prisma/client';
-import { TAppointment, TAppointment_data_for_creation } from '@types';
+import {
+    TAppointment,
+    TAppointmentWithCustomerNameAndFullAddress,
+    TAppointment_data_for_creation,
+} from '@types';
 import { prisma } from '~/db.server';
-import { dates, log } from '~/functions';
+import {
+    addFullAddress,
+    addFullName,
+    dates,
+    isAppointment,
+    log,
+} from '~/functions';
 import { AppointmentOperationError } from '~/functions/errors';
 
 /**
@@ -192,10 +202,16 @@ export async function appointment_create_many(
  * @param whereBlock - Optional. Specify the filters.
  * @returns A promise that resolves to an array of appointments or an AppointmentOperationError.
  */
+
+type appointmentsObjectType = Record<
+    string,
+    Record<string, TAppointmentWithCustomerNameAndFullAddress>
+>;
+
 export async function appointment_find_many(
     include?: Prisma.AppointmentInclude | undefined,
     whereBlock?: Prisma.AppointmentWhereInput | undefined
-): Promise<TAppointment[] | AppointmentOperationError> {
+): Promise<appointmentsObjectType | AppointmentOperationError> {
     try {
         const appointments = await prisma.appointment.findMany({
             where: { completed: false, ...whereBlock },
@@ -204,9 +220,33 @@ export async function appointment_find_many(
         });
 
         if (!appointments) {
-            return [];
+            return {};
         }
-        return appointments.map(addLocaleDates);
+        return appointments.reduce<
+            Record<
+                string,
+                Record<string, TAppointmentWithCustomerNameAndFullAddress>
+            >
+        >((acc, appointment) => {
+            let updatedAppointment =
+                addNameAndAddressToAppointment(appointment);
+            if (updatedAppointment && isAppointment(updatedAppointment)) {
+                updatedAppointment = addLocaleDates(updatedAppointment);
+                const dateString = dates.localDateStringFromDate(
+                    appointment.start
+                );
+                const timeString = dates.localTimeStringFromDate(
+                    appointment.start
+                );
+
+                if (!acc[dateString]) {
+                    acc[dateString] = {};
+                }
+
+                acc[dateString][timeString] = updatedAppointment;
+            }
+            return acc;
+        }, {});
     } catch (err) {
         return new AppointmentOperationError(
             `Error while retrieving appointments \n ${JSON.stringify(
@@ -222,9 +262,16 @@ export async function appointment_find_many(
  * @returns A promise that resolves to an array of appointments or an AppointmentOperationError.
  */
 export async function appointment_find_many_completed(): Promise<
-    TAppointment[] | AppointmentOperationError
+    appointmentsObjectType | AppointmentOperationError
 > {
-    return await appointment_find_many({}, { completed: true });
+    try {
+        return await appointment_find_many({}, { completed: true });
+    } catch (err) {
+        return new AppointmentOperationError(
+            `Error while retrieving completed appointments`,
+            err
+        );
+    }
 }
 
 /**
@@ -234,13 +281,9 @@ export async function appointment_find_many_completed(): Promise<
  */
 export async function appointment_findbyCustomer(
     customerId: string
-): Promise<TAppointment[] | AppointmentOperationError> {
+): Promise<appointmentsObjectType | AppointmentOperationError> {
     try {
-        const appointments = await appointment_find_many(undefined, {
-            customerId,
-        });
-
-        return appointments;
+        return await appointment_find_many(undefined, { customerId });
     } catch (err) {
         return new AppointmentOperationError(
             `Error while retrieving appointments for customer ${customerId}`,
@@ -256,12 +299,9 @@ export async function appointment_findbyCustomer(
  */
 export async function appointment_findbyAddress(
     addressId: string
-): Promise<TAppointment[] | AppointmentOperationError> {
+): Promise<appointmentsObjectType | AppointmentOperationError> {
     try {
-        const appointments = await appointment_find_many(undefined, {
-            addressId,
-        });
-        return appointments;
+        return await appointment_find_many(undefined, { addressId });
     } catch (err) {
         return new AppointmentOperationError(
             `Error while retrieving appointments for address ${addressId}`,
@@ -282,8 +322,11 @@ export async function appointment_findbyId(
         const appointment = await prisma.appointment.findUniqueOrThrow({
             where: { id: appointmentId },
         });
-
-        return addLocaleDates(appointment);
+        let updatedAppointment = addNameAndAddressToAppointment(appointment);
+        if (updatedAppointment && isAppointment(updatedAppointment)) {
+            updatedAppointment = addLocaleDates(updatedAppointment);
+        }
+        return updatedAppointment;
     } catch (err) {
         return new AppointmentOperationError(
             `Error while retrieving appointment ${appointmentId}`,
@@ -302,7 +345,9 @@ export async function appointment_findbyId(
 export async function appointment_update(
     id: string,
     { ...args }: Omit<Partial<Appointment>, 'id' | 'updatedAt' | 'createdAt'>
-): Promise<TAppointment | AppointmentOperationError> {
+): Promise<
+    TAppointmentWithCustomerNameAndFullAddress | AppointmentOperationError
+> {
     try {
         const existingAppointment = await appointment_findbyId(id);
 
@@ -325,7 +370,7 @@ export async function appointment_update(
             throw timeConflictExists;
         }
 
-        const updatedAppointment = await prisma.appointment.update({
+        let updatedAppointment = await prisma.appointment.update({
             where: { id },
             data: { ...args },
         });
@@ -334,7 +379,11 @@ export async function appointment_update(
             throw new Error(`appointment with ID ${id} not updated.`);
         }
 
-        return addLocaleDates(updatedAppointment);
+        updatedAppointment = addNameAndAddressToAppointment(updatedAppointment);
+        if (updatedAppointment && isAppointment(updatedAppointment)) {
+            updatedAppointment = addLocaleDates(updatedAppointment);
+        }
+        return updatedAppointment;
     } catch (err) {
         if (err instanceof AppointmentOperationError) {
             return err;
@@ -366,13 +415,27 @@ export async function appointment_delete(appointmentId: string) {
     }
 }
 
+// helpers
+function addNameAndAddressToAppointment(
+    appointment: TAppointmentWithCustomerNameAndFullAddress
+) {
+    let updatedAppointment = addFullName(appointment);
+
+    if ('address' in updatedAppointment) {
+        updatedAppointment = addFullAddress(updatedAppointment);
+    }
+
+    if (isAppointment(updatedAppointment)) return updatedAppointment;
+    return appointment;
+}
+
 function addLocaleDates(appointment: TAppointment): TAppointment {
     const localTime = {
-        start: dates.formatDate(new Date(appointment.start)),
-        end: dates.formatDate(new Date(appointment.end)),
+        start: dates.localTimeStringFromDate(appointment.start),
+        end: dates.localTimeStringFromDate(appointment.end),
         completedAt:
             appointment.completed && appointment.completedAt
-                ? dates.formatDate(appointment.completedAt)
+                ? dates.localTimeStringFromDate(appointment.completedAt)
                 : '',
     };
     return { ...appointment, localTime };

@@ -1,16 +1,12 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { addFullAddress, addFullName, dates, isAppointment } from '@functions';
+import { addFullAddress, addFullName, dates, isAppointment, log } from '@functions';
 import { TAppointmentWithCustomerNameAndFullAddress } from '@types';
 
-export type CalendarAppointment = {
-    time: string;
-    appointment: TAppointmentWithCustomerNameAndFullAddress | null;
-};
 export type CalendarDayType = {
     date: string;
     dayName: string;
     dayNumber: string;
-    data: CalendarAppointment[];
+    slots: Record<string, TAppointmentWithCustomerNameAndFullAddress | null>;
 };
 export type CalendarWeekType = CalendarDayType[];
 export type CalendarMonthType = CalendarDayType[][];
@@ -23,14 +19,15 @@ export type CalendarType =
 type AppointmentContextType = {
     currentAppointment: null | TAppointmentWithCustomerNameAndFullAddress;
     setAppointments: (
-        appointmentsArray: TAppointmentWithCustomerNameAndFullAddress[]
+        appointments: Record<string, Record<string, TAppointmentWithCustomerNameAndFullAddress>>
     ) => void;
-    setAppointment: (appointmentId?: string) => void;
+    setAppointment: (appointment: TAppointmentWithCustomerNameAndFullAddress) => void;
     setAppointmentProviderDate: (date: Date) => void;
-    appointmentsData: TAppointmentWithCustomerNameAndFullAddress[];
-    appointmentsForToday: TAppointmentWithCustomerNameAndFullAddress[];
-    appointmentsForWeek: TAppointmentWithCustomerNameAndFullAddress[];
-    appointmentsForMonth: TAppointmentWithCustomerNameAndFullAddress[];
+    appointmentsList: TAppointmentWithCustomerNameAndFullAddress[];
+    appointmentsData: Record<string, Record<string, TAppointmentWithCustomerNameAndFullAddress>>;
+    // appointmentsForToday: TAppointmentWithCustomerNameAndFullAddress[];
+    // appointmentsForWeek: TAppointmentWithCustomerNameAndFullAddress[];
+    // appointmentsForMonth: TAppointmentWithCustomerNameAndFullAddress[];
     timeSlotsForToday: CalendarDayType;
     timeSlotsForWeek: CalendarWeekType;
     timeSlotsForMonth: CalendarMonthType;
@@ -51,32 +48,32 @@ export function AppointmentProvider({
     const [currentDate, setCurrentDate] = useState(today);
     const [currentAppointment, setCurrentAppointment] =
         useState<null | TAppointmentWithCustomerNameAndFullAddress>(null);
-    const [appointmentsList, setAppointmentsList] = useState<
-        TAppointmentWithCustomerNameAndFullAddress[]
-    >([]);
-    const appointmentsForToday = useMemo(
-        () => getVisibleAppointmentsForDay(currentDate),
-        [currentDate]
-    );
-    const appointmentsForWeek = useMemo(
-        () => getVisibleAppointmentsForWeek(currentDate),
-        [currentDate]
-    );
-    const appointmentsForMonth = useMemo(
-        () => getVisibleAppointmentsForMonth(currentDate),
-        [currentDate]
-    );
+    const [appointmentsData, setAppointmentsData] = useState<
+    Record<string, Record<string, TAppointmentWithCustomerNameAndFullAddress>>
+    >({});
+    // const appointmentsForToday = useMemo(
+    //     () => getVisibleAppointmentsForDay(currentDate),
+    //     [currentDate]
+    // );
+    // const appointmentsForWeek = useMemo(
+    //     () => getVisibleAppointmentsForWeek(currentDate),
+    //     [currentDate]
+    // );
+    // const appointmentsForMonth = useMemo(
+    //     () => getVisibleAppointmentsForMonth(currentDate),
+    //     [currentDate]
+    // );
     const timeSlotsForToday = useMemo(
-        () => getDayTimeSlots(currentDate, appointmentsForToday),
-        [currentDate, appointmentsForToday]
+        () => getDayTimeSlots(currentDate),
+        [currentDate]
     );
     const timeSlotsForWeek = useMemo(
-        () => getWeekTimeSlots(currentDate, appointmentsForWeek),
-        [currentDate, appointmentsForWeek]
+        () => getWeekTimeSlots(currentDate),
+        [currentDate]
     );
     const timeSlotsForMonth = useMemo(
-        () => getMonthTimeSlots(currentDate, appointmentsForMonth),
-        [currentDate, appointmentsForMonth]
+        () => getMonthTimeSlots(currentDate),
+        [currentDate]
     );
 
     // TODO: USER OBJ NEEDS TO BE SET UP
@@ -88,6 +85,15 @@ export function AppointmentProvider({
     //   }
     //   setUserPreferences()
     // }, [userObj])
+    const appointmentsList = useMemo(() => {
+        const appointmentArray: TAppointmentWithCustomerNameAndFullAddress[] = [];
+        for(const key in appointmentsData){
+            for(const time in appointmentsData[key]){
+                appointmentArray.push(appointmentsData[key][time])
+            }
+        }
+        return appointmentArray;
+    }, [appointmentsData])
 
     function setAppointmentProviderDate(date: Date) {
         date = dates.parseDate(date);
@@ -95,90 +101,47 @@ export function AppointmentProvider({
     }
 
     function setAppointments(
-        appointmentsArray: TAppointmentWithCustomerNameAndFullAddress[]
+        data: Record<string, Record<string, TAppointmentWithCustomerNameAndFullAddress>>
     ) {
-        setAppointmentsList(appointmentsArray);
+        setAppointmentsData(data);
     }
 
-    const appointmentsData = useMemo(() => {
-        return appointmentsList.reduce<
-            TAppointmentWithCustomerNameAndFullAddress[]
-        >((acc, appointment) => {
-            let updatedAppointment = addFullName(appointment);
-
-            if ('address' in updatedAppointment) {
-                updatedAppointment = addFullAddress(updatedAppointment);
-            }
-
-            if (isAppointment(updatedAppointment)) {
-                acc.push(updatedAppointment);
-            }
-            return acc;
-        }, []);
-    }, [appointmentsList]);
-
-    useEffect(() => {}, [appointmentsData]);
-
-    function setAppointment(appointmentId?: string) {
-        let data = null;
-        if (appointmentId && appointmentsList) {
-            data =
-                appointmentsList.find(
-                    (appointment) => appointment.id === appointmentId
-                ) ?? null;
-        }
-        setCurrentAppointment(data);
+    function setAppointment(appointment: TAppointmentWithCustomerNameAndFullAddress) {
+        setCurrentAppointment(appointment);
     }
     /**
      * Gets the calendar data for a day separated into timeslots of 15 min,
      *
      * @param selectedDate - The selected date.
      * @param appointments - The list of appointments.
-     * @returns CalendarDayType - {date: date, dayname: string, data: calendar data}.
+     * @returns CalendarDayType - {date: date, dayname: string, slots: 15 min slots}.
      */
 
     function getDayTimeSlots(
         selectedDate: Date,
-        appointments: TAppointmentWithCustomerNameAndFullAddress[] = appointmentsList
     ): CalendarDayType {
-        const calendarData: {
-            time: string;
-            appointment: TAppointmentWithCustomerNameAndFullAddress | null;
-        }[] = [];
-        const timeStringToCompare = new Date(selectedDate);
-
+        const calendarData: Record<string, TAppointmentWithCustomerNameAndFullAddress | null> = {};
+        selectedDate = dates.parseDate(selectedDate);
+        const selectedDateString = selectedDate.toLocaleString();
+        const dayKey = dates.localDateStringFromDate(selectedDate);
+        const appointments = {...appointmentsData}
+        const dayAppointments = appointments[dayKey] || {};
         for (let i = DAYSTART; i < DAYEND; i++) {
-            const hour = i < 10 ? `0${i}` : `${i}`;
-
+            const hour = i.toString().padStart(2, '0');
+    
             for (let j = 0; j < 60; j += 15) {
-                const minute = j < 10 ? `0${j}` : `${j}`;
+                const minute = j.toString().padStart(2, '0');
                 const timeString = `${hour}:${minute}`;
-
-                const appointment =
-                    appointments.find((apt) => {
-                        const appointmentStart = new Date(apt.start);
-                        const appointmentEnd = new Date(apt.end);
-
-                        timeStringToCompare.setHours(i, j, 0, 0);
-
-                        return (
-                            appointmentStart <= timeStringToCompare &&
-                            appointmentEnd > timeStringToCompare
-                        );
-                    }) || null;
-
-                calendarData.push({
-                    time: timeString,
-                    appointment: appointment ?? null,
-                });
+                const appointment = dayAppointments[timeString] || null;
+    
+                calendarData[timeString] = appointment;
             }
         }
-
         return {
             dayNumber: `${dates.dayNumberFromDate(selectedDate)}`,
-            date: timeStringToCompare.toLocaleString(),
+            date: selectedDateString,
             dayName: dates.getDayName(selectedDate),
-            data: calendarData,
+            slots: calendarData,
         };
     }
 
@@ -192,13 +155,12 @@ export function AppointmentProvider({
      */
     function getWeekTimeSlots(
         selectedDate: Date,
-        appointments: TAppointmentWithCustomerNameAndFullAddress[] = appointmentsList
     ): CalendarWeekType {
         const calendar: CalendarDayType[] = [];
         let currentDate = new Date(selectedDate);
 
         for (let d = 0; d < 7; d++) {
-            const dayData = getDayTimeSlots(currentDate, appointments);
+            const dayData = getDayTimeSlots(currentDate);
             calendar.push(dayData);
             currentDate = dates.incrementDayByOne(currentDate);
         }
@@ -210,13 +172,12 @@ export function AppointmentProvider({
      * the days will always start on a sunday and end on a saturday
      *
      * @param selectedDate - The selected date within the month.
-     * @param appointments - The list of appointments.
      * @returns The calendar data for the month.
      */
     function getMonthTimeSlots(
         selectedDate: Date,
-        appointments: TAppointmentWithCustomerNameAndFullAddress[] = appointmentsList
     ): CalendarMonthType {
+        console.time("get-month")
         const calendar: CalendarWeekType[] = [];
         const currentDate = dates.parseDate(selectedDate);
         const firstDayOfMonth = new Date(
@@ -240,78 +201,65 @@ export function AppointmentProvider({
         const numberOfWeeks = Math.ceil(totalDays / 7);
 
         for (let week = 0; week < numberOfWeeks; week++) {
-            const calendarWeek: CalendarWeekType = [];
-
-            for (let day = 0; day < 7; day++) {
-                const calendarDay = getDayTimeSlots(startDate, appointments);
-                calendarWeek.push(calendarDay);
-
-                startDate = dates.incrementDayByOne(startDate);
-            }
-
+            const calendarWeek: CalendarWeekType = getWeekTimeSlots(startDate);
+            startDate = dates.calculateFutureDate(startDate, 6);
             calendar.push(calendarWeek);
         }
+        console.timeEnd("get-month")
         return calendar;
     }
 
-    function getVisibleAppointmentsForDay(selectedDate: Date) {
-        if (!appointmentsList.length) return [];
-        const day = new Date(selectedDate);
-        const appointmentData = appointmentsList.filter((appointment) => {
-            const appointmentDate = new Date(appointment.start);
+    // function getVisibleAppointmentsForDay(selectedDate: Date) {
+    //     const timeSlots = getDayTimeSlots(selectedDate);
 
-            return (
-                appointmentDate.getDate() === day.getDate() &&
-                appointmentDate.getMonth() === day.getMonth() &&
-                appointmentDate.getFullYear() === day.getFullYear()
-            );
-        });
-        return appointmentData;
-    }
+    //     const appointmentData = Object.values(timeSlots.slots).filter(appointment => appointment !== null);
 
-    function getVisibleAppointmentsForWeek(selectedStartDate: Date) {
-        if (!appointmentsList.length) return [];
+    //     return appointmentData;
+    // }
 
-        const startOfWeek = new Date(selectedStartDate);
-        const selectedEndDate = new Date(startOfWeek);
-        selectedEndDate.setDate(startOfWeek.getDate() + 6);
+    // function getVisibleAppointmentsForWeek(selectedStartDate: Date) {
+    //     if (!appointmentsList.length) return [];
 
-        const appointmentData = appointmentsList.filter((appointment) => {
-            const appointmentDate = new Date(appointment.start);
-            return (
-                appointmentDate >= startOfWeek &&
-                appointmentDate <= selectedEndDate
-            );
-        });
-        return appointmentData;
-    }
+    //     const startOfWeek = dates.parseDate(selectedStartDate);
+    //     const selectedEndDate = dates.calculateFutureDate(startOfWeek, 6);
+    //     const timeSlots = getWeekTimeSlots(startOfWeek);
 
-    function getVisibleAppointmentsForMonth(dateWithinMonth: Date) {
-        if (!appointmentsList.length) return [];
+    //     const appointmentData = appointmentsList.filter((appointment) => {
+    //         const appointmentDate = new Date(appointment.start);
+    //         return (
+    //             appointmentDate >= startOfWeek &&
+    //             appointmentDate <= selectedEndDate
+    //         );
+    //     });
+    //     return appointmentData;
+    // }
 
-        const startDate = dates.parseDate(dateWithinMonth);
+    // function getVisibleAppointmentsForMonth(dateWithinMonth: Date) {
+    //     if (!appointmentsList.length) return [];
 
-        // Check if the start date is not a Sunday, and adjust it to the nearest Sunday
-        if (startDate.getDay() !== 0) {
-            const nearestSunday = dates.startOfWeek(startDate).getTime();
-            startDate.setTime(nearestSunday);
-        }
+    //     const startDate = dates.parseDate(dateWithinMonth);
 
-        // Calculate the end date by getting the end of the week for the last day of the month
-        const lastDay = new Date(
-            startDate.getFullYear(),
-            startDate.getMonth() + 1,
-            0
-        );
-        const endDate = dates.endOfWeek(lastDay);
+    //     // Check if the start date is not a Sunday, and adjust it to the nearest Sunday
+    //     if (startDate.getDay() !== 0) {
+    //         const nearestSunday = dates.startOfWeek(startDate).getTime();
+    //         startDate.setTime(nearestSunday);
+    //     }
 
-        const appointmentData = appointmentsList.filter((appointment) => {
-            const appointmentDate = new Date(appointment.start);
+    //     // Calculate the end date by getting the end of the week for the last day of the month
+    //     const lastDay = new Date(
+    //         startDate.getFullYear(),
+    //         startDate.getMonth() + 1,
+    //         0
+    //     );
+    //     const endDate = dates.endOfWeek(lastDay);
 
-            return appointmentDate >= startDate && appointmentDate <= endDate;
-        });
-        return appointmentData;
-    }
+    //     const appointmentData = appointmentsList.filter((appointment) => {
+    //         const appointmentDate = new Date(appointment.start);
+
+    //         return appointmentDate >= startDate && appointmentDate <= endDate;
+    //     });
+    //     return appointmentData;
+    // }
 
     const value = {
         currentAppointment,
@@ -319,9 +267,10 @@ export function AppointmentProvider({
         setAppointment,
         setAppointmentProviderDate,
         appointmentsData,
-        appointmentsForToday,
-        appointmentsForWeek,
-        appointmentsForMonth,
+        appointmentsList,
+        // appointmentsForToday,
+        // appointmentsForWeek,
+        // appointmentsForMonth,
         timeSlotsForToday,
         timeSlotsForWeek,
         timeSlotsForMonth,

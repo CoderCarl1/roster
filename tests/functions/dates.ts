@@ -42,13 +42,13 @@ describe('DATE FUNCTIONS', () => {
             );
         });
     });
-    describe('formatDate', () => {
-        const { formatDate } = dates;
+    describe('localTimeStringFromDate', () => {
+        const { localTimeStringFromDate } = dates;
         test('should return a string in the format of hh:mm in 24hour time', () => {
             const input = new Date(2022, 1, 1, 12, 34);
             const hours = input.getHours();
             const minutes = input.getMinutes();
-            const result = formatDate(input);
+            const result = localTimeStringFromDate(input);
 
             expect(typeof result).toBe('string');
             expect(result.split(':').length).toBe(2);
@@ -445,8 +445,6 @@ describe('DATE FUNCTIONS', () => {
 });
 
 function formatDate(date: Date) {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-        2,
-        '0'
-    )}-${String(date.getDate()).padStart(2, '0')}`;
+    const options: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: false };
+    return date.toLocaleTimeString(undefined, options);
 }
