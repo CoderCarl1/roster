@@ -40,6 +40,8 @@ export const monthNames = [
     'December',
 ];
 
+const padZero = (value: number): string => (value < 10 ? `0${value}` : `${value}`);
+
 /**
  * Parses a date or date string and returns a valid Date object.
  *
@@ -54,53 +56,51 @@ export function parseDate(possibleDate: unknown): Date {
         throw new Error('Invalid date type provided.');
     }
 
-    if (typeof possibleDate === 'string') {
-        if (isNaN(Date.parse(possibleDate))) {
-            throw new Error('Invalid date string provided.');
+    try {
+        const dateObj = new Date(possibleDate);
+        if (isNaN(dateObj.getTime())) {
+            throw new Error('Invalid date provided.');
         }
+        return dateObj;
+    } catch (error) {
+        throw new Error('Invalid date string or date provided.');
     }
-
-    const dateObj = new Date(possibleDate);
-
-    if (isNaN(dateObj.getTime())) {
-        throw new Error('Invalid date provided.');
-    }
-
-    return dateObj;
 }
 
 export function humanReadable(date: Date | string): string {
     date = parseDate(date);
 
     const options: Intl.DateTimeFormatOptions = {
-        // year: 'numeric',
         month: 'long',
         day: 'numeric',
-        // hour: 'numeric',
-        // minute: 'numeric',
-        // second: 'numeric',
-        // hour12: false,
-        // timeZoneName: 'short',
     };
 
     return date.toLocaleString(undefined, options);
 }
-export function formatDate(date: Date | string): string {
+
+export const localDateStringFromDate = (date: Date| string): string => {
     date = parseDate(date);
+    const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: '2-digit' };
+    return date.toLocaleDateString(undefined, options);
+};
 
-    const options: Intl.DateTimeFormatOptions = {
-        // year: 'numeric',
-        // month: 'long',
-        // day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        // second: 'numeric',
-        hour12: false, // Use 24-hour format
-        // timeZoneName: 'short',
-    };
+export const localTimeStringFromDate = (date: Date | string): string => {
+    date = parseDate(date);
+    const options: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: false };
+    return date.toLocaleTimeString(undefined, options);
+};
 
-    return date.toLocaleString(undefined, options);
-}
+// export function formatDate(date: Date | string): string {
+//     date = parseDate(date);
+
+//     const options: Intl.DateTimeFormatOptions = {
+//         hour: 'numeric',
+//         minute: 'numeric',
+//         hour12: false, // Use 24-hour format
+//     };
+
+//     return date.toLocaleString(undefined, options);
+// }
 
 export function dayNumberFromDate(dateString: Date | string) {
     const date = parseDate(dateString);
@@ -440,9 +440,10 @@ export default {
     calculateFutureDate,
     calculatePastDate,
     dateParts,
+    localDateStringFromDate,
     dayNumberFromDate,
     endOfWeek,
-    formatDate,
+    // formatDate,
     getDateRange,
     getDayName,
     getDaysInMonth,
@@ -456,4 +457,5 @@ export default {
     incrementDayByOne,
     parseDate,
     startOfWeek,
+    localTimeStringFromDate,
 };
