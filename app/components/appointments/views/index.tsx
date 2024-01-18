@@ -10,21 +10,19 @@ const AppointmentCalendar = {
     month: MonthView,
     list: ListView,
 };
-type AppointmentViewTypes = 'list' | 'day' | 'week' | 'month';
+export type AppointmentViewTypes = 'list' | 'day' | 'week' | 'month';
 
 type AppointmentViewProps = {
-    type: AppointmentViewTypes;
+    displayType: AppointmentViewTypes;
 } & React.HTMLProps<HTMLDivElement>;
 
 export default function AppointmentView({
-    type = 'day',
+    displayType = 'day',
     ...props
 }: AppointmentViewProps) {
-    const ViewComponent = AppointmentCalendar[type];
+    const ViewComponent = AppointmentCalendar[displayType];
 
     return (
-        <AppointmentProvider>
             <ViewComponent {...props} />
-        </AppointmentProvider>
     );
 }

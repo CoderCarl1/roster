@@ -431,6 +431,7 @@ function addNameAndAddressToAppointment(
 
 function addLocaleDates(appointment: TAppointment): TAppointment {
     const localTime = {
+        date: dates.localDateStringFromDate(appointment.start),
         start: dates.localTimeStringFromDate(appointment.start),
         end: dates.localTimeStringFromDate(appointment.end),
         completedAt:

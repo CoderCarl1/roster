@@ -15,19 +15,17 @@ import {
 } from '@types';
 
 // import Calendar from '../../components/calendar/calendar';
-import { useAppointments } from '~/components/appointments/appointment.hooks';
-import { SearchBar } from '~/components/general';
-import DatePicker from '../../components/calendar/DatePicker';
+import { AppointmentProvider, useAppointments } from '~/components/appointments/appointment.hooks';
 import Table, { Caption, Row, TD, TH } from '../../components/table/table';
+import AppointmentView, { AppointmentViewTypes } from '~/components/appointments/views';
+import Appointment_Controls from '~/components/appointments/components/Appointment_controls';
 
-export type displayTypeEnum = 'day' | 'week' | 'month' | 'appointments';
 
-function Main(
-    props: React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement>,
-        HTMLElement
-    >
-) {
+type appointmentPageProps = {
+    displayType: AppointmentViewTypes;
+} & React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+
+function Main({ displayType = 'day', ...props }: appointmentPageProps) {
     const data = useLoaderData<homeLoaderDataType>();
 
     const {
@@ -38,31 +36,35 @@ function Main(
         appointmentsData,
         timeSlotsForMonth,
     } = useAppointments();
-    
+
     useEffect(() => {
-        
         const appointmentsLoaderData =
-        data.appointmentsLoaderData as unknown as Record<string, Record<string, TAppointmentWithCustomerNameAndFullAddress>>;
+            data.appointmentsLoaderData as unknown as Record<
+                string,
+                Record<string, TAppointmentWithCustomerNameAndFullAddress>
+            >;
         // console.log("data.appointmentsLoaderData initialk", appointmentsLoaderData)
         // setLoading(true);
         setAppointments(appointmentsLoaderData);
         // setLoading(false);
     }, []);
-    
-    useEffect(() => {
-        console.log("use effect in appointment page")
-        console.log("appointmentsList", appointmentsList && appointmentsList)
-        console.log("appointmentsData", appointmentsData && appointmentsData)
-        console.log("timeslotsForMonth",timeSlotsForMonth && timeSlotsForMonth)
 
-    }, [appointmentsList])
+    useEffect(() => {
+        console.log('use effect in appointment page');
+        console.log('appointmentsList', appointmentsList && appointmentsList);
+        console.log('appointmentsData', appointmentsData && appointmentsData);
+        console.log(
+            'timeslotsForMonth',
+            timeSlotsForMonth && timeSlotsForMonth
+        );
+    }, [appointmentsList]);
+
     return (
-        <>
-            {currentAppointment ? <p>
-                    current appointment is at {currentAppointment.fullAddress}
-                </p> : <p>no appointment selected</p>}
-            {appointmentsList ? <SearchBar appointmentsList={appointmentsList} /> : null}
-        </>
+        <AppointmentProvider>
+            <Appointment_Controls />
+            <AppointmentView displayType={displayType}/>
+        </AppointmentProvider>
+
     );
 
     // const { toggle: loading, setToggleStatus: setLoading } = useToggle(true);

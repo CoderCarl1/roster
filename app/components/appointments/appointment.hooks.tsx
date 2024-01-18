@@ -28,9 +28,9 @@ type AppointmentContextType = {
     // appointmentsForToday: TAppointmentWithCustomerNameAndFullAddress[];
     // appointmentsForWeek: TAppointmentWithCustomerNameAndFullAddress[];
     // appointmentsForMonth: TAppointmentWithCustomerNameAndFullAddress[];
-    timeSlotsForToday: CalendarDayType;
-    timeSlotsForWeek: CalendarWeekType;
-    timeSlotsForMonth: CalendarMonthType;
+    timeSlotsForToday: CalendarDayType | null;
+    timeSlotsForWeek: CalendarWeekType | null;
+    timeSlotsForMonth: CalendarMonthType | null;
 };
 const AppointmentContext = createContext<AppointmentContextType | null>(null);
 
@@ -64,16 +64,38 @@ export function AppointmentProvider({
     //     [currentDate]
     // );
     const timeSlotsForToday = useMemo(
-        () => getDayTimeSlots(currentDate),
-        [currentDate]
+        () => {
+            console.log("timeSlotsForToday use memo")
+         if(Object.keys(appointmentsData).length){
+            console.log("appointmentsData).length > 0")
+            return getDayTimeSlots(currentDate);
+         }  
+         return null
+        },
+        [currentDate, appointmentsData]
     );
     const timeSlotsForWeek = useMemo(
-        () => getWeekTimeSlots(currentDate),
-        [currentDate]
+        () => {
+            console.log("timeSlotsForWeek use memo")
+         if(Object.keys(appointmentsData).length){
+            console.log("appointmentsData).length > 0")
+            return getWeekTimeSlots(currentDate);
+         }  
+         return null
+        },
+        [currentDate, appointmentsData]
     );
     const timeSlotsForMonth = useMemo(
-        () => getMonthTimeSlots(currentDate),
-        [currentDate]
+        () => {
+            console.log("timeSlotsForMonth use memo")
+
+         if(Object.keys(appointmentsData).length){
+            console.log("appointmentsData).length > 0")
+            return getMonthTimeSlots(currentDate);
+         }  
+         return null
+        },
+        [currentDate, appointmentsData]
     );
 
     // TODO: USER OBJ NEEDS TO BE SET UP
@@ -97,6 +119,7 @@ export function AppointmentProvider({
 
     function setAppointmentProviderDate(date: Date) {
         date = dates.parseDate(date);
+        console.log("setting date to", date)
         setCurrentDate(date);
     }
 
@@ -124,8 +147,7 @@ export function AppointmentProvider({
         selectedDate = dates.parseDate(selectedDate);
         const selectedDateString = selectedDate.toLocaleString();
         const dayKey = dates.localDateStringFromDate(selectedDate);
-        const appointments = {...appointmentsData}
-        const dayAppointments = appointments[dayKey] || {};
+        const dayAppointments = appointmentsData[dayKey] || {};
         for (let i = DAYSTART; i < DAYEND; i++) {
             const hour = i.toString().padStart(2, '0');
     
@@ -133,7 +155,7 @@ export function AppointmentProvider({
                 const minute = j.toString().padStart(2, '0');
                 const timeString = `${hour}:${minute}`;
                 const appointment = dayAppointments[timeString] || null;
-    
+
                 calendarData[timeString] = appointment;
             }
         }
@@ -177,7 +199,6 @@ export function AppointmentProvider({
     function getMonthTimeSlots(
         selectedDate: Date,
     ): CalendarMonthType {
-        console.time("get-month")
         const calendar: CalendarWeekType[] = [];
         const currentDate = dates.parseDate(selectedDate);
         const firstDayOfMonth = new Date(
@@ -205,7 +226,6 @@ export function AppointmentProvider({
             startDate = dates.calculateFutureDate(startDate, 6);
             calendar.push(calendarWeek);
         }
-        console.timeEnd("get-month")
         return calendar;
     }
 

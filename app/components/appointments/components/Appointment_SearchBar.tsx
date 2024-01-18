@@ -1,30 +1,27 @@
 import { ElementRef, useEffect, useMemo, useRef, useState } from 'react';
 import { TAppointmentWithCustomerNameAndFullAddress } from '@types';
-import { debounce, joinClasses } from '~/functions';
+import { debounce, joinClasses } from '@functions';
 import UseClickOutside from '~/functions/helpers/useClickOutside';
 import {
     AppointmentProvider,
     useAppointments,
-} from '../appointments/appointment.hooks';
-import FilterBar from './FilterBar';
-import { Button } from '.';
+} from '../appointment.hooks';
+import FilterBar from '../../general/FilterBar';
+import { Button } from '../../general';
 
-type searchBarProps = {
-    appointmentsList: TAppointmentWithCustomerNameAndFullAddress[];
-} & React.HTMLProps<HTMLDivElement>;
+type searchBarProps = React.HTMLProps<HTMLDivElement>;
 
-export default function Main({ appointmentsList, ...props }: searchBarProps) {
+export default function Main({ ...props }: searchBarProps) {
     return (
         <AppointmentProvider>
-            <SearchBar appointmentsList={appointmentsList} {...props} />
+            <AppointmentSearchBar {...props} />
         </AppointmentProvider>
     );
 }
 
-function SearchBar({ appointmentsList, ...props }: searchBarProps) {
-    const [results, setResults] = useState<
-        TAppointmentWithCustomerNameAndFullAddress[]
-    >([]);
+function AppointmentSearchBar({ ...props }: searchBarProps) {
+    const [results, setResults] = useState<TAppointmentWithCustomerNameAndFullAddress[]>([]);
+    const {appointmentsList} = useAppointments();
     const [searchTerm, setSearchTerm] = useState('');
     const [focusedIndex, setFocusedIndex] = useState<number | null>(null); // Track the focused result index;
     const [searchIsCollapsed, setSearchIsCollapsed] = useState(true);

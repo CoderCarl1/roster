@@ -81,7 +81,8 @@ export function humanReadable(date: Date | string): string {
 export const localDateStringFromDate = (date: Date| string): string => {
     date = parseDate(date);
     const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: '2-digit' };
-    return date.toLocaleDateString(undefined, options);
+    const locale = 'en-AU'
+    return date.toLocaleDateString(locale, options);
 };
 
 export const localTimeStringFromDate = (date: Date | string): string => {

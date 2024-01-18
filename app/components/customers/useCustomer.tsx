@@ -21,7 +21,6 @@ function useCustomers() {
     }
 
     function setCustomers(customers: TCustomer[]) {
-        log('set customers invoked');
         setCustomersData(customers);
     }
 
