@@ -34,24 +34,34 @@ function Main(
         setAppointment,
         currentAppointment,
         setAppointments,
+        appointmentsList,
         appointmentsData,
+        timeSlotsForMonth,
     } = useAppointments();
-
+    
     useEffect(() => {
+        
         const appointmentsLoaderData =
-            data.appointmentsLoaderData as unknown as TAppointmentWithCustomerNameAndFullAddress[];
+        data.appointmentsLoaderData as unknown as Record<string, Record<string, TAppointmentWithCustomerNameAndFullAddress>>;
         // console.log("data.appointmentsLoaderData initialk", appointmentsLoaderData)
         // setLoading(true);
         setAppointments(appointmentsLoaderData);
         // setLoading(false);
     }, []);
-    useEffect(() => {}, [appointmentsData]);
+    
+    useEffect(() => {
+        console.log("use effect in appointment page")
+        console.log("appointmentsList", appointmentsList && appointmentsList)
+        console.log("appointmentsData", appointmentsData && appointmentsData)
+        console.log("timeslotsForMonth",timeSlotsForMonth && timeSlotsForMonth)
+
+    }, [appointmentsList])
     return (
         <>
             {currentAppointment ? <p>
                     current appointment is at {currentAppointment.fullAddress}
-                </p> : null}
-            {appointmentsData ? <SearchBar array={appointmentsData} /> : null}
+                </p> : <p>no appointment selected</p>}
+            {appointmentsList ? <SearchBar appointmentsList={appointmentsList} /> : null}
         </>
     );
 
@@ -166,57 +176,57 @@ function Main(
     // }
 }
 
-type appointmentProps = {
-    children?: React.ReactNode;
-} & React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+// type appointmentProps = {
+//     children?: React.ReactNode;
+// } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
-function Appointments({
-    children,
-    className = '',
-    ...props
-}: appointmentProps) {
-    const { appointmentsData, setAppointment } = useAppointments();
-    return (
-        <section {...props} className={'section-wrapper ' + className}>
-            {children}
+// function Appointments({
+//     children,
+//     className = '',
+//     ...props
+// }: appointmentProps) {
+//     const { appointmentsData, setAppointment } = useAppointments();
+//     return (
+//         <section {...props} className={'section-wrapper ' + className}>
+//             {children}
 
-            <Table>
-                <Caption>Appointments</Caption>
+//             <Table>
+//                 <Caption>Appointments</Caption>
 
-                <TH>Customer Name</TH>
-                <TH>Start</TH>
-                <TH>End</TH>
-                <TH>Recurring</TH>
-                <TH>Completed</TH>
+//                 <TH>Customer Name</TH>
+//                 <TH>Start</TH>
+//                 <TH>End</TH>
+//                 <TH>Recurring</TH>
+//                 <TH>Completed</TH>
 
-                {appointmentsData
-                    ? appointmentsData.map((appointment) => {
-                          const {
-                              id,
-                              fullName,
-                              start,
-                              end,
-                              recurring,
-                              completed,
-                          } = appointment;
+//                 {appointmentsData
+//                     ? appointmentsData.map((appointment) => {
+//                           const {
+//                               id,
+//                               fullName,
+//                               start,
+//                               end,
+//                               recurring,
+//                               completed,
+//                           } = appointment;
 
-                          return (
-                              <Row
-                                  key={id + fullName}
-                                  cb={() => setAppointment(id)}
-                              >
-                                  <TD>{fullName}</TD>
-                                  <TD>{dates.formatDate(start)}</TD>
-                                  <TD>{dates.formatDate(end)}</TD>
-                                  <TD>{recurring ? '🔁' : ''}</TD>
-                                  <TD>{completed ? '✅' : '❌'}</TD>
-                              </Row>
-                          );
-                      })
-                    : null}
-            </Table>
-        </section>
-    );
-}
+//                           return (
+//                               <Row
+//                                   key={id + fullName}
+//                                   cb={() => setAppointment(id)}
+//                               >
+//                                   <TD>{fullName}</TD>
+//                                   <TD>{dates.localTimeStringFromDate(start)}</TD>
+//                                   <TD>{dates.localTimeStringFromDate(end)}</TD>
+//                                   <TD>{recurring ? '🔁' : ''}</TD>
+//                                   <TD>{completed ? '✅' : '❌'}</TD>
+//                               </Row>
+//                           );
+//                       })
+//                     : null}
+//             </Table>
+//         </section>
+//     );
+// }
 
 export default Main;

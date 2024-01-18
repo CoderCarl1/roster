@@ -10,18 +10,18 @@ import FilterBar from './FilterBar';
 import { Button } from '.';
 
 type searchBarProps = {
-    array: TAppointmentWithCustomerNameAndFullAddress[];
+    appointmentsList: TAppointmentWithCustomerNameAndFullAddress[];
 } & React.HTMLProps<HTMLDivElement>;
 
-export default function Main({ array, ...props }: searchBarProps) {
+export default function Main({ appointmentsList, ...props }: searchBarProps) {
     return (
         <AppointmentProvider>
-            <SearchBar array={array} {...props} />
+            <SearchBar appointmentsList={appointmentsList} {...props} />
         </AppointmentProvider>
     );
 }
 
-function SearchBar({ array, ...props }: searchBarProps) {
+function SearchBar({ appointmentsList, ...props }: searchBarProps) {
     const [results, setResults] = useState<
         TAppointmentWithCustomerNameAndFullAddress[]
     >([]);
@@ -41,7 +41,7 @@ function SearchBar({ array, ...props }: searchBarProps) {
                     string,
                     TAppointmentWithCustomerNameAndFullAddress
                 >();
-                array.forEach((appointment) => {
+                appointmentsList.forEach((appointment) => {
                     const address = appointment.fullAddress?.toLowerCase();
                     const fullName = appointment.fullName?.toLowerCase() || '';
                     if (
@@ -52,7 +52,9 @@ function SearchBar({ array, ...props }: searchBarProps) {
                         filteredResultsMap.set(address, appointment);
                     }
                 });
-                const filteredArray = Array.from(filteredResultsMap.values());
+                const filteredArray = Array.from(filteredResultsMap.values()).sort((a, b) =>
+                (a?.fullName || '').localeCompare(b?.fullName || '')
+                );
                 if (filteredArray.length) {
                     setResults(filteredArray);
                 } else {
@@ -167,7 +169,7 @@ function AppointmentResultsBar({
                             'search-bar__results--result',
                             focusedIndex === index ? 'current' : ''
                         )}
-                        onClick={() => setAppointment(appointment.id)}
+                        onClick={() => setAppointment(appointment)}
                     >
                         <span className="result__name">
                             {appointment.fullName}
